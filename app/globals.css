@@ -1,7 +1,7 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap');
 @import url("../node_modules/tw-animate-css/dist/tw-animate.css");
 @import url("../node_modules/shadcn/dist/tailwind.css");
+@import "tailwindcss";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -50,6 +50,7 @@
 }
 
 :root {
+  --font-sans: 'Montserrat', sans-serif;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
@@ -118,6 +119,10 @@
   --sidebar-ring: oklch(0.556 0 0);
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -127,5 +132,10 @@
   }
   html {
     @apply font-sans;
+  }
+
+  /* Enhanced focus styles */
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-ring;
   }
 }

@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Wrench, Users, FileText, TrendingUp } from "lucide-react";
+import { Wrench, Users, FileText, TrendingUp, Plus, ArrowRight } from "lucide-react";
 import Link from "next/link";
 
 interface Stats {
@@ -23,6 +23,7 @@ export default function AdminDashboard() {
   const [recentTools, setRecentTools] = useState<
     Array<{ id: string; title: string; status: string; template_type: string; created_at: string }>
   >([]);
+  const [loading, setLoading] = useState(true);
   const supabase = createClient();
 
   useEffect(() => {
@@ -66,6 +67,7 @@ export default function AdminDashboard() {
         .limit(5);
 
       if (tools) setRecentTools(tools);
+      setLoading(false);
     }
     loadDashboard();
   }, []);
@@ -86,34 +88,67 @@ export default function AdminDashboard() {
     free_layout: "Layout Livre",
   };
 
-  const statusLabels: Record<string, { label: string; color: string }> = {
-    draft: { label: "Rascunho", color: "bg-gray-100 text-gray-600" },
-    published: { label: "Publicada", color: "bg-green-100 text-green-700" },
-    archived: { label: "Arquivada", color: "bg-yellow-100 text-yellow-700" },
+  const statusLabels: Record<string, { label: string; className: string }> = {
+    draft: { label: "Rascunho", className: "bg-gray-100 text-gray-600" },
+    published: { label: "Publicada", className: "bg-emerald-50 text-emerald-700" },
+    archived: { label: "Arquivada", className: "bg-amber-50 text-amber-700" },
+  };
+
+  const formatDate = (dateStr: string) => {
+    const date = new Date(dateStr);
+    return date.toLocaleDateString("pt-BR", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
   };
 
   return (
-    <div>
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-        <p className="text-gray-500 mt-1">Visão geral das suas ferramentas</p>
+    <div className="font-sans max-w-6xl mx-auto">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-10">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight" style={{ color: "#2D5A7B" }}>
+            Ola, Administrador!
+          </h1>
+          <p className="text-gray-500 mt-1 text-base">
+            Aqui esta o resumo das suas ferramentas
+          </p>
+        </div>
+        <Link
+          href="/admin/ferramentas/nova"
+          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-white text-sm font-semibold shadow-md hover:shadow-lg transition-all duration-200"
+          style={{ backgroundColor: "#2D5A7B" }}
+        >
+          <Plus className="w-4 h-4" />
+          Criar Ferramenta
+        </Link>
       </div>
 
-      {/* Stats cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      {/* Stat Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-10">
         {statCards.map((card) => (
-          <Card key={card.label}>
-            <CardContent className="pt-5 pb-4">
-              <div className="flex items-center gap-3">
+          <Card
+            key={card.label}
+            className="border border-gray-100 rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden"
+          >
+            <CardContent className="p-6">
+              <div className="flex flex-col items-start gap-4">
                 <div
-                  className="w-10 h-10 rounded-xl flex items-center justify-center"
-                  style={{ backgroundColor: `${card.color}15` }}
+                  className="w-12 h-12 rounded-full flex items-center justify-center"
+                  style={{ backgroundColor: `${card.color}14` }}
                 >
                   <card.icon className="w-5 h-5" style={{ color: card.color }} />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold">{card.value}</p>
-                  <p className="text-xs text-gray-500">{card.label}</p>
+                  <p className="text-3xl font-bold tracking-tight text-gray-900">
+                    {loading ? (
+                      <span className="inline-block w-10 h-8 bg-gray-100 rounded animate-pulse" />
+                    ) : (
+                      card.value
+                    )}
+                  </p>
+                  <p className="text-sm text-gray-500 mt-0.5">{card.label}</p>
                 </div>
               </div>
             </CardContent>
@@ -121,50 +156,90 @@ export default function AdminDashboard() {
         ))}
       </div>
 
-      {/* Recent tools */}
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="text-lg">Ferramentas Recentes</CardTitle>
+      {/* Recent Tools */}
+      <Card className="border border-gray-100 rounded-2xl shadow-sm">
+        <CardHeader className="flex flex-row items-center justify-between px-6 pt-6 pb-4">
+          <CardTitle className="text-lg font-semibold text-gray-900">
+            Ferramentas Recentes
+          </CardTitle>
           <Link
             href="/admin/ferramentas"
-            className="text-sm text-[#2D5A7B] hover:underline"
+            className="inline-flex items-center gap-1 text-sm font-medium hover:underline transition-colors"
+            style={{ color: "#2D5A7B" }}
           >
             Ver todas
+            <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </CardHeader>
-        <CardContent>
-          {recentTools.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">
-              <Wrench className="w-10 h-10 mx-auto mb-3 text-gray-300" />
-              <p>Nenhuma ferramenta criada ainda.</p>
+        <CardContent className="px-6 pb-6">
+          {loading ? (
+            <div className="space-y-3">
+              {[...Array(3)].map((_, i) => (
+                <div key={i} className="h-14 bg-gray-50 rounded-xl animate-pulse" />
+              ))}
+            </div>
+          ) : recentTools.length === 0 ? (
+            <div className="text-center py-14">
+              <div
+                className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
+                style={{ backgroundColor: "#2D5A7B14" }}
+              >
+                <Wrench className="w-7 h-7" style={{ color: "#2D5A7B" }} />
+              </div>
+              <p className="text-gray-900 font-medium mb-1">
+                Nenhuma ferramenta criada ainda
+              </p>
+              <p className="text-gray-500 text-sm mb-5">
+                Comece criando sua primeira ferramenta interativa.
+              </p>
               <Link
                 href="/admin/ferramentas/nova"
-                className="text-[#2D5A7B] hover:underline text-sm mt-2 inline-block"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-white text-sm font-semibold shadow-md hover:shadow-lg transition-all duration-200"
+                style={{ backgroundColor: "#2D5A7B" }}
               >
-                Criar sua primeira ferramenta
+                <Plus className="w-4 h-4" />
+                Criar Ferramenta
               </Link>
             </div>
           ) : (
-            <div className="space-y-3">
+            <div className="divide-y divide-gray-100">
               {recentTools.map((tool) => (
                 <Link
                   key={tool.id}
                   href={`/admin/ferramentas/${tool.id}`}
-                  className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition-colors"
+                  className="flex items-center justify-between py-3.5 px-3 -mx-3 rounded-xl hover:bg-gray-50 transition-colors group"
                 >
-                  <div>
-                    <p className="font-medium text-sm">{tool.title}</p>
-                    <p className="text-xs text-gray-500">
-                      {templateLabels[tool.template_type] || tool.template_type}
-                    </p>
+                  <div className="flex items-center gap-4 min-w-0">
+                    <div
+                      className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0"
+                      style={{ backgroundColor: "#2D5A7B10" }}
+                    >
+                      <FileText className="w-4 h-4" style={{ color: "#2D5A7B" }} />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium text-gray-900 truncate group-hover:text-[#2D5A7B] transition-colors">
+                        {tool.title}
+                      </p>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <span className="text-xs font-medium px-2 py-0.5 rounded-md bg-gray-100 text-gray-600">
+                          {templateLabels[tool.template_type] || tool.template_type}
+                        </span>
+                        <span className="text-xs text-gray-400">
+                          {formatDate(tool.created_at)}
+                        </span>
+                      </div>
+                    </div>
                   </div>
-                  <span
-                    className={`text-xs px-2 py-1 rounded-full ${
-                      statusLabels[tool.status]?.color || ""
-                    }`}
-                  >
-                    {statusLabels[tool.status]?.label || tool.status}
-                  </span>
+                  <div className="flex items-center gap-3 flex-shrink-0">
+                    <span
+                      className={`text-xs font-medium px-2.5 py-1 rounded-full ${
+                        statusLabels[tool.status]?.className || "bg-gray-100 text-gray-600"
+                      }`}
+                    >
+                      {statusLabels[tool.status]?.label || tool.status}
+                    </span>
+                    <ArrowRight className="w-4 h-4 text-gray-300 group-hover:text-[#2D5A7B] transition-colors" />
+                  </div>
                 </Link>
               ))}
             </div>
