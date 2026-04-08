@@ -3,9 +3,13 @@ import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
-});
+function getAnthropicClient() {
+  const apiKey = process.env.ANTHROPIC_API_KEY;
+  if (!apiKey) {
+    throw new Error("ANTHROPIC_API_KEY não configurada no servidor.");
+  }
+  return new Anthropic({ apiKey });
+}
 
 const SYSTEM_PROMPT = `Você é um assistente especialista em criar ferramentas interativas para workshops e mentorias na plataforma Individuando.
 
@@ -157,6 +161,8 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
+
+    const anthropic = getAnthropicClient();
 
     const response = await anthropic.messages.create({
       model: "claude-sonnet-4-20250514",

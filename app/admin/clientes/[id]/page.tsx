@@ -306,6 +306,22 @@ export default function EditClientPage({
 
               <div className="flex items-center justify-between rounded-lg border p-4">
                 <div>
+                  <Label htmlFor="showNameInHeader" className="text-sm font-medium">
+                    Exibir nome no header
+                  </Label>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    Quando a logo já contém o nome, pode desativar.
+                  </p>
+                </div>
+                <Switch
+                  id="showNameInHeader"
+                  checked={brand.showNameInHeader !== false}
+                  onCheckedChange={(v) => updateBrand("showNameInHeader", v)}
+                />
+              </div>
+
+              <div className="flex items-center justify-between rounded-lg border p-4">
+                <div>
                   <Label htmlFor="showPartnerLogo" className="text-sm font-medium">
                     Mostrar logo parceiro
                   </Label>
@@ -532,15 +548,20 @@ export default function EditClientPage({
 
               <Separator />
 
-              <a
-                href="https://www.canva.com/design?create&type=TAB-wLJNniQ&w=1200&h=200"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-lg bg-[#7B2FBE] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#6a28a6]"
-              >
-                <ExternalLink className="h-4 w-4" />
-                Criar Header no Canva
-              </a>
+              <div className="space-y-2">
+                <p className="text-xs text-muted-foreground">
+                  Dica: crie um banner de header personalizado no Canva com tamanho 1200×200px e faça upload acima.
+                </p>
+                <a
+                  href="https://www.canva.com/design/create/custom?width=1200&height=200"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 rounded-lg bg-[#7B2FBE] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#6a28a6]"
+                >
+                  <ExternalLink className="h-4 w-4" />
+                  Criar Header no Canva (1200×200)
+                </a>
+              </div>
             </CardContent>
           </Card>
 
@@ -645,7 +666,7 @@ export default function EditClientPage({
                         <img
                           src={logoUrl}
                           alt="Logo"
-                          className="h-8 w-8 object-contain"
+                          className="h-10 object-contain max-w-[120px]"
                         />
                       ) : (
                         <div
@@ -655,12 +676,14 @@ export default function EditClientPage({
                           {name ? name.charAt(0).toUpperCase() : "C"}
                         </div>
                       )}
-                      <span
-                        style={{ fontWeight: Number(brand.headingWeight) }}
-                        className="text-sm"
-                      >
-                        {name || "Nome do Cliente"}
-                      </span>
+                      {brand.showNameInHeader !== false && (
+                        <span
+                          style={{ fontWeight: Number(brand.headingWeight) }}
+                          className="text-sm"
+                        >
+                          {name || "Nome do Cliente"}
+                        </span>
+                      )}
                     </div>
                     {showPartnerLogo && partnerLogoUrl && (
                       <img
