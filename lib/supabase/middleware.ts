@@ -32,12 +32,12 @@ export async function updateSession(request: NextRequest) {
   // Rotas protegidas: /admin/*
   if (!user && request.nextUrl.pathname.startsWith("/admin")) {
     const url = request.nextUrl.clone();
-    url.pathname = "/login";
+    url.pathname = "/auth/login";
     return NextResponse.redirect(url);
   }
 
-  // Se logado e acessando /login, redirecionar para admin
-  if (user && request.nextUrl.pathname === "/login") {
+  // Se logado e acessando /auth/login, redirecionar para admin
+  if (user && request.nextUrl.pathname === "/auth/login") {
     const url = request.nextUrl.clone();
     url.pathname = "/admin";
     return NextResponse.redirect(url);
