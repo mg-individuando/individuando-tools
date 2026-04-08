@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { toast } from "sonner";
 
@@ -13,9 +14,42 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [view, setView] = useState<View>("login");
+  const [checkingRecovery, setCheckingRecovery] = useState(true);
+  const router = useRouter();
   const [resetSent, setResetSent] = useState(false);
 
   const supabase = createClient();
+
+  // Detecta token de recovery no hash da URL (ex: #access_token=...&type=recovery)
+  useEffect(() => {
+    async function handleRecoveryToken() {
+      const hash = window.location.hash;
+      if (hash && hash.includes("type=recovery")) {
+        // O Supabase já seta a sessão automaticamente via o hash
+        // Aguarda um momento para a sessão ser processada
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
+          router.push("/auth/update-password");
+          return;
+        }
+        // Se não pegou a sessão ainda, tenta via onAuthStateChange
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+          if (event === "PASSWORD_RECOVERY" && session) {
+            subscription.unsubscribe();
+            router.push("/auth/update-password");
+          }
+        });
+        // Timeout: se não funcionar em 3s, mostra a tela normal
+        setTimeout(() => {
+          subscription.unsubscribe();
+          setCheckingRecovery(false);
+        }, 3000);
+        return;
+      }
+      setCheckingRecovery(false);
+    }
+    handleRecoveryToken();
+  }, []);
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
@@ -143,6 +177,20 @@ export default function LoginPage() {
 
   const inputClass =
     "w-full rounded-xl border border-gray-200 bg-gray-50/50 px-4 py-3 text-sm text-gray-900 placeholder:text-gray-300 focus:border-[#2D5A7B] focus:ring-2 focus:ring-[#2D5A7B]/10 focus:bg-white outline-none transition-all font-sans";
+
+  // Mostra loading enquanto verifica token de recovery
+  if (checkingRecovery) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-slate-50 to-white">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-14 h-14 rounded-2xl bg-[#2D5A7B] flex items-center justify-center shadow-lg shadow-[#2D5A7B]/20 animate-pulse">
+            <span className="text-white font-bold text-2xl font-sans">I</span>
+          </div>
+          <p className="text-sm text-gray-400 font-sans">Carregando...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-slate-50 to-white px-4">
