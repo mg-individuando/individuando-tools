@@ -489,13 +489,13 @@ export default function NovoClientePage() {
                   Dica: crie um banner de header personalizado no Canva com tamanho 1200×200px e faça upload acima.
                 </p>
                 <a
-                  href="https://www.canva.com/design/create/custom?width=1200&height=200"
+                  href="https://www.canva.com/create/banners/"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 rounded-lg bg-[#7B2FBE] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#6a28a6]"
                 >
                   <ExternalLink className="h-4 w-4" />
-                  Criar Header no Canva (1200×200)
+                  Abrir Canva — Criar Banner
                 </a>
               </div>
             </CardContent>

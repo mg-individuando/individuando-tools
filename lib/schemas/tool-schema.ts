@@ -77,6 +77,16 @@ export const TemplateType = z.enum([
   "blank",
 ]);
 
+// Campo customizado de identificação
+export const IdentificationFieldSchema = z.object({
+  id: z.string(),
+  label: z.string(),
+  placeholder: z.string().optional(),
+  required: z.boolean().default(false),
+  type: z.enum(["text", "dropdown"]).default("text"),
+  options: z.array(z.string()).optional(), // para dropdown
+});
+
 // Configurações da ferramenta
 export const ToolSettingsSchema = z.object({
   requireName: z.boolean().default(true),
@@ -86,6 +96,8 @@ export const ToolSettingsSchema = z.object({
   confirmationMessage: z
     .string()
     .default("Obrigado por preencher! Suas respostas foram salvas."),
+  welcomeMessage: z.string().optional(),
+  identificationFields: z.array(IdentificationFieldSchema).optional(),
 });
 
 // Types exportados
@@ -95,4 +107,5 @@ export type Section = z.infer<typeof SectionSchema>;
 export type Theme = z.infer<typeof ThemeSchema>;
 export type ToolSchema = z.infer<typeof ToolSchemaDefinition>;
 export type TemplateType = z.infer<typeof TemplateType>;
+export type IdentificationField = z.infer<typeof IdentificationFieldSchema>;
 export type ToolSettings = z.infer<typeof ToolSettingsSchema>;

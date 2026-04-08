@@ -16,7 +16,7 @@ import BuilderPanel from "@/components/builder/BuilderPanel";
 import { QRCodeSVG } from "qrcode.react";
 import { toast } from "sonner";
 import type { Tool } from "@/lib/schemas/types";
-import type { ToolSchema, ToolSettings } from "@/lib/schemas/tool-schema";
+import type { ToolSchema, ToolSettings, IdentificationField } from "@/lib/schemas/tool-schema";
 import {
   ArrowLeft,
   Copy,
@@ -31,6 +31,8 @@ import {
   MessageCircle,
   Download,
   Send,
+  Plus,
+  Trash2,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -506,11 +508,39 @@ export default function EditToolPage({
 
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Comportamento</CardTitle>
+              <CardTitle className="text-lg">Tela de Boas-Vindas</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label>Mensagem de boas-vindas (opcional)</Label>
+                <Textarea
+                  value={(settings as any).welcomeMessage || ""}
+                  onChange={(e) =>
+                    setSettings({
+                      ...settings,
+                      welcomeMessage: e.target.value,
+                    } as ToolSettings)
+                  }
+                  placeholder="Ex: Bem-vindo ao workshop de desenvolvimento! Preencha seus dados para começar."
+                  rows={2}
+                />
+                <p className="text-xs text-muted-foreground">
+                  Aparece na tela inicial antes do participante começar.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Identificação do Participante</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
-                <Label>Exigir nome do participante</Label>
+                <div>
+                  <Label>Exigir nome</Label>
+                  <p className="text-xs text-muted-foreground">Campo obrigatório na tela de boas-vindas</p>
+                </div>
                 <Switch
                   checked={settings.requireName}
                   onCheckedChange={(v) =>
@@ -520,7 +550,10 @@ export default function EditToolPage({
               </div>
               <Separator />
               <div className="flex items-center justify-between">
-                <Label>Exigir email do participante</Label>
+                <div>
+                  <Label>Exigir email</Label>
+                  <p className="text-xs text-muted-foreground">Campo obrigatório na tela de boas-vindas</p>
+                </div>
                 <Switch
                   checked={settings.requireEmail}
                   onCheckedChange={(v) =>
@@ -528,7 +561,198 @@ export default function EditToolPage({
                   }
                 />
               </div>
+
               <Separator />
+
+              {/* Custom identification fields */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <Label>Campos adicionais</Label>
+                    <p className="text-xs text-muted-foreground">
+                      Ex: Concessionária, Cargo, Turma, Unidade...
+                    </p>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      const currentFields = ((settings as any).identificationFields || []) as IdentificationField[];
+                      setSettings({
+                        ...settings,
+                        identificationFields: [
+                          ...currentFields,
+                          {
+                            id: `field_${Date.now()}`,
+                            label: "",
+                            placeholder: "",
+                            required: false,
+                            type: "text",
+                          },
+                        ],
+                      } as ToolSettings);
+                    }}
+                  >
+                    <Plus className="w-3.5 h-3.5 mr-1" />
+                    Adicionar
+                  </Button>
+                </div>
+
+                {(((settings as any).identificationFields || []) as IdentificationField[]).map(
+                  (field, index) => (
+                    <div
+                      key={field.id}
+                      className="rounded-lg border p-4 space-y-3 bg-gray-50/50"
+                    >
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex-1 space-y-3">
+                          <div className="grid grid-cols-2 gap-3">
+                            <div className="space-y-1">
+                              <Label className="text-xs">Label *</Label>
+                              <Input
+                                value={field.label}
+                                onChange={(e) => {
+                                  const fields = [
+                                    ...((settings as any).identificationFields || []),
+                                  ];
+                                  fields[index] = {
+                                    ...fields[index],
+                                    label: e.target.value,
+                                  };
+                                  setSettings({
+                                    ...settings,
+                                    identificationFields: fields,
+                                  } as ToolSettings);
+                                }}
+                                placeholder="Ex: Concessionária"
+                                className="text-sm"
+                              />
+                            </div>
+                            <div className="space-y-1">
+                              <Label className="text-xs">Placeholder</Label>
+                              <Input
+                                value={field.placeholder || ""}
+                                onChange={(e) => {
+                                  const fields = [
+                                    ...((settings as any).identificationFields || []),
+                                  ];
+                                  fields[index] = {
+                                    ...fields[index],
+                                    placeholder: e.target.value,
+                                  };
+                                  setSettings({
+                                    ...settings,
+                                    identificationFields: fields,
+                                  } as ToolSettings);
+                                }}
+                                placeholder="Ex: Qual sua concessionária?"
+                                className="text-sm"
+                              />
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-4">
+                            <div className="space-y-1">
+                              <Label className="text-xs">Tipo</Label>
+                              <select
+                                value={field.type || "text"}
+                                onChange={(e) => {
+                                  const fields = [
+                                    ...((settings as any).identificationFields || []),
+                                  ];
+                                  fields[index] = {
+                                    ...fields[index],
+                                    type: e.target.value as "text" | "dropdown",
+                                  };
+                                  setSettings({
+                                    ...settings,
+                                    identificationFields: fields,
+                                  } as ToolSettings);
+                                }}
+                                className="h-8 rounded-md border border-input bg-background px-2 text-xs"
+                              >
+                                <option value="text">Texto livre</option>
+                                <option value="dropdown">Lista de opções</option>
+                              </select>
+                            </div>
+                            <div className="flex items-center gap-2 mt-4">
+                              <Switch
+                                checked={field.required}
+                                onCheckedChange={(v) => {
+                                  const fields = [
+                                    ...((settings as any).identificationFields || []),
+                                  ];
+                                  fields[index] = {
+                                    ...fields[index],
+                                    required: v,
+                                  };
+                                  setSettings({
+                                    ...settings,
+                                    identificationFields: fields,
+                                  } as ToolSettings);
+                                }}
+                              />
+                              <Label className="text-xs">Obrigatório</Label>
+                            </div>
+                          </div>
+                          {field.type === "dropdown" && (
+                            <div className="space-y-1">
+                              <Label className="text-xs">
+                                Opções (uma por linha)
+                              </Label>
+                              <Textarea
+                                value={(field.options || []).join("\n")}
+                                onChange={(e) => {
+                                  const fields = [
+                                    ...((settings as any).identificationFields || []),
+                                  ];
+                                  fields[index] = {
+                                    ...fields[index],
+                                    options: e.target.value
+                                      .split("\n")
+                                      .filter((o) => o.trim()),
+                                  };
+                                  setSettings({
+                                    ...settings,
+                                    identificationFields: fields,
+                                  } as ToolSettings);
+                                }}
+                                placeholder={"Concessionária A\nConcessionária B\nConcessionária C"}
+                                rows={3}
+                                className="text-sm"
+                              />
+                            </div>
+                          )}
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="shrink-0 text-red-400 hover:text-red-600 hover:bg-red-50 mt-5"
+                          onClick={() => {
+                            const fields = [
+                              ...((settings as any).identificationFields || []),
+                            ];
+                            fields.splice(index, 1);
+                            setSettings({
+                              ...settings,
+                              identificationFields: fields,
+                            } as ToolSettings);
+                          }}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  )
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Comportamento</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
                 <Label>Permitir múltiplas respostas</Label>
                 <Switch
