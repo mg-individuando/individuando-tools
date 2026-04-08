@@ -10,8 +10,9 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
+import { FileUpload } from "@/components/ui/file-upload";
 import { toast } from "sonner";
-import { ArrowLeft, Save, Eye } from "lucide-react";
+import { ArrowLeft, Save, Eye, ExternalLink } from "lucide-react";
 import Link from "next/link";
 import type { BrandConfig } from "@/lib/schemas/types";
 
@@ -45,6 +46,24 @@ const RADIUS_OPTIONS = [
   { value: "9999px", label: "Pill (9999px)" },
 ];
 
+const HEADER_LAYOUT_OPTIONS = [
+  { value: "logo-left", label: "Logo a esquerda" },
+  { value: "logo-center", label: "Logo centralizado" },
+  { value: "logo-right", label: "Logo a direita" },
+];
+
+const HEADER_HEIGHT_OPTIONS = [
+  { value: "compact", label: "Compacto (60px)" },
+  { value: "normal", label: "Normal (80px)" },
+  { value: "tall", label: "Alto (120px)" },
+];
+
+const HEADER_HEIGHT_MAP: Record<string, string> = {
+  compact: "60px",
+  normal: "80px",
+  tall: "120px",
+};
+
 const DEFAULT_BRAND: BrandConfig = {
   primaryColor: "#2D5A7B",
   secondaryColor: "#64748B",
@@ -73,19 +92,23 @@ export default function NovoClientePage() {
   const [partnerLogoUrl, setPartnerLogoUrl] = useState("");
   const [showPartnerLogo, setShowPartnerLogo] = useState(true);
 
-  // Brand config
-  const [brand, setBrand] = useState<BrandConfig>({ ...DEFAULT_BRAND });
+  // Brand config (extra header fields stored as arbitrary keys in the JSONB)
+  const [brand, setBrand] = useState<Record<string, any>>({
+    ...DEFAULT_BRAND,
+    headerBgImage: "",
+    headerLayout: "logo-left",
+    headerHeight: "normal",
+  });
 
-  function updateBrand<K extends keyof BrandConfig>(
-    key: K,
-    value: BrandConfig[K]
-  ) {
+  const slugified = name.trim() ? generateSlug(name) : "novo";
+
+  function updateBrand(key: string, value: any) {
     setBrand((prev) => ({ ...prev, [key]: value }));
   }
 
   async function handleSave() {
     if (!name.trim()) {
-      toast.error("O nome do cliente é obrigatório.");
+      toast.error("O nome do cliente e obrigatorio.");
       return;
     }
 
@@ -98,7 +121,7 @@ export default function NovoClientePage() {
       } = await supabase.auth.getUser();
 
       if (!user) {
-        toast.error("Você precisa estar logado.");
+        toast.error("Voce precisa estar logado.");
         setSaving(false);
         return;
       }
@@ -131,8 +154,10 @@ export default function NovoClientePage() {
     }
   }
 
+  const headerHeightPx = HEADER_HEIGHT_MAP[brand.headerHeight] ?? "80px";
+
   return (
-    <div className="space-y-8 max-w-4xl mx-auto">
+    <div className="space-y-8 max-w-7xl mx-auto">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
@@ -160,380 +185,481 @@ export default function NovoClientePage() {
         </Button>
       </div>
 
-      {/* Section 1: Identidade */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="font-sans text-[#2D5A7B]">
-            Identidade
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-5">
-          <div className="space-y-2">
-            <Label htmlFor="name">Nome do cliente *</Label>
-            <Input
-              id="name"
-              placeholder="Ex: Empresa ABC"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="logoUrl">URL do logo do cliente</Label>
-            <Input
-              id="logoUrl"
-              type="url"
-              placeholder="https://exemplo.com/logo.png"
-              value={logoUrl}
-              onChange={(e) => setLogoUrl(e.target.value)}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="partnerLogoUrl">URL do logo parceiro (Individuando)</Label>
-            <Input
-              id="partnerLogoUrl"
-              type="url"
-              placeholder="https://exemplo.com/partner-logo.png"
-              value={partnerLogoUrl}
-              onChange={(e) => setPartnerLogoUrl(e.target.value)}
-            />
-          </div>
-
-          <div className="flex items-center justify-between rounded-lg border p-4">
-            <div>
-              <Label htmlFor="showPartnerLogo" className="text-sm font-medium">
-                Mostrar logo parceiro
-              </Label>
-              <p className="text-xs text-muted-foreground mt-0.5">
-                Exibir o logo da Individuando ao lado do logo do cliente.
-              </p>
-            </div>
-            <Switch
-              id="showPartnerLogo"
-              checked={showPartnerLogo}
-              onCheckedChange={setShowPartnerLogo}
-            />
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Section 2: Cores */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="font-sans text-[#2D5A7B]">Cores</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-            <ColorField
-              label="Cor primária"
-              value={brand.primaryColor!}
-              onChange={(v) => updateBrand("primaryColor", v)}
-            />
-            <ColorField
-              label="Cor secundária"
-              value={brand.secondaryColor!}
-              onChange={(v) => updateBrand("secondaryColor", v)}
-            />
-            <ColorField
-              label="Cor de fundo"
-              value={brand.backgroundColor!}
-              onChange={(v) => updateBrand("backgroundColor", v)}
-            />
-            <ColorField
-              label="Cor do texto"
-              value={brand.textColor!}
-              onChange={(v) => updateBrand("textColor", v)}
-            />
-            <ColorField
-              label="Cor dos botões"
-              value={brand.buttonColor!}
-              onChange={(v) => updateBrand("buttonColor", v)}
-            />
-            <ColorField
-              label="Cor do texto dos botões"
-              value={brand.buttonTextColor!}
-              onChange={(v) => updateBrand("buttonTextColor", v)}
-            />
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Section 3: Tipografia */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="font-sans text-[#2D5A7B]">
-            Tipografia
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-5">
-          <div className="space-y-2">
-            <Label htmlFor="fontFamily">Fonte</Label>
-            <select
-              id="fontFamily"
-              value={brand.fontFamily}
-              onChange={(e) => updateBrand("fontFamily", e.target.value)}
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-            >
-              {FONT_OPTIONS.map((font) => (
-                <option key={font} value={font}>
-                  {font}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {brand.fontFamily === "Custom" && (
-            <div className="space-y-2">
-              <Label htmlFor="fontUrl">URL da fonte custom</Label>
-              <Input
-                id="fontUrl"
-                type="url"
-                placeholder="https://fonts.googleapis.com/css2?family=..."
-                value={brand.fontUrl}
-                onChange={(e) => updateBrand("fontUrl", e.target.value)}
-              />
-              <p className="text-xs text-muted-foreground">
-                Cole a URL de importação do Google Fonts ou outra fonte.
-              </p>
-            </div>
-          )}
-
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-            <div className="space-y-2">
-              <Label htmlFor="headingWeight">Peso do título</Label>
-              <select
-                id="headingWeight"
-                value={brand.headingWeight}
-                onChange={(e) => updateBrand("headingWeight", e.target.value)}
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-              >
-                {WEIGHT_OPTIONS.map((w) => (
-                  <option key={w.value} value={w.value}>
-                    {w.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="bodyWeight">Peso do corpo</Label>
-              <select
-                id="bodyWeight"
-                value={brand.bodyWeight}
-                onChange={(e) => updateBrand("bodyWeight", e.target.value)}
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-              >
-                {WEIGHT_OPTIONS.map((w) => (
-                  <option key={w.value} value={w.value}>
-                    {w.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="labelWeight">Peso dos labels</Label>
-              <select
-                id="labelWeight"
-                value={brand.labelWeight}
-                onChange={(e) => updateBrand("labelWeight", e.target.value)}
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-              >
-                {WEIGHT_OPTIONS.map((w) => (
-                  <option key={w.value} value={w.value}>
-                    {w.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Section 4: Header */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="font-sans text-[#2D5A7B]">Header</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-            <ColorField
-              label="Cor de fundo do header"
-              value={brand.headerBg!}
-              onChange={(v) => updateBrand("headerBg", v)}
-            />
-            <ColorField
-              label="Cor do texto do header"
-              value={brand.headerTextColor!}
-              onChange={(v) => updateBrand("headerTextColor", v)}
-            />
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Section 5: Extras */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="font-sans text-[#2D5A7B]">Extras</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-5">
-          <div className="space-y-2">
-            <Label htmlFor="buttonRadius">Arredondamento dos botões</Label>
-            <select
-              id="buttonRadius"
-              value={brand.buttonRadius}
-              onChange={(e) => updateBrand("buttonRadius", e.target.value)}
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-            >
-              {RADIUS_OPTIONS.map((r) => (
-                <option key={r.value} value={r.value}>
-                  {r.label}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="footerText">Texto do rodape</Label>
-            <Input
-              id="footerText"
-              placeholder="Powered by Individuando"
-              value={brand.footerText}
-              onChange={(e) => updateBrand("footerText", e.target.value)}
-            />
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Live Preview */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="font-sans text-[#2D5A7B] flex items-center gap-2">
-            <Eye className="h-5 w-5" />
-            Preview
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div
-            className="rounded-xl overflow-hidden border"
-            style={{ fontFamily: brand.fontFamily === "Custom" ? "sans-serif" : brand.fontFamily }}
-          >
-            {/* Preview Header */}
-            <div
-              className="px-6 py-4 flex items-center justify-between"
-              style={{
-                backgroundColor: brand.headerBg,
-                color: brand.headerTextColor,
-              }}
-            >
-              <div className="flex items-center gap-3">
-                {logoUrl ? (
-                  <img
-                    src={logoUrl}
-                    alt="Logo"
-                    className="h-8 w-8 object-contain"
-                  />
-                ) : (
-                  <div
-                    className="h-8 w-8 rounded-lg flex items-center justify-center text-white text-sm font-bold"
-                    style={{ backgroundColor: brand.primaryColor }}
-                  >
-                    {name ? name.charAt(0).toUpperCase() : "C"}
-                  </div>
-                )}
-                <span
-                  style={{ fontWeight: Number(brand.headingWeight) }}
-                  className="text-lg"
-                >
-                  {name || "Nome do Cliente"}
-                </span>
-              </div>
-              {showPartnerLogo && partnerLogoUrl && (
-                <img
-                  src={partnerLogoUrl}
-                  alt="Partner"
-                  className="h-6 object-contain opacity-60"
+      {/* Two-column layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Left column: form cards */}
+        <div className="lg:col-span-2 space-y-8">
+          {/* Section 1: Identidade */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="font-sans text-[#2D5A7B]">
+                Identidade
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-5">
+              <div className="space-y-2">
+                <Label htmlFor="name">Nome do cliente *</Label>
+                <Input
+                  id="name"
+                  placeholder="Ex: Empresa ABC"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
                 />
-              )}
-            </div>
+              </div>
 
-            {/* Preview Body */}
-            <div
-              className="p-6 space-y-4"
-              style={{
-                backgroundColor: brand.backgroundColor,
-                color: brand.textColor,
-              }}
-            >
-              <h3
-                className="text-xl"
-                style={{ fontWeight: Number(brand.headingWeight) }}
-              >
-                Titulo de exemplo
-              </h3>
-              <p
-                className="text-sm"
-                style={{ fontWeight: Number(brand.bodyWeight) }}
-              >
-                Este e um texto de exemplo para visualizar como o conteudo vai
-                aparecer com as configuracoes de marca escolhidas.
-              </p>
+              <FileUpload
+                bucket="client-assets"
+                path={`logos/${slugified}`}
+                accept="image/png,image/jpeg,image/svg+xml,image/webp"
+                label="Logo do cliente"
+                hint="PNG, JPG ou SVG. Maximo 5MB."
+                currentUrl={logoUrl || undefined}
+                onUpload={(url) => setLogoUrl(url)}
+              />
 
-              {/* Sample Card */}
-              <div className="rounded-lg border bg-white p-4 space-y-3">
-                <label
-                  className="text-sm block"
-                  style={{ fontWeight: Number(brand.labelWeight) }}
+              <FileUpload
+                bucket="client-assets"
+                path={`partner-logos/${slugified}`}
+                accept="image/png,image/jpeg,image/svg+xml,image/webp"
+                label="Logo parceiro (Individuando)"
+                hint="PNG, JPG ou SVG. Maximo 5MB."
+                currentUrl={partnerLogoUrl || undefined}
+                onUpload={(url) => setPartnerLogoUrl(url)}
+              />
+
+              <div className="flex items-center justify-between rounded-lg border p-4">
+                <div>
+                  <Label htmlFor="showPartnerLogo" className="text-sm font-medium">
+                    Mostrar logo parceiro
+                  </Label>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    Exibir o logo da Individuando ao lado do logo do cliente.
+                  </p>
+                </div>
+                <Switch
+                  id="showPartnerLogo"
+                  checked={showPartnerLogo}
+                  onCheckedChange={setShowPartnerLogo}
+                />
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Section 2: Cores */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="font-sans text-[#2D5A7B]">Cores</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <ColorField
+                  label="Cor primaria"
+                  value={brand.primaryColor!}
+                  onChange={(v) => updateBrand("primaryColor", v)}
+                />
+                <ColorField
+                  label="Cor secundaria"
+                  value={brand.secondaryColor!}
+                  onChange={(v) => updateBrand("secondaryColor", v)}
+                />
+                <ColorField
+                  label="Cor de fundo"
+                  value={brand.backgroundColor!}
+                  onChange={(v) => updateBrand("backgroundColor", v)}
+                />
+                <ColorField
+                  label="Cor do texto"
+                  value={brand.textColor!}
+                  onChange={(v) => updateBrand("textColor", v)}
+                />
+                <ColorField
+                  label="Cor dos botoes"
+                  value={brand.buttonColor!}
+                  onChange={(v) => updateBrand("buttonColor", v)}
+                />
+                <ColorField
+                  label="Cor do texto dos botoes"
+                  value={brand.buttonTextColor!}
+                  onChange={(v) => updateBrand("buttonTextColor", v)}
+                />
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Section 3: Tipografia */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="font-sans text-[#2D5A7B]">
+                Tipografia
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-5">
+              <div className="space-y-2">
+                <Label htmlFor="fontFamily">Fonte</Label>
+                <select
+                  id="fontFamily"
+                  value={brand.fontFamily}
+                  onChange={(e) => updateBrand("fontFamily", e.target.value)}
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                 >
-                  Campo de exemplo
-                </label>
-                <div className="h-10 rounded-md border bg-gray-50" />
-                <button
-                  className="px-4 py-2 text-sm"
+                  {FONT_OPTIONS.map((font) => (
+                    <option key={font} value={font}>
+                      {font}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {brand.fontFamily === "Custom" && (
+                <>
+                  <div className="space-y-2">
+                    <Label htmlFor="fontUrl">URL da fonte custom</Label>
+                    <Input
+                      id="fontUrl"
+                      type="url"
+                      placeholder="https://fonts.googleapis.com/css2?family=..."
+                      value={brand.fontUrl}
+                      onChange={(e) => updateBrand("fontUrl", e.target.value)}
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Cole a URL de importacao do Google Fonts ou outra fonte.
+                    </p>
+                  </div>
+
+                  <FileUpload
+                    bucket="client-assets"
+                    path={`fonts/${slugified}`}
+                    accept=".ttf,.otf,.woff,.woff2"
+                    label="Arquivo da fonte"
+                    hint="TTF, OTF, WOFF ou WOFF2. Maximo 5MB."
+                    currentUrl={brand.fontUrl || undefined}
+                    onUpload={(url) => updateBrand("fontUrl", url)}
+                  />
+                </>
+              )}
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+                <div className="space-y-2">
+                  <Label htmlFor="headingWeight">Peso do titulo</Label>
+                  <select
+                    id="headingWeight"
+                    value={brand.headingWeight}
+                    onChange={(e) => updateBrand("headingWeight", e.target.value)}
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                  >
+                    {WEIGHT_OPTIONS.map((w) => (
+                      <option key={w.value} value={w.value}>
+                        {w.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="bodyWeight">Peso do corpo</Label>
+                  <select
+                    id="bodyWeight"
+                    value={brand.bodyWeight}
+                    onChange={(e) => updateBrand("bodyWeight", e.target.value)}
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                  >
+                    {WEIGHT_OPTIONS.map((w) => (
+                      <option key={w.value} value={w.value}>
+                        {w.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="labelWeight">Peso dos labels</Label>
+                  <select
+                    id="labelWeight"
+                    value={brand.labelWeight}
+                    onChange={(e) => updateBrand("labelWeight", e.target.value)}
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                  >
+                    {WEIGHT_OPTIONS.map((w) => (
+                      <option key={w.value} value={w.value}>
+                        {w.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Section 4: Header */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="font-sans text-[#2D5A7B]">Header</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <ColorField
+                  label="Cor de fundo do header"
+                  value={brand.headerBg!}
+                  onChange={(v) => updateBrand("headerBg", v)}
+                />
+                <ColorField
+                  label="Cor do texto do header"
+                  value={brand.headerTextColor!}
+                  onChange={(v) => updateBrand("headerTextColor", v)}
+                />
+              </div>
+
+              <FileUpload
+                bucket="client-assets"
+                path={`headers/${slugified}`}
+                accept="image/png,image/jpeg,image/svg+xml,image/webp"
+                label="Imagem de fundo do header"
+                hint="PNG, JPG ou SVG. Maximo 5MB. Recomendado: 1200x200px."
+                currentUrl={brand.headerBgImage || undefined}
+                onUpload={(url) => updateBrand("headerBgImage", url)}
+              />
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <div className="space-y-2">
+                  <Label htmlFor="headerLayout">Layout do header</Label>
+                  <select
+                    id="headerLayout"
+                    value={brand.headerLayout ?? "logo-left"}
+                    onChange={(e) => updateBrand("headerLayout", e.target.value)}
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                  >
+                    {HEADER_LAYOUT_OPTIONS.map((opt) => (
+                      <option key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="headerHeight">Altura do header</Label>
+                  <select
+                    id="headerHeight"
+                    value={brand.headerHeight ?? "normal"}
+                    onChange={(e) => updateBrand("headerHeight", e.target.value)}
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                  >
+                    {HEADER_HEIGHT_OPTIONS.map((opt) => (
+                      <option key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <Separator />
+
+              <a
+                href="https://www.canva.com/design?create&type=TAB-wLJNniQ&w=1200&h=200"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 rounded-lg bg-[#7B2FBE] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#6a28a6]"
+              >
+                <ExternalLink className="h-4 w-4" />
+                Criar Header no Canva
+              </a>
+            </CardContent>
+          </Card>
+
+          {/* Section 5: Extras */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="font-sans text-[#2D5A7B]">Extras</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-5">
+              <div className="space-y-2">
+                <Label htmlFor="buttonRadius">Arredondamento dos botoes</Label>
+                <select
+                  id="buttonRadius"
+                  value={brand.buttonRadius}
+                  onChange={(e) => updateBrand("buttonRadius", e.target.value)}
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                >
+                  {RADIUS_OPTIONS.map((r) => (
+                    <option key={r.value} value={r.value}>
+                      {r.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="footerText">Texto do rodape</Label>
+                <Input
+                  id="footerText"
+                  placeholder="Powered by Individuando"
+                  value={brand.footerText}
+                  onChange={(e) => updateBrand("footerText", e.target.value)}
+                />
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Bottom Save */}
+          <div className="flex justify-end pb-8">
+            <Button
+              onClick={handleSave}
+              disabled={saving}
+              size="lg"
+              className="bg-[#2D5A7B] hover:bg-[#1e3f56]"
+            >
+              <Save className="mr-2 h-4 w-4" />
+              {saving ? "Salvando..." : "Salvar Cliente"}
+            </Button>
+          </div>
+        </div>
+
+        {/* Right column: sticky preview */}
+        <div className="lg:col-span-1">
+          <div className="sticky top-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="font-sans text-[#2D5A7B] flex items-center gap-2">
+                  <Eye className="h-5 w-5" />
+                  Preview
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div
+                  className="rounded-xl overflow-hidden border"
                   style={{
-                    backgroundColor: brand.buttonColor,
-                    color: brand.buttonTextColor,
-                    borderRadius: brand.buttonRadius,
-                    fontWeight: Number(brand.bodyWeight),
+                    fontFamily:
+                      brand.fontFamily === "Custom"
+                        ? "sans-serif"
+                        : brand.fontFamily,
                   }}
                 >
-                  Botao de acao
-                </button>
-              </div>
-            </div>
+                  {/* Preview Header */}
+                  <div
+                    className="px-4 flex items-center gap-3"
+                    style={{
+                      backgroundColor: brand.headerBg,
+                      color: brand.headerTextColor,
+                      height: headerHeightPx,
+                      backgroundImage: brand.headerBgImage
+                        ? `url(${brand.headerBgImage})`
+                        : undefined,
+                      backgroundSize: "cover",
+                      backgroundPosition: "center",
+                      justifyContent:
+                        brand.headerLayout === "logo-center"
+                          ? "center"
+                          : brand.headerLayout === "logo-right"
+                            ? "flex-end"
+                            : "flex-start",
+                    }}
+                  >
+                    <div
+                      className="flex items-center gap-3"
+                      style={{
+                        flexDirection:
+                          brand.headerLayout === "logo-right"
+                            ? "row-reverse"
+                            : "row",
+                      }}
+                    >
+                      {logoUrl ? (
+                        <img
+                          src={logoUrl}
+                          alt="Logo"
+                          className="h-8 w-8 object-contain"
+                        />
+                      ) : (
+                        <div
+                          className="h-8 w-8 rounded-lg flex items-center justify-center text-white text-sm font-bold shrink-0"
+                          style={{ backgroundColor: brand.primaryColor }}
+                        >
+                          {name ? name.charAt(0).toUpperCase() : "C"}
+                        </div>
+                      )}
+                      <span
+                        style={{ fontWeight: Number(brand.headingWeight) }}
+                        className="text-sm"
+                      >
+                        {name || "Nome do Cliente"}
+                      </span>
+                    </div>
+                    {showPartnerLogo && partnerLogoUrl && (
+                      <img
+                        src={partnerLogoUrl}
+                        alt="Partner"
+                        className="h-5 object-contain opacity-60 ml-auto"
+                      />
+                    )}
+                  </div>
 
-            {/* Preview Footer */}
-            <div
-              className="px-6 py-3 text-center text-xs border-t"
-              style={{
-                backgroundColor: brand.backgroundColor,
-                color: brand.secondaryColor,
-              }}
-            >
-              {brand.footerText}
-            </div>
+                  {/* Preview Body */}
+                  <div
+                    className="p-4 space-y-3"
+                    style={{
+                      backgroundColor: brand.backgroundColor,
+                      color: brand.textColor,
+                    }}
+                  >
+                    <h3
+                      className="text-base"
+                      style={{ fontWeight: Number(brand.headingWeight) }}
+                    >
+                      Titulo de exemplo
+                    </h3>
+                    <p
+                      className="text-xs"
+                      style={{ fontWeight: Number(brand.bodyWeight) }}
+                    >
+                      Este e um texto de exemplo para visualizar como o conteudo
+                      vai aparecer com as configuracoes de marca escolhidas.
+                    </p>
+
+                    {/* Sample Card */}
+                    <div className="rounded-lg border bg-white p-3 space-y-2">
+                      <label
+                        className="text-xs block"
+                        style={{ fontWeight: Number(brand.labelWeight) }}
+                      >
+                        Campo de exemplo
+                      </label>
+                      <div className="h-8 rounded-md border bg-gray-50" />
+                      <button
+                        className="px-3 py-1.5 text-xs"
+                        style={{
+                          backgroundColor: brand.buttonColor,
+                          color: brand.buttonTextColor,
+                          borderRadius: brand.buttonRadius,
+                          fontWeight: Number(brand.bodyWeight),
+                        }}
+                      >
+                        Botao de acao
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Preview Footer */}
+                  <div
+                    className="px-4 py-2 text-center text-[10px] border-t"
+                    style={{
+                      backgroundColor: brand.backgroundColor,
+                      color: brand.secondaryColor,
+                    }}
+                  >
+                    {brand.footerText}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
-        </CardContent>
-      </Card>
-
-      {/* Bottom Save */}
-      <div className="flex justify-end pb-8">
-        <Button
-          onClick={handleSave}
-          disabled={saving}
-          size="lg"
-          className="bg-[#2D5A7B] hover:bg-[#1e3f56]"
-        >
-          <Save className="mr-2 h-4 w-4" />
-          {saving ? "Salvando..." : "Salvar Cliente"}
-        </Button>
+        </div>
       </div>
     </div>
   );
 }
 
-/* ─── Color Field Component ─── */
+/* --- Color Field Component --- */
 
 function ColorField({
   label,
