@@ -8,6 +8,7 @@ import {
   LayoutDashboard,
   Wrench,
   Users,
+  Building2,
   LogOut,
   Menu,
   X,
@@ -20,6 +21,7 @@ import type { Profile } from "@/lib/schemas/types";
 const navItems = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/ferramentas", label: "Ferramentas", icon: Wrench },
+  { href: "/admin/clientes", label: "Clientes", icon: Building2, adminOnly: true },
   { href: "/admin/usuarios", label: "Usuarios", icon: Users, adminOnly: true },
 ];
 

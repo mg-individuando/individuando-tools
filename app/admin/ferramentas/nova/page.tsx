@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { templates, generateSlug } from "@/lib/templates";
@@ -20,14 +20,37 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   table: Table,
 };
 
+interface ClientOption {
+  id: string;
+  name: string;
+  logo_url: string | null;
+}
+
 export default function NovaFerramentaPage() {
   const [step, setStep] = useState<"template" | "details">("template");
   const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [loading, setLoading] = useState(false);
+  const [clients, setClients] = useState<ClientOption[]>([]);
+  const [selectedClient, setSelectedClient] = useState<string>("");
   const router = useRouter();
   const supabase = createClient();
+
+  useEffect(() => {
+    async function loadClients() {
+      const { data } = await supabase
+        .from("clients")
+        .select("id, name, logo_url")
+        .eq("is_active", true)
+        .order("name");
+
+      if (data) {
+        setClients(data);
+      }
+    }
+    loadClients();
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   async function handleCreate() {
     if (!selectedTemplate || !title) return;
@@ -65,6 +88,7 @@ export default function NovaFerramentaPage() {
         schema,
         settings: template.defaultSettings,
         status: "draft",
+        client_id: selectedClient || null,
       })
       .select("id")
       .single();
@@ -164,8 +188,38 @@ export default function NovaFerramentaPage() {
           <CardTitle>Detalhes</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
+          {/* Client selector */}
           <div className="space-y-2">
-            <Label htmlFor="title">Título da Ferramenta</Label>
+            <Label htmlFor="client">Cliente</Label>
+            <div className="flex items-center gap-3">
+              {selectedClient && (() => {
+                const client = clients.find((c) => c.id === selectedClient);
+                return client?.logo_url ? (
+                  <img
+                    src={client.logo_url}
+                    alt={client.name}
+                    className="w-8 h-8 rounded-md object-contain border border-gray-200 bg-white"
+                  />
+                ) : null;
+              })()}
+              <select
+                id="client"
+                value={selectedClient}
+                onChange={(e) => setSelectedClient(e.target.value)}
+                className="w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 focus:border-[#2D5A7B] focus:ring-2 focus:ring-[#2D5A7B]/10 outline-none transition-all"
+              >
+                <option value="">Sem cliente (padrao Individuando)</option>
+                {clients.map((client) => (
+                  <option key={client.id} value={client.id}>
+                    {client.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="title">Titulo da Ferramenta</Label>
             <Input
               id="title"
               value={title}
@@ -174,12 +228,12 @@ export default function NovaFerramentaPage() {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="description">Descrição (opcional)</Label>
+            <Label htmlFor="description">Descricao (opcional)</Label>
             <Textarea
               id="description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Uma breve descrição para os participantes..."
+              placeholder="Uma breve descricao para os participantes..."
               rows={3}
             />
           </div>

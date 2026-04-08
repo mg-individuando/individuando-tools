@@ -11,6 +11,38 @@ export interface Profile {
   updated_at: string;
 }
 
+export interface BrandConfig {
+  primaryColor?: string;
+  secondaryColor?: string;
+  backgroundColor?: string;
+  textColor?: string;
+  buttonColor?: string;
+  buttonTextColor?: string;
+  buttonRadius?: string;
+  fontFamily?: string;
+  fontUrl?: string;
+  headingWeight?: string;
+  bodyWeight?: string;
+  labelWeight?: string;
+  headerBg?: string;
+  headerTextColor?: string;
+  footerText?: string;
+}
+
+export interface Client {
+  id: string;
+  created_by: string | null;
+  name: string;
+  slug: string;
+  logo_url: string | null;
+  partner_logo_url: string | null;
+  show_partner_logo: boolean;
+  brand_config: BrandConfig;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface Tool {
   id: string;
   created_by: string;
@@ -25,8 +57,10 @@ export interface Tool {
   published_at: string | null;
   created_at: string;
   updated_at: string;
+  client_id: string | null;
   // Joined
   profiles?: Profile;
+  clients?: Client;
 }
 
 export interface ToolSession {
