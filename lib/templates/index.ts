@@ -1,8 +1,8 @@
 import { swotTemplate, swotDefaultSettings } from "./swot";
 import { radarTemplate, radarDefaultSettings } from "./radar";
 import { ikigaiTemplate, ikigaiDefaultSettings } from "./ikigai";
-import { categoryGridTemplate, categoryGridDefaultSettings } from "./category-grid";
-import { dynamicTableTemplate, dynamicTableDefaultSettings } from "./dynamic-table";
+import { viaTemplate, viaDefaultSettings } from "./via";
+import { metasTemplate, metasDefaultSettings } from "./metas";
 import type { ToolSchema, ToolSettings } from "@/lib/schemas/tool-schema";
 
 export interface TemplateDefinition {
@@ -44,16 +44,16 @@ export const templates: Record<string, TemplateDefinition> = {
     name: "Forças Pessoais (VIA)",
     description: "Grid de categorias com checkboxes para identificar suas forças de caráter",
     icon: "layout-grid",
-    schema: categoryGridTemplate,
-    defaultSettings: categoryGridDefaultSettings,
+    schema: viaTemplate,
+    defaultSettings: viaDefaultSettings,
   },
   dynamic_table: {
     type: "dynamic_table",
     name: "Planejamento de Metas",
     description: "Tabela dinâmica para definir metas, prazos, ações e indicadores",
     icon: "table",
-    schema: dynamicTableTemplate,
-    defaultSettings: dynamicTableDefaultSettings,
+    schema: metasTemplate,
+    defaultSettings: metasDefaultSettings,
   },
 };
 

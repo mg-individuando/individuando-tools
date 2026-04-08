@@ -3,9 +3,9 @@ import type { ToolSchema, ToolSettings } from "@/lib/schemas/tool-schema";
 export const ikigaiTemplate: ToolSchema = {
   version: "1.0",
   layout: "ikigai",
-  title: "Ikigai — Razão de Ser",
+  title: "Ikigai — Seu Propósito de Vida",
   description:
-    "Descubra seu Ikigai explorando a interseção entre o que você ama, o que faz bem, o que o mundo precisa e pelo que pode ser pago.",
+    "Descubra seu Ikigai explorando a interseção entre o que você ama, o que você faz bem, o que o mundo precisa e pelo que você pode ser pago.",
   instructions:
     "Preencha cada círculo e observe as interseções. Seu Ikigai está no centro, onde todos os elementos se encontram.",
   theme: {
@@ -14,17 +14,19 @@ export const ikigaiTemplate: ToolSchema = {
     backgroundColor: "#F8FAFC",
   },
   sections: [
+    // 4 círculos principais
     {
-      id: "ama",
-      label: "O que você AMA",
-      description: "Atividades, temas e causas que te enchem de energia",
+      id: "amo",
+      label: "O que eu AMO",
+      description: "Quais atividades te fazem perder a noção do tempo? O que te dá alegria?",
+      position: "circle-top",
       color: "#EC4899",
       icon: "heart",
       fields: [
         {
-          id: "ama_texto",
+          id: "amo_texto",
           type: "text_long",
-          placeholder: "Ex: Ensinar, criar, resolver problemas complexos, arte...",
+          placeholder: "Ex: Ensinar, criar coisas novas, estar na natureza, música...",
           required: true,
           maxLength: 500,
         },
@@ -32,15 +34,16 @@ export const ikigaiTemplate: ToolSchema = {
     },
     {
       id: "bom",
-      label: "O que você FAZ BEM",
-      description: "Habilidades, talentos e competências reconhecidas",
-      color: "#3B82F6",
+      label: "O que eu faço BEM",
+      description: "Quais são seus talentos e habilidades? O que as pessoas elogiam em você?",
+      position: "circle-right",
+      color: "#F59E0B",
       icon: "star",
       fields: [
         {
           id: "bom_texto",
           type: "text_long",
-          placeholder: "Ex: Comunicação, análise de dados, liderança, escrita...",
+          placeholder: "Ex: Comunicação, liderança, análise, design, cozinhar...",
           required: true,
           maxLength: 500,
         },
@@ -48,8 +51,9 @@ export const ikigaiTemplate: ToolSchema = {
     },
     {
       id: "mundo",
-      label: "O que o MUNDO PRECISA",
-      description: "Problemas reais que você pode ajudar a resolver",
+      label: "O que o MUNDO precisa",
+      description: "Que problemas você gostaria de resolver? Como você pode contribuir?",
+      position: "circle-bottom",
       color: "#10B981",
       icon: "globe",
       fields: [
@@ -64,31 +68,33 @@ export const ikigaiTemplate: ToolSchema = {
     },
     {
       id: "pago",
-      label: "Pelo que podem te PAGAR",
-      description: "Atividades com demanda de mercado e valor financeiro",
-      color: "#F59E0B",
+      label: "Pelo que posso ser PAGO",
+      description: "Que habilidades ou serviços geram valor no mercado?",
+      position: "circle-left",
+      color: "#3B82F6",
       icon: "banknote",
       fields: [
         {
           id: "pago_texto",
           type: "text_long",
-          placeholder: "Ex: Consultoria, mentoria, desenvolvimento de software...",
+          placeholder: "Ex: Consultoria, aulas, projetos, produtos digitais...",
           required: true,
           maxLength: 500,
         },
       ],
     },
-    // Interseções
+    // 4 interseções entre pares
     {
       id: "paixao",
       label: "Paixão",
-      description: "Ama + Faz Bem",
-      color: "#8B5CF6",
+      description: "Amo + Faço bem",
+      position: "intersect-top-right",
+      color: "#F97316",
       fields: [
         {
           id: "paixao_texto",
           type: "text_long",
-          placeholder: "O que surge quando você combina o que ama com o que faz bem?",
+          placeholder: "O que você ama E faz bem?",
           maxLength: 300,
         },
       ],
@@ -96,13 +102,14 @@ export const ikigaiTemplate: ToolSchema = {
     {
       id: "missao",
       label: "Missão",
-      description: "Ama + Mundo Precisa",
-      color: "#06B6D4",
+      description: "Amo + Mundo precisa",
+      position: "intersect-top-left",
+      color: "#8B5CF6",
       fields: [
         {
           id: "missao_texto",
           type: "text_long",
-          placeholder: "Que missão emerge entre o que ama e o que o mundo precisa?",
+          placeholder: "O que você ama E o mundo precisa?",
           maxLength: 300,
         },
       ],
@@ -110,13 +117,14 @@ export const ikigaiTemplate: ToolSchema = {
     {
       id: "vocacao",
       label: "Vocação",
-      description: "Mundo Precisa + Pode ser Pago",
-      color: "#14B8A6",
+      description: "Mundo precisa + Posso ser pago",
+      position: "intersect-bottom-left",
+      color: "#06B6D4",
       fields: [
         {
           id: "vocacao_texto",
           type: "text_long",
-          placeholder: "Que vocação surge entre necessidade do mundo e remuneração?",
+          placeholder: "O que o mundo precisa E pelo que posso ser pago?",
           maxLength: 300,
         },
       ],
@@ -124,28 +132,31 @@ export const ikigaiTemplate: ToolSchema = {
     {
       id: "profissao",
       label: "Profissão",
-      description: "Faz Bem + Pode ser Pago",
-      color: "#F97316",
+      description: "Faço bem + Posso ser pago",
+      position: "intersect-bottom-right",
+      color: "#14B8A6",
       fields: [
         {
           id: "profissao_texto",
           type: "text_long",
-          placeholder: "Que profissão surge entre o que faz bem e o que pode gerar renda?",
+          placeholder: "O que faço bem E pelo que posso ser pago?",
           maxLength: 300,
         },
       ],
     },
+    // Centro — O Ikigai
     {
       id: "ikigai",
-      label: "Seu IKIGAI",
-      description: "A interseção de tudo — sua razão de ser",
+      label: "Meu IKIGAI",
+      description: "A interseção de tudo — seu propósito",
+      position: "center",
       color: "#2D5A7B",
-      icon: "sparkles",
+      icon: "compass",
       fields: [
         {
           id: "ikigai_texto",
           type: "text_long",
-          placeholder: "Descreva o que surge quando tudo se encontra...",
+          placeholder: "Qual é o seu propósito? O que conecta tudo isso?",
           required: true,
           maxLength: 500,
         },
@@ -160,5 +171,5 @@ export const ikigaiDefaultSettings: ToolSettings = {
   allowMultipleResponses: false,
   showProgressBar: false,
   confirmationMessage:
-    "Seu Ikigai foi salvo! Use essa reflexão como guia para alinhar propósito e carreira.",
+    "Seu Ikigai foi salvo! Volte a ele sempre que precisar reconectar com seu propósito.",
 };

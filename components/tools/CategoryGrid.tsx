@@ -1,12 +1,14 @@
 "use client";
 
 import type { Section } from "@/lib/schemas/tool-schema";
-import { Brain, Flame, Heart, Scale, Shield, Sparkles } from "lucide-react";
+import {
+  BookOpen, Flame, Users, Scale, Shield, Sparkles,
+} from "lucide-react";
 
 const iconMap: Record<string, React.ComponentType<{ className?: string; style?: React.CSSProperties }>> = {
-  brain: Brain,
+  "book-open": BookOpen,
   flame: Flame,
-  "hand-heart": Heart,
+  users: Users,
   scale: Scale,
   shield: Shield,
   sparkles: Sparkles,
@@ -19,50 +21,42 @@ interface CategoryGridProps {
   readOnly?: boolean;
 }
 
-export default function CategoryGrid({ sections, values, onChange, readOnly = false }: CategoryGridProps) {
-  // Count selected per section
-  const countSelected = (section: Section) =>
-    section.fields.filter((f) => values[f.id]).length;
-
-  const totalSelected = sections.reduce((sum, s) => sum + countSelected(s), 0);
-  const totalFields = sections.reduce((sum, s) => sum + s.fields.length, 0);
+export default function CategoryGrid({
+  sections,
+  values,
+  onChange,
+  readOnly = false,
+}: CategoryGridProps) {
+  const totalSelected = Object.values(values).filter(Boolean).length;
 
   return (
-    <div className="w-full max-w-4xl mx-auto">
+    <div className="w-full max-w-5xl mx-auto">
       {/* Summary bar */}
       <div className="flex items-center justify-between mb-6 px-4 py-3 rounded-xl bg-white border">
         <span className="text-sm text-gray-600">
-          Forças selecionadas: <strong className="text-gray-900">{totalSelected}</strong> de {totalFields}
+          Forças selecionadas:
         </span>
-        <div className="flex gap-1">
-          {sections.map((s) => (
-            <div
-              key={s.id}
-              className="flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium"
-              style={{ backgroundColor: `${s.color}15`, color: s.color }}
-            >
-              {countSelected(s)}
-            </div>
-          ))}
-        </div>
+        <span className="text-lg font-bold" style={{ color: "#2D5A7B" }}>
+          {totalSelected} de 24
+        </span>
       </div>
 
       {/* Category cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {sections.map((section) => {
           const Icon = section.icon ? iconMap[section.icon] : null;
-          const selected = countSelected(section);
+          const selectedInCategory = section.fields.filter((f) => values[f.id]).length;
 
           return (
             <div
               key={section.id}
-              className="rounded-2xl border-2 p-4 transition-all hover:shadow-md"
+              className="rounded-2xl border-2 p-5 transition-all hover:shadow-md"
               style={{
-                borderColor: selected > 0 ? section.color : "#e5e7eb",
-                backgroundColor: selected > 0 ? `${section.color}06` : "white",
+                borderColor: section.color || "#e5e7eb",
+                backgroundColor: `${section.color}06`,
               }}
             >
-              {/* Header */}
+              {/* Category header */}
               <div className="flex items-center gap-2 mb-1">
                 {Icon && (
                   <div
@@ -79,40 +73,54 @@ export default function CategoryGrid({ sections, values, onChange, readOnly = fa
                 </div>
                 <span
                   className="text-xs font-bold px-2 py-0.5 rounded-full"
-                  style={{ backgroundColor: `${section.color}15`, color: section.color }}
+                  style={{
+                    backgroundColor: selectedInCategory > 0 ? `${section.color}20` : "#f3f4f6",
+                    color: selectedInCategory > 0 ? section.color : "#9ca3af",
+                  }}
                 >
-                  {selected}/{section.fields.length}
+                  {selectedInCategory}/{section.fields.length}
                 </span>
               </div>
 
               {section.description && (
-                <p className="text-xs text-gray-500 mb-3">{section.description}</p>
+                <p className="text-xs text-gray-400 mb-3">{section.description}</p>
               )}
 
               {/* Checkboxes */}
-              <div className="space-y-1.5">
+              <div className="space-y-2">
                 {section.fields.map((field) => {
-                  const checked = !!values[field.id];
+                  const isChecked = !!values[field.id];
+
                   return (
                     <label
                       key={field.id}
-                      className={`flex items-center gap-2.5 px-3 py-2 rounded-lg cursor-pointer
-                        transition-all border ${
-                          checked
-                            ? "border-current bg-white shadow-sm"
-                            : "border-transparent hover:bg-gray-50"
-                        } ${readOnly ? "pointer-events-none opacity-75" : ""}`}
-                      style={checked ? { borderColor: `${section.color}40`, color: section.color } : {}}
+                      className={`flex items-start gap-2.5 p-2.5 rounded-lg border cursor-pointer transition-all ${
+                        isChecked
+                          ? "border-current shadow-sm"
+                          : "border-gray-100 hover:border-gray-200 bg-white"
+                      }`}
+                      style={
+                        isChecked
+                          ? {
+                              borderColor: `${section.color}60`,
+                              backgroundColor: `${section.color}10`,
+                            }
+                          : undefined
+                      }
                     >
                       <input
                         type="checkbox"
-                        checked={checked}
+                        checked={isChecked}
                         onChange={(e) => onChange(field.id, e.target.checked)}
                         disabled={readOnly}
-                        className="w-4 h-4 rounded border-gray-300 transition-colors"
+                        className="mt-0.5 h-4 w-4 rounded border-gray-300 transition-colors"
                         style={{ accentColor: section.color }}
                       />
-                      <span className={`text-sm ${checked ? "font-medium" : "text-gray-700"}`}>
+                      <span
+                        className={`text-sm leading-snug ${
+                          isChecked ? "font-medium text-gray-800" : "text-gray-600"
+                        }`}
+                      >
                         {field.label}
                       </span>
                     </label>
@@ -123,6 +131,33 @@ export default function CategoryGrid({ sections, values, onChange, readOnly = fa
           );
         })}
       </div>
+
+      {/* Top strengths summary */}
+      {totalSelected > 0 && (
+        <div className="mt-6 p-4 rounded-xl bg-white border">
+          <h4 className="text-sm font-semibold text-gray-700 mb-2">
+            Suas forças selecionadas:
+          </h4>
+          <div className="flex flex-wrap gap-2">
+            {sections.flatMap((section) =>
+              section.fields
+                .filter((f) => values[f.id])
+                .map((f) => (
+                  <span
+                    key={f.id}
+                    className="text-xs px-2.5 py-1 rounded-full font-medium"
+                    style={{
+                      backgroundColor: `${section.color}15`,
+                      color: section.color,
+                    }}
+                  >
+                    {f.label?.split("—")[0]?.trim()}
+                  </span>
+                ))
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
