@@ -43,5 +43,10 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
+  // Permitir acesso às rotas de auth (callback, update-password)
+  if (request.nextUrl.pathname.startsWith("/auth/")) {
+    return supabaseResponse;
+  }
+
   return supabaseResponse;
 }
