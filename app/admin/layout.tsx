@@ -43,7 +43,7 @@ export default function AdminLayout({
         } = await supabase.auth.getUser();
 
         if (!user) {
-          router.push("/login");
+          router.push("/auth/login");
           return;
         }
 
@@ -77,7 +77,7 @@ export default function AdminLayout({
     try {
       await supabase.auth.signOut();
       toast.success("Sessao encerrada.");
-      router.push("/login");
+      router.push("/auth/login");
     } catch {
       toast.error("Erro ao sair.");
     }
