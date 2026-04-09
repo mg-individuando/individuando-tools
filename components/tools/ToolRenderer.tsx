@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import type { ToolSchema } from "@/lib/schemas/tool-schema";
+import type { ToolSchema, Section, Field } from "@/lib/schemas/tool-schema";
 import SwotGrid from "./SwotGrid";
 import RadarChart from "./RadarChart";
 import IkigaiDiagram from "./IkigaiDiagram";
@@ -16,6 +16,9 @@ interface ToolRendererProps {
   onSubmit?: (data: Record<string, unknown>) => void;
   onSectionClick?: (sectionIndex: number) => void;
   selectedSectionIndex?: number;
+  /** Builder callbacks for inline editing */
+  onSectionUpdate?: (sectionIndex: number, updates: Partial<Section>) => void;
+  onFieldUpdate?: (sectionIndex: number, fieldIndex: number, updates: Partial<Field>) => void;
 }
 
 export default function ToolRenderer({
@@ -25,6 +28,8 @@ export default function ToolRenderer({
   onSubmit,
   onSectionClick,
   selectedSectionIndex,
+  onSectionUpdate,
+  onFieldUpdate,
 }: ToolRendererProps) {
   const [values, setValues] = useState<Record<string, unknown>>(initialValues);
 
@@ -32,9 +37,11 @@ export default function ToolRenderer({
     setValues((prev) => ({ ...prev, [fieldId]: value }));
   };
 
-  const sectionSelectProps = {
+  const builderProps = {
     onSectionClick,
     selectedSectionIndex,
+    onSectionUpdate,
+    onFieldUpdate,
   };
 
   const renderTool = () => {
@@ -46,7 +53,7 @@ export default function ToolRenderer({
             values={values as Record<string, string>}
             onChange={(id, val) => handleChange(id, val)}
             readOnly={readOnly}
-            {...sectionSelectProps}
+            {...builderProps}
           />
         );
 
@@ -57,7 +64,7 @@ export default function ToolRenderer({
             values={values as Record<string, number>}
             onChange={(id, val) => handleChange(id, val)}
             readOnly={readOnly}
-            {...sectionSelectProps}
+            {...builderProps}
           />
         );
 
@@ -68,7 +75,7 @@ export default function ToolRenderer({
             values={values as Record<string, string>}
             onChange={(id, val) => handleChange(id, val)}
             readOnly={readOnly}
-            {...sectionSelectProps}
+            {...builderProps}
           />
         );
 
@@ -79,7 +86,7 @@ export default function ToolRenderer({
             values={values as Record<string, boolean>}
             onChange={(id, val) => handleChange(id, val)}
             readOnly={readOnly}
-            {...sectionSelectProps}
+            {...builderProps}
           />
         );
 
@@ -90,7 +97,7 @@ export default function ToolRenderer({
             values={values}
             onChange={(id, val) => handleChange(id, val)}
             readOnly={readOnly}
-            {...sectionSelectProps}
+            {...builderProps}
           />
         );
 
@@ -102,7 +109,7 @@ export default function ToolRenderer({
             values={values}
             onChange={(id, val) => handleChange(id, val)}
             readOnly={readOnly}
-            {...sectionSelectProps}
+            {...builderProps}
           />
         );
 
@@ -113,7 +120,7 @@ export default function ToolRenderer({
             values={values}
             onChange={(id, val) => handleChange(id, val)}
             readOnly={readOnly}
-            {...sectionSelectProps}
+            {...builderProps}
           />
         );
     }

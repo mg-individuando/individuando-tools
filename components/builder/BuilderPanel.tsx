@@ -175,12 +175,14 @@ export default function BuilderPanel({ schema, onChange, onSave, saving }: Build
             )}
           </div>
 
-          {/* Tool sections with click-to-select */}
+          {/* Tool sections with inline editing */}
           <ToolRenderer
             schema={schema}
             readOnly={false}
             onSectionClick={(si) => setSelected({ type: "section", sectionIndex: si })}
             selectedSectionIndex={selected?.type === "section" ? selected.sectionIndex : undefined}
+            onSectionUpdate={updateSection}
+            onFieldUpdate={updateField}
           />
         </div>
       </div>

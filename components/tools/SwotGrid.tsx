@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import type { Section } from "@/lib/schemas/tool-schema";
+import type { Section, Field } from "@/lib/schemas/tool-schema";
 import SectionIcon from "./SectionIcon";
+import InlineEdit from "./InlineEdit";
 
 interface SwotGridProps {
   sections: Section[];
@@ -11,6 +12,8 @@ interface SwotGridProps {
   readOnly?: boolean;
   onSectionClick?: (sectionIndex: number) => void;
   selectedSectionIndex?: number;
+  onSectionUpdate?: (sectionIndex: number, updates: Partial<Section>) => void;
+  onFieldUpdate?: (sectionIndex: number, fieldIndex: number, updates: Partial<Field>) => void;
 }
 
 export default function SwotGrid({
@@ -20,8 +23,11 @@ export default function SwotGrid({
   readOnly = false,
   onSectionClick,
   selectedSectionIndex,
+  onSectionUpdate,
+  onFieldUpdate,
 }: SwotGridProps) {
   const [focusedField, setFocusedField] = useState<string | null>(null);
+  const isBuilder = !!onSectionUpdate;
 
   const positionOrder = ["top-left", "top-right", "bottom-left", "bottom-right"];
   const orderedSections = useMemo(() => {
@@ -84,14 +90,35 @@ export default function SwotGrid({
                       <span className="text-xs font-bold text-white">{section.label.charAt(0)}</span>
                     )}
                   </div>
-                  <div className="min-w-0">
-                    <h3 className="font-semibold text-[15px] text-[#0f172a] leading-tight">
-                      {section.label}
-                    </h3>
-                    {section.description && (
-                      <p className="text-[13px] text-[#475569] mt-0.5 leading-snug">
-                        {section.description}
-                      </p>
+                  <div className="min-w-0 flex-1">
+                    {isBuilder ? (
+                      <>
+                        <InlineEdit
+                          value={section.label}
+                          onChange={(v) => onSectionUpdate(originalIndex, { label: v })}
+                          tag="h3"
+                          className="font-semibold text-[15px] text-[#0f172a] leading-tight"
+                          placeholder="Nome da seção"
+                        />
+                        <InlineEdit
+                          value={section.description || ""}
+                          onChange={(v) => onSectionUpdate(originalIndex, { description: v })}
+                          tag="p"
+                          className="text-[13px] text-[#475569] mt-0.5 leading-snug"
+                          placeholder="Descrição da seção"
+                        />
+                      </>
+                    ) : (
+                      <>
+                        <h3 className="font-semibold text-[15px] text-[#0f172a] leading-tight">
+                          {section.label}
+                        </h3>
+                        {section.description && (
+                          <p className="text-[13px] text-[#475569] mt-0.5 leading-snug">
+                            {section.description}
+                          </p>
+                        )}
+                      </>
                     )}
                   </div>
                 </div>
@@ -100,6 +127,18 @@ export default function SwotGrid({
               {/* Input */}
               {field && (
                 <div className="px-5 pb-4 flex-1 flex flex-col">
+                  {/* Editable placeholder label in builder mode */}
+                  {isBuilder && (
+                    <div className="mb-1.5">
+                      <InlineEdit
+                        value={field.placeholder || ""}
+                        onChange={(v) => onFieldUpdate!(originalIndex, 0, { placeholder: v })}
+                        tag="span"
+                        className="text-[11px] text-[#94a3b8] italic"
+                        placeholder="Texto de exemplo (placeholder)"
+                      />
+                    </div>
+                  )}
                   <textarea
                     value={values[field.id] || ""}
                     onChange={(e) => onChange(field.id, e.target.value)}

@@ -11,6 +11,8 @@ interface CategoryGridProps {
   readOnly?: boolean;
   onSectionClick?: (sectionIndex: number) => void;
   selectedSectionIndex?: number;
+  onSectionUpdate?: (sectionIndex: number, updates: Partial<Section>) => void;
+  onFieldUpdate?: (sectionIndex: number, fieldIndex: number, updates: Partial<import("@/lib/schemas/tool-schema").Field>) => void;
 }
 
 export default function CategoryGrid({

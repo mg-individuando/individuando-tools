@@ -3,6 +3,7 @@
 import { useState } from "react";
 import type { Section, Field } from "@/lib/schemas/tool-schema";
 import SectionIcon from "./SectionIcon";
+import InlineEdit from "./InlineEdit";
 
 interface FreeLayoutProps {
   sections: Section[];
@@ -11,6 +12,8 @@ interface FreeLayoutProps {
   readOnly?: boolean;
   onSectionClick?: (sectionIndex: number) => void;
   selectedSectionIndex?: number;
+  onSectionUpdate?: (sectionIndex: number, updates: Partial<Section>) => void;
+  onFieldUpdate?: (sectionIndex: number, fieldIndex: number, updates: Partial<Field>) => void;
 }
 
 export default function FreeLayout({
@@ -20,21 +23,44 @@ export default function FreeLayout({
   readOnly = false,
   onSectionClick,
   selectedSectionIndex,
+  onSectionUpdate,
+  onFieldUpdate,
 }: FreeLayoutProps) {
   const [focusedField, setFocusedField] = useState<string | null>(null);
+  const isBuilder = !!onSectionUpdate;
 
-  function renderField(field: Field, sectionColor: string) {
+  function renderField(field: Field, sectionColor: string, sectionIndex: number, fieldIndex: number) {
     const fieldValue = values[field.id];
+
+    // Builder-mode editable label
+    const fieldLabel = isBuilder ? (
+      <InlineEdit
+        value={field.label || ""}
+        onChange={(v) => onFieldUpdate!(sectionIndex, fieldIndex, { label: v })}
+        tag="label"
+        className="text-[13px] font-medium text-[#475569]"
+        placeholder="Label do campo"
+      />
+    ) : field.label ? (
+      <label className="text-[13px] font-medium text-[#475569]">
+        {field.label}
+        {field.required && <span className="text-red-400 ml-0.5">*</span>}
+      </label>
+    ) : null;
 
     switch (field.type) {
       case "text_short":
         return (
           <div key={field.id} className="space-y-1.5">
-            {field.label && (
-              <label className="text-[13px] font-medium text-[#475569]">
-                {field.label}
-                {field.required && <span className="text-red-400 ml-0.5">*</span>}
-              </label>
+            {fieldLabel}
+            {isBuilder && (
+              <InlineEdit
+                value={field.placeholder || ""}
+                onChange={(v) => onFieldUpdate!(sectionIndex, fieldIndex, { placeholder: v })}
+                tag="span"
+                className="text-[11px] text-[#94a3b8] italic"
+                placeholder="Placeholder do campo"
+              />
             )}
             <input
               type="text"
@@ -61,11 +87,15 @@ export default function FreeLayout({
       case "text_long":
         return (
           <div key={field.id} className="space-y-1.5">
-            {field.label && (
-              <label className="text-[13px] font-medium text-[#475569]">
-                {field.label}
-                {field.required && <span className="text-red-400 ml-0.5">*</span>}
-              </label>
+            {fieldLabel}
+            {isBuilder && (
+              <InlineEdit
+                value={field.placeholder || ""}
+                onChange={(v) => onFieldUpdate!(sectionIndex, fieldIndex, { placeholder: v })}
+                tag="span"
+                className="text-[11px] text-[#94a3b8] italic"
+                placeholder="Placeholder do campo"
+              />
             )}
             <textarea
               value={(fieldValue as string) || ""}
@@ -99,9 +129,19 @@ export default function FreeLayout({
           <div key={field.id} className="space-y-2.5">
             {field.label && (
               <div className="flex items-center justify-between">
-                <label className="text-[13px] font-medium text-[#475569]">
-                  {field.label}
-                </label>
+                {isBuilder ? (
+                  <InlineEdit
+                    value={field.label}
+                    onChange={(v) => onFieldUpdate!(sectionIndex, fieldIndex, { label: v })}
+                    tag="label"
+                    className="text-[13px] font-medium text-[#475569]"
+                    placeholder="Label"
+                  />
+                ) : (
+                  <label className="text-[13px] font-medium text-[#475569]">
+                    {field.label}
+                  </label>
+                )}
                 <span
                   className="inline-flex items-center justify-center min-w-[28px] h-7 rounded-lg text-xs font-bold text-white px-1.5"
                   style={{
@@ -150,7 +190,17 @@ export default function FreeLayout({
                 className="h-4 w-4 rounded border-[rgba(0,128,255,0.2)]"
                 style={{ accentColor: "#0080ff" }}
               />
-              <span className="text-sm text-[#0f172a]">{field.label}</span>
+              {isBuilder ? (
+                <InlineEdit
+                  value={field.label || ""}
+                  onChange={(v) => onFieldUpdate!(sectionIndex, fieldIndex, { label: v })}
+                  tag="span"
+                  className="text-sm text-[#0f172a]"
+                  placeholder="Label do checkbox"
+                />
+              ) : (
+                <span className="text-sm text-[#0f172a]">{field.label}</span>
+              )}
             </label>
           </div>
         );
@@ -158,9 +208,7 @@ export default function FreeLayout({
       case "radio":
         return (
           <div key={field.id} className="space-y-1.5">
-            {field.label && (
-              <label className="text-[13px] font-medium text-[#475569]">{field.label}</label>
-            )}
+            {fieldLabel}
             <div className="space-y-1">
               {field.options?.map((opt) => (
                 <label
@@ -187,9 +235,7 @@ export default function FreeLayout({
       case "dropdown":
         return (
           <div key={field.id} className="space-y-1.5">
-            {field.label && (
-              <label className="text-[13px] font-medium text-[#475569]">{field.label}</label>
-            )}
+            {fieldLabel}
             <select
               value={(fieldValue as string) || ""}
               onChange={(e) => onChange(field.id, e.target.value)}
@@ -211,9 +257,7 @@ export default function FreeLayout({
       case "date":
         return (
           <div key={field.id} className="space-y-1.5">
-            {field.label && (
-              <label className="text-[13px] font-medium text-[#475569]">{field.label}</label>
-            )}
+            {fieldLabel}
             <input
               type="date"
               value={(fieldValue as string) || ""}
@@ -273,14 +317,35 @@ export default function FreeLayout({
                 >
                   <SectionIcon icon={section.icon} size={18} className="text-white" />
                 </div>
-                <div className="min-w-0">
-                  <h3 className="font-semibold text-[15px] text-[#0f172a] leading-tight">
-                    {section.label}
-                  </h3>
-                  {section.description && (
-                    <p className="text-[13px] text-[#475569] leading-snug mt-0.5">
-                      {section.description}
-                    </p>
+                <div className="min-w-0 flex-1">
+                  {isBuilder ? (
+                    <>
+                      <InlineEdit
+                        value={section.label}
+                        onChange={(v) => onSectionUpdate!(sectionIndex, { label: v })}
+                        tag="h3"
+                        className="font-semibold text-[15px] text-[#0f172a] leading-tight"
+                        placeholder="Nome da seção"
+                      />
+                      <InlineEdit
+                        value={section.description || ""}
+                        onChange={(v) => onSectionUpdate!(sectionIndex, { description: v })}
+                        tag="p"
+                        className="text-[13px] text-[#475569] leading-snug mt-0.5"
+                        placeholder="Descrição da seção"
+                      />
+                    </>
+                  ) : (
+                    <>
+                      <h3 className="font-semibold text-[15px] text-[#0f172a] leading-tight">
+                        {section.label}
+                      </h3>
+                      {section.description && (
+                        <p className="text-[13px] text-[#475569] leading-snug mt-0.5">
+                          {section.description}
+                        </p>
+                      )}
+                    </>
                   )}
                 </div>
               </div>
@@ -288,7 +353,7 @@ export default function FreeLayout({
 
             {/* Section fields */}
             <div className="px-5 pb-5 pt-2 space-y-3.5">
-              {section.fields.map((field) => renderField(field, color))}
+              {section.fields.map((field, fieldIndex) => renderField(field, color, sectionIndex, fieldIndex))}
             </div>
           </div>
         );
