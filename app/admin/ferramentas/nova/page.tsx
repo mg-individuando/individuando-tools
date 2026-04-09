@@ -27,6 +27,7 @@ import {
   User,
   Maximize2,
   X as XIcon,
+  ImagePlus,
 } from "lucide-react";
 import Link from "next/link";
 import ToolRenderer from "@/components/tools/ToolRenderer";
@@ -48,6 +49,7 @@ interface ClientOption {
 interface ChatMessage {
   role: "user" | "assistant";
   content: string;
+  images?: string[]; // base64 data URIs
   schema?: any;
   settings?: any;
   meta?: any;
@@ -83,7 +85,9 @@ export default function NovaFerramentaPage() {
   const [generatedMeta, setGeneratedMeta] = useState<any>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const imageInputRef = useRef<HTMLInputElement>(null);
   const [showPreview, setShowPreview] = useState(false);
+  const [pendingImages, setPendingImages] = useState<string[]>([]);
 
   useEffect(() => {
     async function loadClients() {
@@ -202,26 +206,70 @@ export default function NovaFerramentaPage() {
     router.push(`/admin/ferramentas/${data.id}`);
   }
 
+  function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = e.target.files;
+    if (!files) return;
+
+    Array.from(files).forEach((file) => {
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error("Imagem muito grande (máx 5MB)");
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = () => {
+        setPendingImages((prev) => [...prev, reader.result as string]);
+      };
+      reader.readAsDataURL(file);
+    });
+
+    // Reset input
+    e.target.value = "";
+  }
+
   async function sendMessage(text?: string) {
     const msg = text || inputMessage.trim();
-    if (!msg || aiLoading) return;
+    if ((!msg && pendingImages.length === 0) || aiLoading) return;
 
-    const userMessage: ChatMessage = { role: "user", content: msg };
+    const userMessage: ChatMessage = {
+      role: "user",
+      content: msg || "Analise esta imagem de referência e crie uma ferramenta similar.",
+      images: pendingImages.length > 0 ? [...pendingImages] : undefined,
+    };
     const newMessages = [...chatMessages, userMessage];
     setChatMessages(newMessages);
     setInputMessage("");
+    setPendingImages([]);
     setAiLoading(true);
 
+    // Reset textarea height
+    if (textareaRef.current) textareaRef.current.style.height = "auto";
+
     try {
+      // Build messages for API — include images as content blocks
+      const apiMessages = newMessages.map((m) => {
+        if (m.images && m.images.length > 0) {
+          return {
+            role: m.role,
+            content: [
+              ...m.images.map((img) => ({
+                type: "image" as const,
+                source: {
+                  type: "base64" as const,
+                  media_type: img.split(";")[0].split(":")[1] as string,
+                  data: img.split(",")[1],
+                },
+              })),
+              { type: "text" as const, text: m.content },
+            ],
+          };
+        }
+        return { role: m.role, content: m.content };
+      });
+
       const response = await fetch("/api/ai/generate-tool", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          messages: newMessages.map((m) => ({
-            role: m.role,
-            content: m.content,
-          })),
-        }),
+        body: JSON.stringify({ messages: apiMessages }),
       });
 
       if (!response.ok) {
@@ -418,6 +466,19 @@ export default function NovaFerramentaPage() {
                           : "bg-gray-100 text-gray-700 rounded-bl-md"
                       }`}
                     >
+                      {/* Show attached images */}
+                      {msg.images && msg.images.length > 0 && (
+                        <div className="flex gap-2 flex-wrap mb-2">
+                          {msg.images.map((img, j) => (
+                            <img
+                              key={j}
+                              src={img}
+                              alt="Referência"
+                              className="h-20 rounded-lg object-cover border border-white/20"
+                            />
+                          ))}
+                        </div>
+                      )}
                       <p className="whitespace-pre-wrap">{msg.content}</p>
                       {msg.schema && (
                         <div className="mt-3 pt-3 border-t border-gray-200/50">
@@ -453,22 +514,66 @@ export default function NovaFerramentaPage() {
               </div>
 
               {/* Input */}
-              <div className="border-t p-4">
+              <div className="border-t p-4 space-y-2">
+                {/* Pending images */}
+                {pendingImages.length > 0 && (
+                  <div className="flex gap-2 flex-wrap">
+                    {pendingImages.map((img, i) => (
+                      <div key={i} className="relative group">
+                        <img
+                          src={img}
+                          alt="Referência"
+                          className="h-16 w-16 rounded-lg object-cover border border-gray-200"
+                        />
+                        <button
+                          onClick={() =>
+                            setPendingImages((prev) =>
+                              prev.filter((_, idx) => idx !== i)
+                            )
+                          }
+                          className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-red-500 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          <XIcon className="w-3 h-3" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
                 <form
                   onSubmit={(e) => {
                     e.preventDefault();
                     sendMessage();
                   }}
-                  className="flex gap-2"
+                  className="flex gap-2 items-end"
                 >
+                  {/* Image upload */}
+                  <input
+                    ref={imageInputRef}
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={handleImageUpload}
+                    className="hidden"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => imageInputRef.current?.click()}
+                    disabled={aiLoading}
+                    className="shrink-0 p-2.5 rounded-xl border border-gray-200 text-gray-400 hover:text-purple-500 hover:border-purple-200 hover:bg-purple-50 transition-colors disabled:opacity-50"
+                    title="Enviar imagem de referência"
+                  >
+                    <ImagePlus className="w-4 h-4" />
+                  </button>
+
                   <textarea
                     ref={textareaRef}
                     value={inputMessage}
                     onChange={(e) => {
                       setInputMessage(e.target.value);
-                      // Auto resize
                       e.target.style.height = "auto";
-                      e.target.style.height = Math.min(e.target.scrollHeight, 150) + "px";
+                      e.target.style.height =
+                        Math.min(e.target.scrollHeight, 150) + "px";
                     }}
                     onKeyDown={(e) => {
                       if (e.key === "Enter" && !e.shiftKey) {
@@ -476,7 +581,7 @@ export default function NovaFerramentaPage() {
                         sendMessage();
                       }
                     }}
-                    placeholder="Descreva a ferramenta que você precisa..."
+                    placeholder="Descreva a ferramenta ou envie uma imagem de referência..."
                     disabled={aiLoading}
                     rows={1}
                     className="flex-1 resize-none rounded-xl border border-gray-200 bg-gray-50/50 px-4 py-3 text-sm text-gray-900 placeholder:text-gray-300 focus:ring-2 focus:ring-purple-200 focus:bg-white focus:border-purple-300 outline-none transition-all"
@@ -484,19 +589,20 @@ export default function NovaFerramentaPage() {
                   />
                   <Button
                     type="submit"
-                    disabled={!inputMessage.trim() || aiLoading}
+                    disabled={
+                      (!inputMessage.trim() && pendingImages.length === 0) ||
+                      aiLoading
+                    }
                     className="bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 shrink-0"
                   >
                     <Send className="w-4 h-4" />
                   </Button>
                 </form>
-                {generatedSchema && (
-                  <p className="text-xs text-gray-400 mt-2">
-                    💡 Não gostou? Peça ajustes: &quot;mude as cores&quot;,
-                    &quot;adicione mais dimensões&quot;, &quot;troque para
-                    radar&quot;...
-                  </p>
-                )}
+                <p className="text-xs text-gray-400">
+                  {generatedSchema
+                    ? '💡 Peça ajustes: "mude as cores", "adicione dimensões", "troque para radar"...'
+                    : "📎 Envie imagens de referência para a IA se inspirar"}
+                </p>
               </div>
             </Card>
           </div>

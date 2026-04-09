@@ -24,6 +24,7 @@ export default function DynamicTable({
 }: DynamicTableProps) {
   const section = sections[0];
   const fields = section?.fields || [];
+  const color = section?.color || "#2D5A7B";
 
   function createEmptyRow(): MetaRow {
     const row: MetaRow = { id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6) };
@@ -43,6 +44,7 @@ export default function DynamicTable({
 
   const [rows, setRows] = useState<MetaRow[]>(getInitialRows);
   const [expandedRow, setExpandedRow] = useState<string | null>(null);
+  const [hoveredRow, setHoveredRow] = useState<string | null>(null);
 
   const updateRows = (newRows: MetaRow[]) => {
     setRows(newRows);
@@ -75,98 +77,169 @@ export default function DynamicTable({
   return (
     <div className="w-full max-w-4xl mx-auto">
       {/* Header */}
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
+      <div className="flex items-center justify-between mb-5">
+        <div className="flex items-center gap-3">
           <div
-            className="w-8 h-8 rounded-lg flex items-center justify-center"
-            style={{ backgroundColor: `${section?.color || "#2D5A7B"}20` }}
+            className="w-10 h-10 rounded-xl flex items-center justify-center shadow-sm"
+            style={{
+              background: `linear-gradient(135deg, ${color}18, ${color}08)`,
+              border: `1px solid ${color}20`,
+            }}
           >
-            <Target className="w-4 h-4" style={{ color: section?.color || "#2D5A7B" }} />
+            <Target className="w-5 h-5" style={{ color }} />
           </div>
           <div>
-            <h3 className="font-semibold text-gray-800">{section?.label}</h3>
+            <h3 className="font-bold text-gray-800">{section?.label}</h3>
             {section?.description && (
-              <p className="text-xs text-gray-400">{section.description}</p>
+              <p className="text-xs text-gray-400 mt-0.5">{section.description}</p>
             )}
           </div>
         </div>
-        <span className="text-sm text-gray-500">
+        <div
+          className="px-3 py-1 rounded-full text-xs font-bold"
+          style={{
+            background: `linear-gradient(135deg, ${color}15, ${color}08)`,
+            color,
+            border: `1px solid ${color}20`,
+          }}
+        >
           {rows.length} {rows.length === 1 ? "meta" : "metas"}
-        </span>
+        </div>
       </div>
 
-      {/* Desktop table view */}
-      <div className="hidden md:block overflow-x-auto rounded-xl border">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b bg-gray-50">
-              <th className="px-3 py-2.5 text-left font-semibold text-gray-600 w-8">#</th>
-              {fields.map((field) => (
-                <th
-                  key={field.id}
-                  className="px-3 py-2.5 text-left font-semibold text-gray-600"
-                >
-                  {field.label}
-                </th>
-              ))}
-              {!readOnly && (
-                <th className="px-3 py-2.5 text-center font-semibold text-gray-600 w-12" />
-              )}
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((row, index) => (
-              <tr
-                key={row.id}
-                className="border-b last:border-b-0 hover:bg-gray-50/50 transition-colors"
+      {/* Desktop card-based rows */}
+      <div className="hidden md:block space-y-3">
+        {/* Sticky header with frosted glass */}
+        <div
+          className="sticky top-0 z-10 rounded-xl px-4 py-3 flex items-center gap-3"
+          style={{
+            background: "rgba(255,255,255,0.75)",
+            backdropFilter: "blur(16px)",
+            WebkitBackdropFilter: "blur(16px)",
+            border: "1px solid rgba(255,255,255,0.5)",
+            boxShadow: "0 2px 12px rgba(0,0,0,0.04)",
+          }}
+        >
+          <div className="w-9 flex-shrink-0" />
+          {fields.map((field) => (
+            <div
+              key={field.id}
+              className="flex-1 text-xs font-bold text-gray-500 uppercase tracking-wider"
+            >
+              {field.label}
+            </div>
+          ))}
+          {!readOnly && <div className="w-10 flex-shrink-0" />}
+        </div>
+
+        {/* Row cards */}
+        {rows.map((row, index) => {
+          const isHovered = hoveredRow === row.id;
+
+          return (
+            <div
+              key={row.id}
+              className="rounded-xl flex items-start gap-3 px-4 py-3 transition-all duration-200"
+              style={{
+                background: "rgba(255,255,255,0.72)",
+                backdropFilter: "blur(12px)",
+                WebkitBackdropFilter: "blur(12px)",
+                border: "1px solid rgba(255,255,255,0.5)",
+                boxShadow: isHovered
+                  ? "0 8px 32px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.04)"
+                  : "0 2px 12px rgba(0,0,0,0.03), 0 1px 2px rgba(0,0,0,0.02)",
+                transform: isHovered ? "translateY(-1px)" : "none",
+              }}
+              onMouseEnter={() => setHoveredRow(row.id)}
+              onMouseLeave={() => setHoveredRow(null)}
+            >
+              {/* Row number badge */}
+              <div
+                className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 text-xs font-bold text-white shadow-sm mt-0.5"
+                style={{
+                  background: `linear-gradient(135deg, ${color}, ${color}BB)`,
+                  boxShadow: `0 2px 8px ${color}30`,
+                }}
               >
-                <td className="px-3 py-2 text-gray-400 font-medium">{index + 1}</td>
-                {fields.map((field) => (
-                  <td key={field.id} className="px-3 py-2">
-                    {field.type === "text_long" ? (
-                      <textarea
-                        value={row[field.id] || ""}
-                        onChange={(e) => updateField(row.id, field.id, e.target.value)}
-                        placeholder={field.placeholder}
-                        maxLength={field.maxLength}
-                        readOnly={readOnly}
-                        rows={2}
-                        className="w-full min-w-[150px] rounded border border-gray-200 bg-white px-2.5 py-1.5
-                          text-sm placeholder:text-gray-300 focus:outline-none focus:ring-1
-                          focus:ring-[#2D5A7B]/30 resize-none transition-all"
-                      />
-                    ) : (
-                      <input
-                        type="text"
-                        value={row[field.id] || ""}
-                        onChange={(e) => updateField(row.id, field.id, e.target.value)}
-                        placeholder={field.placeholder}
-                        maxLength={field.maxLength}
-                        readOnly={readOnly}
-                        className="w-full min-w-[100px] rounded border border-gray-200 bg-white px-2.5 py-1.5
-                          text-sm placeholder:text-gray-300 focus:outline-none focus:ring-1
-                          focus:ring-[#2D5A7B]/30 transition-all"
-                      />
-                    )}
-                  </td>
-                ))}
-                {!readOnly && (
-                  <td className="px-3 py-2 text-center">
-                    <button
-                      onClick={() => removeRow(row.id)}
-                      disabled={rows.length <= 1}
-                      className="p-1 rounded text-gray-300 hover:text-red-500 hover:bg-red-50
-                        disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-                      title="Remover meta"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </td>
-                )}
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                {index + 1}
+              </div>
+
+              {/* Fields */}
+              {fields.map((field) => (
+                <div key={field.id} className="flex-1 min-w-0">
+                  {field.type === "text_long" ? (
+                    <textarea
+                      value={row[field.id] || ""}
+                      onChange={(e) => updateField(row.id, field.id, e.target.value)}
+                      placeholder={field.placeholder}
+                      maxLength={field.maxLength}
+                      readOnly={readOnly}
+                      rows={2}
+                      className="w-full rounded-lg bg-transparent px-3 py-2 text-sm text-gray-700
+                        placeholder:text-gray-300 border-0 resize-none transition-all duration-200
+                        focus:outline-none"
+                      style={{
+                        boxShadow: "inset 0 2px 4px rgba(0,0,0,0.04)",
+                        background: "rgba(0,0,0,0.015)",
+                      }}
+                      onFocus={(e) => {
+                        e.currentTarget.style.boxShadow = `inset 0 2px 4px rgba(0,0,0,0.04), 0 0 0 2px ${color}30`;
+                        e.currentTarget.style.background = "rgba(255,255,255,0.9)";
+                      }}
+                      onBlur={(e) => {
+                        e.currentTarget.style.boxShadow = "inset 0 2px 4px rgba(0,0,0,0.04)";
+                        e.currentTarget.style.background = "rgba(0,0,0,0.015)";
+                      }}
+                    />
+                  ) : (
+                    <input
+                      type="text"
+                      value={row[field.id] || ""}
+                      onChange={(e) => updateField(row.id, field.id, e.target.value)}
+                      placeholder={field.placeholder}
+                      maxLength={field.maxLength}
+                      readOnly={readOnly}
+                      className="w-full rounded-lg bg-transparent px-3 py-2 text-sm text-gray-700
+                        placeholder:text-gray-300 border-0 transition-all duration-200
+                        focus:outline-none"
+                      style={{
+                        boxShadow: "inset 0 2px 4px rgba(0,0,0,0.04)",
+                        background: "rgba(0,0,0,0.015)",
+                      }}
+                      onFocus={(e) => {
+                        e.currentTarget.style.boxShadow = `inset 0 2px 4px rgba(0,0,0,0.04), 0 0 0 2px ${color}30`;
+                        e.currentTarget.style.background = "rgba(255,255,255,0.9)";
+                      }}
+                      onBlur={(e) => {
+                        e.currentTarget.style.boxShadow = "inset 0 2px 4px rgba(0,0,0,0.04)";
+                        e.currentTarget.style.background = "rgba(0,0,0,0.015)";
+                      }}
+                    />
+                  )}
+                </div>
+              ))}
+
+              {/* Delete button -- visible on hover */}
+              {!readOnly && (
+                <button
+                  onClick={() => removeRow(row.id)}
+                  disabled={rows.length <= 1}
+                  className="w-10 h-9 rounded-lg flex items-center justify-center flex-shrink-0
+                    transition-all duration-200 mt-0.5"
+                  style={{
+                    opacity: isHovered ? 1 : 0,
+                    color: isHovered ? "#ef4444" : "#d1d5db",
+                    background: isHovered ? "rgba(239,68,68,0.06)" : "transparent",
+                    cursor: rows.length <= 1 ? "not-allowed" : "pointer",
+                  }}
+                  title="Remover meta"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              )}
+            </div>
+          );
+        })}
       </div>
 
       {/* Mobile card view */}
@@ -178,33 +251,58 @@ export default function DynamicTable({
           return (
             <div
               key={row.id}
-              className="rounded-xl border bg-white overflow-hidden transition-all"
+              className="rounded-2xl overflow-hidden transition-all duration-200"
+              style={{
+                background: "rgba(255,255,255,0.72)",
+                backdropFilter: "blur(12px)",
+                WebkitBackdropFilter: "blur(12px)",
+                border: "1px solid rgba(255,255,255,0.5)",
+                boxShadow: isExpanded
+                  ? "0 8px 32px rgba(0,0,0,0.08)"
+                  : "0 2px 12px rgba(0,0,0,0.03)",
+              }}
             >
               <button
                 onClick={() => toggleExpand(row.id)}
-                className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-gray-50 transition-colors"
+                className="w-full flex items-center gap-3 px-4 py-3.5 text-left transition-colors"
               >
                 <span
-                  className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0"
-                  style={{ backgroundColor: section?.color || "#2D5A7B" }}
+                  className="w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold text-white flex-shrink-0 shadow-sm"
+                  style={{
+                    background: `linear-gradient(135deg, ${color}, ${color}BB)`,
+                    boxShadow: `0 2px 8px ${color}30`,
+                  }}
                 >
                   {index + 1}
                 </span>
-                <span className="flex-1 font-medium text-sm text-gray-800 truncate">
+                <span className="flex-1 font-semibold text-sm text-gray-800 truncate">
                   {metaName || "Nova meta..."}
                 </span>
-                {isExpanded ? (
-                  <ChevronUp className="w-4 h-4 text-gray-400" />
-                ) : (
+                <div
+                  className="w-7 h-7 rounded-lg flex items-center justify-center transition-all duration-200"
+                  style={{
+                    background: isExpanded ? `${color}10` : "rgba(0,0,0,0.03)",
+                    transform: isExpanded ? "rotate(180deg)" : "rotate(0deg)",
+                  }}
+                >
                   <ChevronDown className="w-4 h-4 text-gray-400" />
-                )}
+                </div>
               </button>
 
               {isExpanded && (
-                <div className="px-4 pb-4 space-y-3 border-t">
+                <div className="px-4 pb-4 space-y-4">
+                  <div
+                    className="h-px w-full"
+                    style={{
+                      background: `linear-gradient(90deg, transparent, ${color}20, transparent)`,
+                    }}
+                  />
                   {fields.map((field) => (
-                    <div key={field.id} className="pt-3">
-                      <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 block">
+                    <div key={field.id}>
+                      <label
+                        className="text-[11px] font-bold uppercase tracking-wider mb-1.5 block"
+                        style={{ color: `${color}90` }}
+                      >
                         {field.label}
                       </label>
                       {field.type === "text_long" ? (
@@ -215,9 +313,21 @@ export default function DynamicTable({
                           maxLength={field.maxLength}
                           readOnly={readOnly}
                           rows={3}
-                          className="w-full rounded-lg border border-gray-200 bg-white p-2.5 text-sm
-                            placeholder:text-gray-300 focus:outline-none focus:ring-1
-                            focus:ring-[#2D5A7B]/30 resize-none"
+                          className="w-full rounded-xl px-3.5 py-2.5 text-sm text-gray-700
+                            placeholder:text-gray-300 border-0 resize-none transition-all duration-200
+                            focus:outline-none"
+                          style={{
+                            boxShadow: "inset 0 2px 4px rgba(0,0,0,0.04)",
+                            background: "rgba(0,0,0,0.02)",
+                          }}
+                          onFocus={(e) => {
+                            e.currentTarget.style.boxShadow = `inset 0 2px 4px rgba(0,0,0,0.04), 0 0 0 2px ${color}30`;
+                            e.currentTarget.style.background = "rgba(255,255,255,0.9)";
+                          }}
+                          onBlur={(e) => {
+                            e.currentTarget.style.boxShadow = "inset 0 2px 4px rgba(0,0,0,0.04)";
+                            e.currentTarget.style.background = "rgba(0,0,0,0.02)";
+                          }}
                         />
                       ) : (
                         <input
@@ -227,9 +337,21 @@ export default function DynamicTable({
                           placeholder={field.placeholder}
                           maxLength={field.maxLength}
                           readOnly={readOnly}
-                          className="w-full rounded-lg border border-gray-200 bg-white p-2.5 text-sm
-                            placeholder:text-gray-300 focus:outline-none focus:ring-1
-                            focus:ring-[#2D5A7B]/30"
+                          className="w-full rounded-xl px-3.5 py-2.5 text-sm text-gray-700
+                            placeholder:text-gray-300 border-0 transition-all duration-200
+                            focus:outline-none"
+                          style={{
+                            boxShadow: "inset 0 2px 4px rgba(0,0,0,0.04)",
+                            background: "rgba(0,0,0,0.02)",
+                          }}
+                          onFocus={(e) => {
+                            e.currentTarget.style.boxShadow = `inset 0 2px 4px rgba(0,0,0,0.04), 0 0 0 2px ${color}30`;
+                            e.currentTarget.style.background = "rgba(255,255,255,0.9)";
+                          }}
+                          onBlur={(e) => {
+                            e.currentTarget.style.boxShadow = "inset 0 2px 4px rgba(0,0,0,0.04)";
+                            e.currentTarget.style.background = "rgba(0,0,0,0.02)";
+                          }}
                         />
                       )}
                     </div>
@@ -238,9 +360,11 @@ export default function DynamicTable({
                     <button
                       onClick={() => removeRow(row.id)}
                       disabled={rows.length <= 1}
-                      className="text-xs text-red-400 hover:text-red-600 disabled:opacity-30
-                        disabled:cursor-not-allowed mt-2 transition-colors"
+                      className="flex items-center gap-1.5 text-xs text-red-400 hover:text-red-500
+                        disabled:opacity-30 disabled:cursor-not-allowed mt-1 transition-colors
+                        px-2.5 py-1.5 rounded-lg hover:bg-red-50"
                     >
+                      <Trash2 className="w-3 h-3" />
                       Remover esta meta
                     </button>
                   )}
@@ -255,13 +379,22 @@ export default function DynamicTable({
       {!readOnly && (
         <button
           onClick={addRow}
-          className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-3
-            rounded-xl border-2 border-dashed border-gray-200 text-gray-400
-            hover:border-[#2D5A7B]/30 hover:text-[#2D5A7B] hover:bg-[#2D5A7B]/5
-            transition-all active:scale-[0.99]"
+          className="mt-5 w-full flex items-center justify-center gap-2.5 px-5 py-3.5
+            rounded-xl text-white font-semibold text-sm
+            transition-all duration-200 active:scale-[0.98] hover:-translate-y-0.5"
+          style={{
+            background: `linear-gradient(135deg, ${color}, ${color}CC)`,
+            boxShadow: `0 4px 16px ${color}30, 0 2px 4px ${color}20`,
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.boxShadow = `0 8px 24px ${color}40, 0 2px 4px ${color}20`;
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.boxShadow = `0 4px 16px ${color}30, 0 2px 4px ${color}20`;
+          }}
         >
-          <Plus className="w-4 h-4" />
-          <span className="text-sm font-medium">Adicionar Meta</span>
+          <Plus className="w-4.5 h-4.5" />
+          Adicionar Meta
         </button>
       )}
     </div>

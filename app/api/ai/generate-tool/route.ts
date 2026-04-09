@@ -164,14 +164,19 @@ export async function POST(request: NextRequest) {
 
     const anthropic = getAnthropicClient();
 
+    // Messages can be simple strings or multimodal content blocks
+    const formattedMessages = messages.map(
+      (m: { role: string; content: any }) => ({
+        role: m.role as "user" | "assistant",
+        content: m.content, // Already formatted by the client (string or content blocks array)
+      })
+    );
+
     const response = await anthropic.messages.create({
       model: "claude-sonnet-4-20250514",
       max_tokens: 4096,
       system: SYSTEM_PROMPT,
-      messages: messages.map((m: { role: string; content: string }) => ({
-        role: m.role as "user" | "assistant",
-        content: m.content,
-      })),
+      messages: formattedMessages,
     });
 
     const text =
