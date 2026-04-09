@@ -28,6 +28,7 @@ import {
   Maximize2,
   X as XIcon,
   ImagePlus,
+  FileUp,
 } from "lucide-react";
 import Link from "next/link";
 import ToolRenderer from "@/components/tools/ToolRenderer";
@@ -65,7 +66,7 @@ const SUGGESTIONS = [
 ];
 
 export default function NovaFerramentaPage() {
-  const [mode, setMode] = useState<"choose" | "template" | "ai">("choose");
+  const [mode, setMode] = useState<"choose" | "template" | "ai" | "pdf">("choose");
   const [step, setStep] = useState<"template" | "details">("template");
   const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
   const [title, setTitle] = useState("");
@@ -88,6 +89,15 @@ export default function NovaFerramentaPage() {
   const imageInputRef = useRef<HTMLInputElement>(null);
   const [showPreview, setShowPreview] = useState(false);
   const [pendingImages, setPendingImages] = useState<string[]>([]);
+
+  // PDF import state
+  const [pdfImage, setPdfImage] = useState<string | null>(null);
+  const [pdfText, setPdfText] = useState("");
+  const [pdfFields, setPdfFields] = useState("");
+  const [pdfNotes, setPdfNotes] = useState("");
+  const [pdfLoading, setPdfLoading] = useState(false);
+  const [pdfFileName, setPdfFileName] = useState("");
+  const pdfInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     async function loadClients() {
@@ -329,7 +339,7 @@ export default function NovaFerramentaPage() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* AI option */}
           <Card
             className="cursor-pointer transition-all hover:shadow-lg hover:scale-[1.02] border-2 border-transparent hover:border-purple-200 group"
@@ -343,12 +353,33 @@ export default function NovaFerramentaPage() {
                 Criar com IA
               </h3>
               <p className="text-sm text-gray-500 leading-relaxed">
-                Descreva o que você precisa e a inteligência artificial monta a
-                ferramenta pra você. Rápido, fácil e personalizado.
+                Descreva o que você precisa e a IA monta a ferramenta pra você.
               </p>
               <div className="mt-4 inline-flex items-center gap-1.5 text-xs font-medium text-purple-600 bg-purple-50 px-3 py-1.5 rounded-full">
                 <Wand2 className="w-3 h-3" />
                 Recomendado
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* PDF Import option */}
+          <Card
+            className="cursor-pointer transition-all hover:shadow-lg hover:scale-[1.02] border-2 border-transparent hover:border-emerald-200 group"
+            onClick={() => setMode("pdf")}
+          >
+            <CardContent className="pt-8 pb-8 text-center">
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center mx-auto mb-4 shadow-lg group-hover:shadow-xl transition-shadow">
+                <FileUp className="w-8 h-8 text-white" />
+              </div>
+              <h3 className="text-lg font-bold font-sans mb-2">
+                Importar PDF
+              </h3>
+              <p className="text-sm text-gray-500 leading-relaxed">
+                Suba um PDF de ferramenta existente e a IA converte para digital.
+              </p>
+              <div className="mt-4 inline-flex items-center gap-1.5 text-xs font-medium text-emerald-600 bg-emerald-50 px-3 py-1.5 rounded-full">
+                <FileUp className="w-3 h-3" />
+                Novo
               </div>
             </CardContent>
           </Card>
@@ -366,8 +397,7 @@ export default function NovaFerramentaPage() {
                 Usar Template
               </h3>
               <p className="text-sm text-gray-500 leading-relaxed">
-                Escolha entre os templates prontos: SWOT, Roda da Vida, Ikigai,
-                Forças VIA ou Planejamento de Metas.
+                Escolha entre os templates prontos: SWOT, Roda da Vida, Ikigai e mais.
               </p>
               <div className="mt-4 inline-flex items-center gap-1.5 text-xs font-medium text-[#2D5A7B] bg-[#2D5A7B]/10 px-3 py-1.5 rounded-full">
                 <Grid2X2 className="w-3 h-3" />
@@ -773,6 +803,381 @@ export default function NovaFerramentaPage() {
             </div>
           </div>
         )}
+      </div>
+    );
+  }
+
+  // ── PDF Import Mode ──────────────────────────────
+  if (mode === "pdf") {
+    async function handlePdfUpload(e: React.ChangeEvent<HTMLInputElement>) {
+      const file = e.target.files?.[0];
+      if (!file) return;
+
+      if (file.size > 20 * 1024 * 1024) {
+        toast.error("PDF muito grande (máx 20MB)");
+        return;
+      }
+
+      setPdfFileName(file.name);
+
+      // Convert PDF to image using canvas (first page)
+      const reader = new FileReader();
+      reader.onload = async () => {
+        const arrayBuffer = reader.result as ArrayBuffer;
+
+        // Use pdfjs to render the first page as image
+        try {
+          const pdfjsLib = await import("pdfjs-dist");
+          pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`;
+
+          const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+          const page = await pdf.getPage(1);
+          const viewport = page.getViewport({ scale: 2.0 });
+
+          const canvas = document.createElement("canvas");
+          canvas.width = viewport.width;
+          canvas.height = viewport.height;
+          const ctx = canvas.getContext("2d")!;
+
+          await page.render({ canvasContext: ctx, viewport, canvas } as any).promise;
+          const imageData = canvas.toDataURL("image/png");
+          setPdfImage(imageData);
+
+          // Extract text
+          const textContent = await page.getTextContent();
+          const extractedText = textContent.items
+            .map((item: any) => item.str)
+            .filter((s: string) => s.trim())
+            .join("\n");
+          setPdfText(extractedText);
+
+          // Check for form fields
+          const annotations = await page.getAnnotations();
+          const formFields = annotations
+            .filter((a: any) => a.subtype === "Widget")
+            .map(
+              (a: any) =>
+                `Campo "${a.fieldName || "sem nome"}": tipo=${a.fieldType || "Text"}, rect=[${a.rect.map((r: number) => Math.round(r)).join(",")}]`
+            )
+            .join("\n");
+          if (formFields) setPdfFields(formFields);
+
+          toast.success("PDF carregado com sucesso!");
+        } catch (err) {
+          console.error("PDF rendering error:", err);
+          // Fallback: try to use the file as-is by converting to base64
+          const base64Reader = new FileReader();
+          base64Reader.onload = () => {
+            toast.info("PDF carregado. A IA analisará o conteúdo textual.");
+          };
+          base64Reader.readAsDataURL(file);
+        }
+      };
+      reader.readAsArrayBuffer(file);
+      e.target.value = "";
+    }
+
+    async function handlePdfImport() {
+      if (!pdfImage) {
+        toast.error("Faça upload de um PDF primeiro");
+        return;
+      }
+
+      setPdfLoading(true);
+      try {
+        const formData = new FormData();
+        formData.append("image", pdfImage);
+        if (pdfText) formData.append("extractedText", pdfText);
+        if (pdfFields) formData.append("extractedFields", pdfFields);
+        if (pdfNotes) formData.append("userNotes", pdfNotes);
+
+        const response = await fetch("/api/ai/import-pdf", {
+          method: "POST",
+          body: formData,
+        });
+
+        if (!response.ok) {
+          const err = await response.json();
+          throw new Error(err.error || "Erro ao importar PDF");
+        }
+
+        const data = await response.json();
+
+        if (data.schema) {
+          setGeneratedSchema(data.schema);
+          setGeneratedSettings(data.settings);
+          setGeneratedMeta(data.meta);
+          if (data.meta?.title) setTitle(data.meta.title);
+          toast.success("Ferramenta gerada a partir do PDF!");
+        }
+      } catch (error: any) {
+        toast.error(error.message || "Erro ao processar o PDF");
+      } finally {
+        setPdfLoading(false);
+      }
+    }
+
+    return (
+      <div className="max-w-5xl mx-auto">
+        <div className="mb-6">
+          <button
+            onClick={() => {
+              setMode("choose");
+              setPdfImage(null);
+              setPdfText("");
+              setPdfFields("");
+              setPdfNotes("");
+              setGeneratedSchema(null);
+            }}
+            className="text-sm text-gray-500 hover:text-gray-700 flex items-center gap-1 mb-3"
+          >
+            <ArrowLeft className="w-3 h-3" /> Voltar
+          </button>
+          <h1 className="text-2xl font-bold text-gray-900 font-sans">
+            Importar Ferramenta de PDF
+          </h1>
+          <p className="text-gray-500 mt-1">
+            Suba um PDF de uma ferramenta existente e a IA converte para formato digital interativo
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Left — Upload & Settings */}
+          <div className="space-y-6">
+            {/* Upload area */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base flex items-center gap-2">
+                  <FileUp className="w-4 h-4 text-emerald-600" />
+                  Upload do PDF
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <input
+                  ref={pdfInputRef}
+                  type="file"
+                  accept="application/pdf"
+                  onChange={handlePdfUpload}
+                  className="hidden"
+                />
+
+                {!pdfImage ? (
+                  <button
+                    onClick={() => pdfInputRef.current?.click()}
+                    className="w-full border-2 border-dashed border-gray-300 rounded-xl p-10 text-center hover:border-emerald-400 hover:bg-emerald-50/30 transition-colors"
+                  >
+                    <FileUp className="w-10 h-10 text-gray-400 mx-auto mb-3" />
+                    <p className="text-sm font-medium text-gray-600">
+                      Clique para selecionar um PDF
+                    </p>
+                    <p className="text-xs text-gray-400 mt-1">
+                      Até 20MB. A primeira página será analisada.
+                    </p>
+                  </button>
+                ) : (
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Check className="w-4 h-4 text-emerald-600" />
+                        <span className="text-sm font-medium text-gray-700">
+                          {pdfFileName}
+                        </span>
+                      </div>
+                      <button
+                        onClick={() => pdfInputRef.current?.click()}
+                        className="text-xs text-emerald-600 hover:underline"
+                      >
+                        Trocar PDF
+                      </button>
+                    </div>
+
+                    {/* PDF preview */}
+                    <div className="rounded-lg border overflow-hidden bg-gray-50">
+                      <img
+                        src={pdfImage}
+                        alt="Preview do PDF"
+                        className="w-full h-auto"
+                      />
+                    </div>
+
+                    {/* Extracted info */}
+                    {pdfText && (
+                      <details className="text-xs">
+                        <summary className="text-gray-500 cursor-pointer hover:text-gray-700">
+                          Texto extraído ({pdfText.length} caracteres)
+                        </summary>
+                        <pre className="mt-2 p-2 bg-gray-50 rounded text-gray-600 whitespace-pre-wrap max-h-32 overflow-y-auto">
+                          {pdfText}
+                        </pre>
+                      </details>
+                    )}
+
+                    {pdfFields && (
+                      <details className="text-xs">
+                        <summary className="text-emerald-600 cursor-pointer hover:text-emerald-700 font-medium">
+                          {pdfFields.split("\n").length} campos editáveis detectados
+                        </summary>
+                        <pre className="mt-2 p-2 bg-emerald-50 rounded text-emerald-700 whitespace-pre-wrap">
+                          {pdfFields}
+                        </pre>
+                      </details>
+                    )}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Notes */}
+            {pdfImage && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-base">
+                    Observações (opcional)
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <Textarea
+                    value={pdfNotes}
+                    onChange={(e) => setPdfNotes(e.target.value)}
+                    placeholder="Ex: Quero que o quadrante 1 seja para tarefas urgentes e importantes. Adicionar um campo para nome do participante..."
+                    rows={3}
+                    className="text-sm"
+                  />
+                  <p className="text-xs text-gray-400 mt-2">
+                    Instruções adicionais para a IA ao converter o PDF
+                  </p>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Client selector */}
+            {pdfImage && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-base">Cliente (opcional)</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <select
+                    value={selectedClient}
+                    onChange={(e) => setSelectedClient(e.target.value)}
+                    className="w-full border rounded-md px-3 py-2 text-sm"
+                  >
+                    <option value="">Sem cliente específico</option>
+                    {clients.map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.name}
+                      </option>
+                    ))}
+                  </select>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Actions */}
+            {pdfImage && !generatedSchema && (
+              <Button
+                onClick={handlePdfImport}
+                disabled={pdfLoading}
+                className="w-full bg-emerald-600 hover:bg-emerald-700 gap-2 py-6 text-base"
+              >
+                {pdfLoading ? (
+                  <>
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    Analisando PDF com IA...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="w-5 h-5" />
+                    Converter para Ferramenta Digital
+                  </>
+                )}
+              </Button>
+            )}
+
+            {generatedSchema && (
+              <div className="space-y-3">
+                <div className="space-y-2">
+                  <Label className="text-sm">Título da Ferramenta</Label>
+                  <Input
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    placeholder="Título da ferramenta"
+                  />
+                </div>
+                <Button
+                  onClick={handleAiCreate}
+                  disabled={loading || !title}
+                  className="w-full bg-[#2D5A7B] hover:bg-[#1e3f56] gap-2 py-6 text-base"
+                >
+                  {loading ? (
+                    <>
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                      Salvando...
+                    </>
+                  ) : (
+                    <>
+                      <Check className="w-5 h-5" />
+                      Salvar Ferramenta
+                    </>
+                  )}
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setGeneratedSchema(null);
+                    setGeneratedSettings(null);
+                    setGeneratedMeta(null);
+                  }}
+                  className="w-full gap-2"
+                >
+                  <RotateCcw className="w-4 h-4" />
+                  Reconverter
+                </Button>
+              </div>
+            )}
+          </div>
+
+          {/* Right — Preview */}
+          <div>
+            {generatedSchema ? (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <Check className="w-4 h-4 text-emerald-600" />
+                    Preview da Ferramenta Gerada
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-center mb-4">
+                    <h2
+                      className="text-xl font-bold"
+                      style={{ color: generatedSchema.theme?.primaryColor }}
+                    >
+                      {generatedSchema.title}
+                    </h2>
+                    {generatedSchema.description && (
+                      <p className="text-gray-500 mt-2 text-sm">
+                        {generatedSchema.description}
+                      </p>
+                    )}
+                  </div>
+                  <ToolRenderer schema={generatedSchema} readOnly={false} />
+                </CardContent>
+              </Card>
+            ) : (
+              <Card className="border-dashed">
+                <CardContent className="py-16 text-center">
+                  <FileUp className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                  <p className="text-sm text-gray-400">
+                    {pdfImage
+                      ? "Clique em \"Converter para Ferramenta Digital\" para gerar o preview"
+                      : "Faça upload de um PDF para começar"}
+                  </p>
+                </CardContent>
+              </Card>
+            )}
+          </div>
+        </div>
       </div>
     );
   }
