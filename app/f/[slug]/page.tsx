@@ -160,15 +160,15 @@ export default function PublicFormPage({
   const settings = tool.settings as ToolSettings;
   const brand = (client?.brand_config || {}) as Record<string, any>;
 
-  // Resolve colors
+  // Resolve colors — DataPulse defaults when no client
   const primaryColor =
-    brand.primaryColor || schema.theme?.primaryColor || "#2D5A7B";
+    brand.primaryColor || schema.theme?.primaryColor || "#0080ff";
   const backgroundColor =
-    brand.backgroundColor || schema.theme?.backgroundColor || "var(--background)";
+    brand.backgroundColor || schema.theme?.backgroundColor || "#f8fafc";
   const textColor = brand.textColor || undefined;
-  const buttonColor = brand.buttonColor || primaryColor;
-  const buttonTextColor = brand.buttonTextColor || "var(--primary-foreground)";
-  const buttonRadius = brand.buttonRadius || "0.75rem";
+  const buttonColor = brand.buttonColor || undefined; // undefined = use gradient
+  const buttonTextColor = brand.buttonTextColor || "#ffffff";
+  const buttonRadius = brand.buttonRadius || "12px";
   const cardRadius = brand.cardRadius || "16px";
   const fontFamily = brand.fontFamily || undefined;
   const headingWeight = brand.headingWeight || "600";
@@ -177,6 +177,7 @@ export default function PublicFormPage({
   const headerBg = brand.headerBg || undefined;
   const headerTextColor = brand.headerTextColor || primaryColor;
   const footerText = brand.footerText || "Powered by Individuando";
+  const useGradientButton = !brand.buttonColor; // use DataPulse gradient when no custom button color
   const showNameInHeader = brand.showNameInHeader !== false;
 
   const idFields =
@@ -356,14 +357,8 @@ export default function PublicFormPage({
       >
         <BrandedHeader compact />
         <div className="flex-1 flex flex-col items-center justify-center px-4">
-          <div
-            className="w-16 h-16 rounded-full flex items-center justify-center mb-6"
-            style={{ backgroundColor: `${primaryColor}15` }}
-          >
-            <CheckCircle2
-              className="w-8 h-8"
-              style={{ color: primaryColor }}
-            />
+          <div className="w-16 h-16 rounded-2xl gradient-primary flex items-center justify-center mb-6">
+            <CheckCircle2 className="w-8 h-8 text-white" />
           </div>
           <h1
             className="text-2xl font-semibold text-foreground mb-2"
@@ -448,11 +443,19 @@ export default function PublicFormPage({
             </div>
 
             {/* Identification form */}
-            <div className="bg-card rounded-2xl border border-border shadow-sm p-6 sm:p-8 space-y-5">
+            <div
+              className="rounded-2xl p-6 sm:p-8 space-y-5 transition-all duration-200"
+              style={{
+                backdropFilter: "blur(12px)",
+                WebkitBackdropFilter: "blur(12px)",
+                background: "rgba(255,255,255,0.8)",
+                border: "1px solid rgba(0,128,255,0.1)",
+                boxShadow: "rgba(0,128,255,0.08) 0px 4px 24px",
+              }}
+            >
               <p
-                className="text-xs font-medium uppercase tracking-wider"
+                className="text-xs font-semibold uppercase tracking-wider gradient-text"
                 style={{
-                  color: primaryColor,
                   fontWeight: Number(labelWeight),
                 }}
               >
@@ -477,12 +480,7 @@ export default function PublicFormPage({
                     value={participantName}
                     onChange={(e) => setParticipantName(e.target.value)}
                     placeholder="Como você quer ser identificado"
-                    className="w-full rounded-xl border border-input bg-muted/50 px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/40 focus:ring-2 focus:bg-card outline-none transition-all"
-                    style={
-                      {
-                        "--tw-ring-color": `${primaryColor}22`,
-                      } as React.CSSProperties
-                    }
+                    className="w-full rounded-xl border border-[rgba(0,128,255,0.1)] bg-white/60 px-4 py-3 text-sm text-[#0f172a] placeholder:text-[#94a3b8] focus:border-[#0080ff]/40 focus:ring-2 focus:ring-[#0080ff]/10 focus:bg-white outline-none transition-all duration-200"
                   />
                 </div>
               )}
@@ -506,12 +504,7 @@ export default function PublicFormPage({
                     value={participantEmail}
                     onChange={(e) => setParticipantEmail(e.target.value)}
                     placeholder="seu@email.com"
-                    className="w-full rounded-xl border border-input bg-muted/50 px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/40 focus:ring-2 focus:bg-card outline-none transition-all"
-                    style={
-                      {
-                        "--tw-ring-color": `${primaryColor}22`,
-                      } as React.CSSProperties
-                    }
+                    className="w-full rounded-xl border border-[rgba(0,128,255,0.1)] bg-white/60 px-4 py-3 text-sm text-[#0f172a] placeholder:text-[#94a3b8] focus:border-[#0080ff]/40 focus:ring-2 focus:ring-[#0080ff]/10 focus:bg-white outline-none transition-all duration-200"
                   />
                 </div>
               )}
@@ -568,7 +561,7 @@ export default function PublicFormPage({
                         }))
                       }
                       placeholder={field.placeholder || ""}
-                      className="w-full rounded-xl border border-input bg-muted/50 px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/40 focus:ring-2 focus:bg-card outline-none transition-all"
+                      className="w-full rounded-xl border border-[rgba(0,128,255,0.1)] bg-white/60 px-4 py-3 text-sm text-[#0f172a] placeholder:text-[#94a3b8] focus:border-[#0080ff]/40 focus:ring-2 focus:ring-[#0080ff]/10 focus:bg-white outline-none transition-all duration-200"
                       style={
                         {
                           "--tw-ring-color": `${primaryColor}22`,
@@ -582,11 +575,9 @@ export default function PublicFormPage({
               {/* Start button */}
               <button
                 onClick={handleStartTool}
-                className="w-full flex items-center justify-center gap-2 py-3.5 text-sm font-semibold transition-all hover:opacity-90 active:scale-[0.98]"
+                className={`w-full flex items-center justify-center gap-2 py-3.5 text-sm font-semibold transition-all duration-200 active:scale-[0.98] ${useGradientButton ? "btn-primary" : ""}`}
                 style={{
-                  backgroundColor: buttonColor,
-                  color: buttonTextColor,
-                  borderRadius: buttonRadius,
+                  ...(!useGradientButton ? { backgroundColor: buttonColor, color: buttonTextColor, borderRadius: buttonRadius } : {}),
                   fontFamily: fontFamily || undefined,
                 }}
               >
@@ -663,13 +654,10 @@ export default function PublicFormPage({
         <ToolRenderer schema={schema} onSubmit={handleSubmit} />
 
         {submitting && (
-          <div className="fixed inset-0 bg-card/60 backdrop-blur-sm flex items-center justify-center z-50">
-            <div className="bg-card rounded-2xl p-6 shadow-lg border border-border flex items-center gap-3">
-              <Loader2
-                className="w-5 h-5 animate-spin"
-                style={{ color: primaryColor }}
-              />
-              <span className="text-sm text-muted-foreground font-medium">
+          <div className="fixed inset-0 bg-white/60 backdrop-blur-sm flex items-center justify-center z-50">
+            <div className="glass-card p-6 flex items-center gap-3">
+              <Loader2 className="w-5 h-5 animate-spin text-[#0080ff]" />
+              <span className="text-sm text-[#475569] font-medium">
                 Enviando...
               </span>
             </div>
