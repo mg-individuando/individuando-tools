@@ -47,9 +47,9 @@ const RADIUS_OPTIONS = [
 ];
 
 const HEADER_LAYOUT_OPTIONS = [
-  { value: "logo-left", label: "Logo a esquerda" },
+  { value: "logo-left", label: "Logo à esquerda" },
   { value: "logo-center", label: "Logo centralizado" },
-  { value: "logo-right", label: "Logo a direita" },
+  { value: "logo-right", label: "Logo à direita" },
 ];
 
 const HEADER_HEIGHT_OPTIONS = [
@@ -72,6 +72,7 @@ const DEFAULT_BRAND: BrandConfig = {
   buttonColor: "#2D5A7B",
   buttonTextColor: "#FFFFFF",
   buttonRadius: "12px",
+  cardRadius: "16px",
   fontFamily: "Montserrat",
   fontUrl: "",
   headingWeight: "700",
@@ -109,7 +110,7 @@ export default function NovoClientePage() {
 
   async function handleSave() {
     if (!name.trim()) {
-      toast.error("O nome do cliente e obrigatorio.");
+      toast.error("O nome do cliente é obrigatório.");
       return;
     }
 
@@ -122,7 +123,7 @@ export default function NovoClientePage() {
       } = await supabase.auth.getUser();
 
       if (!user) {
-        toast.error("Voce precisa estar logado.");
+        toast.error("Você precisa estar logado.");
         setSaving(false);
         return;
       }
@@ -135,7 +136,7 @@ export default function NovoClientePage() {
         .single();
 
       if (!profile) {
-        toast.error("Perfil nao encontrado.");
+        toast.error("Perfil não encontrado.");
         setSaving(false);
         return;
       }
@@ -226,7 +227,7 @@ export default function NovoClientePage() {
                 path={`logos/${slugified}`}
                 accept="image/png,image/jpeg,image/svg+xml,image/webp"
                 label="Logo do cliente"
-                hint="PNG, JPG ou SVG. Maximo 5MB."
+                hint="PNG, JPG ou SVG. Máximo 5MB."
                 currentUrl={logoUrl || undefined}
                 onUpload={(url) => setLogoUrl(url)}
               />
@@ -236,7 +237,7 @@ export default function NovoClientePage() {
                 path={`partner-logos/${slugified}`}
                 accept="image/png,image/jpeg,image/svg+xml,image/webp"
                 label="Logo parceiro (Individuando)"
-                hint="PNG, JPG ou SVG. Maximo 5MB."
+                hint="PNG, JPG ou SVG. Máximo 5MB."
                 currentUrl={partnerLogoUrl || undefined}
                 onUpload={(url) => setPartnerLogoUrl(url)}
               />
@@ -283,12 +284,12 @@ export default function NovoClientePage() {
             <CardContent>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <ColorField
-                  label="Cor primaria"
+                  label="Cor primária"
                   value={brand.primaryColor!}
                   onChange={(v) => updateBrand("primaryColor", v)}
                 />
                 <ColorField
-                  label="Cor secundaria"
+                  label="Cor secundária"
                   value={brand.secondaryColor!}
                   onChange={(v) => updateBrand("secondaryColor", v)}
                 />
@@ -303,12 +304,12 @@ export default function NovoClientePage() {
                   onChange={(v) => updateBrand("textColor", v)}
                 />
                 <ColorField
-                  label="Cor dos botoes"
+                  label="Cor dos botões"
                   value={brand.buttonColor!}
                   onChange={(v) => updateBrand("buttonColor", v)}
                 />
                 <ColorField
-                  label="Cor do texto dos botoes"
+                  label="Cor do texto dos botões"
                   value={brand.buttonTextColor!}
                   onChange={(v) => updateBrand("buttonTextColor", v)}
                 />
@@ -352,7 +353,7 @@ export default function NovoClientePage() {
                       onChange={(e) => updateBrand("fontUrl", e.target.value)}
                     />
                     <p className="text-xs text-muted-foreground">
-                      Cole a URL de importacao do Google Fonts ou outra fonte.
+                      Cole a URL de importação do Google Fonts ou outra fonte.
                     </p>
                   </div>
 
@@ -361,7 +362,7 @@ export default function NovoClientePage() {
                     path={`fonts/${slugified}`}
                     accept=".ttf,.otf,.woff,.woff2"
                     label="Arquivo da fonte"
-                    hint="TTF, OTF, WOFF ou WOFF2. Maximo 5MB."
+                    hint="TTF, OTF, WOFF ou WOFF2. Máximo 5MB."
                     currentUrl={brand.fontUrl || undefined}
                     onUpload={(url) => updateBrand("fontUrl", url)}
                   />
@@ -370,7 +371,7 @@ export default function NovoClientePage() {
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
                 <div className="space-y-2">
-                  <Label htmlFor="headingWeight">Peso do titulo</Label>
+                  <Label htmlFor="headingWeight">Peso do título</Label>
                   <select
                     id="headingWeight"
                     value={brand.headingWeight}
@@ -444,7 +445,7 @@ export default function NovoClientePage() {
                 path={`headers/${slugified}`}
                 accept="image/png,image/jpeg,image/svg+xml,image/webp"
                 label="Imagem de fundo do header"
-                hint="PNG, JPG ou SVG. Maximo 5MB. Recomendado: 1200x200px."
+                hint="PNG, JPG ou SVG. Máximo 5MB. Recomendado: 1200x200px."
                 currentUrl={brand.headerBgImage || undefined}
                 onUpload={(url) => updateBrand("headerBgImage", url)}
               />
@@ -507,7 +508,7 @@ export default function NovoClientePage() {
             </CardHeader>
             <CardContent className="space-y-5">
               <div className="space-y-2">
-                <Label htmlFor="buttonRadius">Arredondamento dos botoes</Label>
+                <Label htmlFor="buttonRadius">Arredondamento dos botões</Label>
                 <select
                   id="buttonRadius"
                   value={brand.buttonRadius}
@@ -523,7 +524,24 @@ export default function NovoClientePage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="footerText">Texto do rodape</Label>
+                <Label htmlFor="cardRadius">Arredondamento dos cards</Label>
+                <select
+                  id="cardRadius"
+                  value={brand.cardRadius}
+                  onChange={(e) => updateBrand("cardRadius", e.target.value)}
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                >
+                  <option value="4px">Sutil (4px)</option>
+                  <option value="8px">Moderado (8px)</option>
+                  <option value="12px">Arredondado (12px)</option>
+                  <option value="16px">Suave (16px)</option>
+                  <option value="24px">Muito arredondado (24px)</option>
+                </select>
+                <p className="text-xs text-muted-foreground">Controla o arredondamento dos cards nas ferramentas</p>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="footerText">Texto do rodapé</Label>
                 <Input
                   id="footerText"
                   placeholder="Powered by Individuando"
@@ -669,14 +687,14 @@ export default function NovoClientePage() {
                       className="text-base"
                       style={{ fontWeight: Number(brand.headingWeight) }}
                     >
-                      Titulo de exemplo
+                      Título de exemplo
                     </h3>
                     <p
                       className="text-xs"
                       style={{ fontWeight: Number(brand.bodyWeight) }}
                     >
-                      Este e um texto de exemplo para visualizar como o conteudo
-                      vai aparecer com as configuracoes de marca escolhidas.
+                      Este é um texto de exemplo para visualizar como o conteúdo
+                      vai aparecer com as configurações de marca escolhidas.
                     </p>
 
                     {/* Sample Card */}
@@ -697,7 +715,7 @@ export default function NovoClientePage() {
                           fontWeight: Number(brand.bodyWeight),
                         }}
                       >
-                        Botao de acao
+                        Botão de ação
                       </button>
                     </div>
                   </div>

@@ -558,7 +558,7 @@ export default function EditToolPage({
               </div>
               {tool.status !== "published" && (
                 <p className="text-sm text-amber-600 mt-2">
-                  Esta ferramenta ainda nao esta publicada. Publique-a para que
+                  Esta ferramenta ainda não está publicada. Publique-a para que
                   o link funcione.
                 </p>
               )}
@@ -611,7 +611,7 @@ export default function EditToolPage({
               <div className="space-y-2">
                 <Label>
                   Emails dos participantes (um por linha ou separados por
-                  virgula)
+                  vírgula)
                 </Label>
                 <Textarea
                   value={emailList}
@@ -631,7 +631,7 @@ export default function EditToolPage({
                 Enviar Convites
               </Button>
               <p className="text-xs text-gray-400">
-                A mensagem com o link sera copiada para a area de transferencia.
+                A mensagem com o link será copiada para a área de transferência.
                 Cole-a no seu cliente de email.
               </p>
             </CardContent>
@@ -642,7 +642,7 @@ export default function EditToolPage({
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
                 <Share2 className="w-5 h-5 text-[#2D5A7B]" />
-                Compartilhamento Rapido
+                Compartilhamento Rápido
               </CardTitle>
             </CardHeader>
             <CardContent>

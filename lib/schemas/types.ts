@@ -19,6 +19,7 @@ export interface BrandConfig {
   buttonColor?: string;
   buttonTextColor?: string;
   buttonRadius?: string;
+  cardRadius?: string;
   fontFamily?: string;
   fontUrl?: string;
   headingWeight?: string;

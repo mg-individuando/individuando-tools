@@ -27,9 +27,9 @@ export default function FreeLayout({
         return (
           <div key={field.id} className="space-y-1.5">
             {field.label && (
-              <label className="text-sm font-medium text-gray-700">
+              <label className="text-sm font-medium text-gray-600">
                 {field.label}
-                {field.required && <span className="text-red-500 ml-0.5">*</span>}
+                {field.required && <span className="text-red-400 ml-0.5">*</span>}
               </label>
             )}
             <input
@@ -40,10 +40,12 @@ export default function FreeLayout({
               maxLength={field.maxLength}
               required={field.required}
               readOnly={readOnly}
-              className="w-full rounded-md border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm text-gray-700 placeholder:text-gray-400 outline-none transition-colors focus:border-gray-300 focus:bg-white focus:ring-2 focus:ring-offset-0"
+              className="w-full rounded-xl border-0 bg-white px-4 py-3 text-sm text-gray-700 placeholder:text-gray-300 outline-none transition-shadow"
               style={{
-                boxShadow: focusedField === field.id ? `0 0 0 2px ${sectionColor}25` : "none",
-                borderColor: focusedField === field.id ? sectionColor : undefined,
+                boxShadow:
+                  focusedField === field.id
+                    ? `0 0 0 3px ${sectionColor}33`
+                    : "0 1px 2px rgba(0,0,0,0.04)",
               }}
               onFocus={() => setFocusedField(field.id)}
               onBlur={() => setFocusedField(null)}
@@ -62,9 +64,9 @@ export default function FreeLayout({
         return (
           <div key={field.id} className="space-y-1.5">
             {field.label && (
-              <label className="text-sm font-medium text-gray-700">
+              <label className="text-sm font-medium text-gray-600">
                 {field.label}
-                {field.required && <span className="text-red-500 ml-0.5">*</span>}
+                {field.required && <span className="text-red-400 ml-0.5">*</span>}
               </label>
             )}
             <textarea
@@ -75,10 +77,12 @@ export default function FreeLayout({
               required={field.required}
               readOnly={readOnly}
               rows={4}
-              className="w-full rounded-md border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm leading-relaxed text-gray-700 placeholder:text-gray-400 outline-none resize-none transition-colors focus:border-gray-300 focus:bg-white focus:ring-2 focus:ring-offset-0"
+              className="w-full rounded-xl border-0 bg-white px-4 py-3 text-sm leading-relaxed text-gray-700 placeholder:text-gray-300 outline-none resize-none transition-shadow"
               style={{
-                boxShadow: focusedField === field.id ? `0 0 0 2px ${sectionColor}25` : "none",
-                borderColor: focusedField === field.id ? sectionColor : undefined,
+                boxShadow:
+                  focusedField === field.id
+                    ? `0 0 0 3px ${sectionColor}33`
+                    : "0 1px 2px rgba(0,0,0,0.04)",
               }}
               onFocus={() => setFocusedField(field.id)}
               onBlur={() => setFocusedField(null)}
@@ -99,34 +103,38 @@ export default function FreeLayout({
         const step = field.step ?? 1;
         const val = (fieldValue as number) ?? (field.defaultValue as number) ?? min;
         return (
-          <div key={field.id} className="space-y-2">
+          <div key={field.id} className="space-y-3">
             {field.label && (
               <div className="flex items-center justify-between">
-                <label className="text-sm font-medium text-gray-700">
+                <label className="text-sm font-medium text-gray-600">
                   {field.label}
                 </label>
-                <span className="text-sm font-bold" style={{ color: sectionColor }}>
+                <span
+                  className="inline-flex items-center justify-center w-10 h-10 rounded-full text-sm font-bold text-white"
+                  style={{ backgroundColor: sectionColor }}
+                >
                   {val}
-                  <span className="text-xs font-normal text-gray-400">/{max}</span>
                 </span>
               </div>
             )}
-            <input
-              type="range"
-              min={min}
-              max={max}
-              step={step}
-              value={val}
-              onChange={(e) => onChange(field.id, parseInt(e.target.value))}
-              disabled={readOnly}
-              className="w-full h-2 rounded-full appearance-none cursor-pointer"
-              style={{
-                background: `linear-gradient(to right, ${sectionColor} 0%, ${sectionColor} ${((val - min) / (max - min)) * 100}%, #e2e8f0 ${((val - min) / (max - min)) * 100}%, #e2e8f0 100%)`,
-              }}
-            />
-            <div className="flex justify-between text-[10px] text-gray-400">
-              <span>{min}</span>
-              <span>{max}</span>
+            <div className="bg-white rounded-xl p-4" style={{ boxShadow: "0 1px 2px rgba(0,0,0,0.04)" }}>
+              <input
+                type="range"
+                min={min}
+                max={max}
+                step={step}
+                value={val}
+                onChange={(e) => onChange(field.id, parseInt(e.target.value))}
+                disabled={readOnly}
+                className="w-full h-2 rounded-full appearance-none cursor-pointer"
+                style={{
+                  background: `linear-gradient(to right, ${sectionColor} 0%, ${sectionColor} ${((val - min) / (max - min)) * 100}%, #e2e8f0 ${((val - min) / (max - min)) * 100}%, #e2e8f0 100%)`,
+                }}
+              />
+              <div className="flex justify-between text-[10px] text-gray-400 mt-1.5">
+                <span>{min}</span>
+                <span>{max}</span>
+              </div>
             </div>
           </div>
         );
@@ -135,13 +143,17 @@ export default function FreeLayout({
       case "checkbox":
         return (
           <div key={field.id}>
-            <label className="flex items-center gap-2.5 cursor-pointer py-1">
+            <label
+              className="flex items-center gap-3 cursor-pointer rounded-xl bg-white px-4 py-3 transition-shadow hover:shadow-sm"
+              style={{ boxShadow: "0 1px 2px rgba(0,0,0,0.04)" }}
+            >
               <input
                 type="checkbox"
                 checked={!!fieldValue}
                 onChange={(e) => onChange(field.id, e.target.checked)}
                 disabled={readOnly}
                 className="h-4 w-4 rounded border-gray-300"
+                style={{ accentColor: sectionColor }}
               />
               <span className="text-sm text-gray-700">{field.label}</span>
             </label>
@@ -152,11 +164,15 @@ export default function FreeLayout({
         return (
           <div key={field.id} className="space-y-1.5">
             {field.label && (
-              <label className="text-sm font-medium text-gray-700">{field.label}</label>
+              <label className="text-sm font-medium text-gray-600">{field.label}</label>
             )}
-            <div className="space-y-1">
+            <div className="space-y-2">
               {field.options?.map((opt) => (
-                <label key={opt.value} className="flex items-center gap-2.5 cursor-pointer py-1">
+                <label
+                  key={opt.value}
+                  className="flex items-center gap-3 cursor-pointer rounded-xl bg-white px-4 py-3 transition-shadow hover:shadow-sm"
+                  style={{ boxShadow: "0 1px 2px rgba(0,0,0,0.04)" }}
+                >
                   <input
                     type="radio"
                     name={field.id}
@@ -165,6 +181,7 @@ export default function FreeLayout({
                     onChange={() => onChange(field.id, opt.value)}
                     disabled={readOnly}
                     className="h-4 w-4 border-gray-300"
+                    style={{ accentColor: sectionColor }}
                   />
                   <span className="text-sm text-gray-700">{opt.label}</span>
                 </label>
@@ -177,13 +194,21 @@ export default function FreeLayout({
         return (
           <div key={field.id} className="space-y-1.5">
             {field.label && (
-              <label className="text-sm font-medium text-gray-700">{field.label}</label>
+              <label className="text-sm font-medium text-gray-600">{field.label}</label>
             )}
             <select
               value={(fieldValue as string) || ""}
               onChange={(e) => onChange(field.id, e.target.value)}
               disabled={readOnly}
-              className="w-full rounded-md border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm text-gray-700 outline-none focus:border-gray-300 focus:bg-white"
+              className="w-full rounded-xl border-0 bg-white px-4 py-3 text-sm text-gray-700 outline-none transition-shadow"
+              style={{
+                boxShadow:
+                  focusedField === field.id
+                    ? `0 0 0 3px ${sectionColor}33`
+                    : "0 1px 2px rgba(0,0,0,0.04)",
+              }}
+              onFocus={() => setFocusedField(field.id)}
+              onBlur={() => setFocusedField(null)}
             >
               <option value="">{field.placeholder || "Selecione..."}</option>
               {field.options?.map((opt) => (
@@ -199,14 +224,22 @@ export default function FreeLayout({
         return (
           <div key={field.id} className="space-y-1.5">
             {field.label && (
-              <label className="text-sm font-medium text-gray-700">{field.label}</label>
+              <label className="text-sm font-medium text-gray-600">{field.label}</label>
             )}
             <input
               type="date"
               value={(fieldValue as string) || ""}
               onChange={(e) => onChange(field.id, e.target.value)}
               readOnly={readOnly}
-              className="w-full rounded-md border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm text-gray-700 outline-none focus:border-gray-300 focus:bg-white"
+              className="w-full rounded-xl border-0 bg-white px-4 py-3 text-sm text-gray-700 outline-none transition-shadow"
+              style={{
+                boxShadow:
+                  focusedField === field.id
+                    ? `0 0 0 3px ${sectionColor}33`
+                    : "0 1px 2px rgba(0,0,0,0.04)",
+              }}
+              onFocus={() => setFocusedField(field.id)}
+              onBlur={() => setFocusedField(null)}
             />
           </div>
         );
@@ -224,33 +257,40 @@ export default function FreeLayout({
         return (
           <div
             key={section.id}
-            className="bg-white rounded-lg overflow-hidden"
+            className="overflow-hidden"
             style={{
-              border: "1px solid #e2e8f0",
-              borderLeft: `4px solid ${color}`,
-              boxShadow: "0 1px 3px rgba(0,0,0,0.06)",
+              backgroundColor: `${color}14`,
+              borderRadius: "var(--card-radius, 16px)",
+              boxShadow:
+                "0 2px 20px rgba(0,0,0,0.04), 0 1px 4px rgba(0,0,0,0.06)",
             }}
           >
+            {/* Top accent bar */}
+            <div
+              className="h-[3px] w-full"
+              style={{ backgroundColor: color }}
+            />
+
             {/* Section header */}
-            <div className="px-5 pt-4 pb-2">
-              <div className="flex items-center gap-2.5 mb-1">
-                <SectionIcon icon={section.icon} size={22} />
+            <div className="px-6 pt-5 pb-2">
+              <div className="flex items-center gap-3 mb-1">
+                <SectionIcon icon={section.icon} size={24} />
                 <h3
-                  className="font-semibold text-base leading-tight"
+                  className="font-bold text-base leading-tight"
                   style={{ color }}
                 >
                   {section.label}
                 </h3>
               </div>
               {section.description && (
-                <p className="text-sm text-gray-500 leading-relaxed mt-1">
+                <p className="text-sm text-gray-500 leading-relaxed mt-1 ml-[36px]">
                   {section.description}
                 </p>
               )}
             </div>
 
             {/* Section fields */}
-            <div className="px-5 pb-5 pt-2 space-y-4">
+            <div className="px-6 pb-6 pt-2 space-y-4">
               {section.fields.map((field) => renderField(field, color))}
             </div>
           </div>

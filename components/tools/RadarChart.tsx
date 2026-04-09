@@ -100,10 +100,11 @@ export default function RadarChart({
     <div className="flex flex-col items-center gap-8 w-full">
       {/* Radar SVG Section */}
       <div
-        className="relative w-full max-w-[460px] mx-auto bg-white rounded-lg p-4"
+        className="relative w-full max-w-[460px] mx-auto p-4"
         style={{
-          border: "1px solid #e2e8f0",
-          boxShadow: "0 1px 3px rgba(0,0,0,0.06)",
+          background: "#f8f9fc",
+          borderRadius: "var(--card-radius, 16px)",
+          boxShadow: "0 2px 12px rgba(0,0,0,0.06)",
         }}
       >
         <svg
@@ -206,11 +207,11 @@ export default function RadarChart({
           return (
             <div
               key={section.id}
-              className="bg-white rounded-lg overflow-hidden"
+              className="overflow-hidden"
               style={{
-                border: "1px solid #e2e8f0",
-                borderLeft: `4px solid ${color}`,
-                boxShadow: "0 1px 3px rgba(0,0,0,0.06)",
+                background: hexToRgba(color, 0.08),
+                borderRadius: "var(--card-radius, 16px)",
+                boxShadow: "0 2px 12px rgba(0,0,0,0.06)",
               }}
             >
               <div className="px-4 py-3.5">
@@ -223,32 +224,34 @@ export default function RadarChart({
                     </span>
                   </div>
                   <span
-                    className="text-lg font-bold tabular-nums"
-                    style={{ color }}
+                    className="inline-flex items-center justify-center w-9 h-9 rounded-full text-sm font-bold text-white"
+                    style={{ backgroundColor: color }}
                   >
                     {value}
-                    <span className="text-xs font-normal text-slate-400">
-                      /{max}
-                    </span>
                   </span>
                 </div>
 
-                {/* Slider */}
-                <input
-                  type="range"
-                  min={min}
-                  max={max}
-                  step={field.step ?? 1}
-                  value={value}
-                  onChange={(e) => onChange(field.id, parseInt(e.target.value))}
-                  disabled={readOnly}
-                  className="radar-slider w-full h-1.5 appearance-none rounded-full cursor-pointer outline-none disabled:opacity-50 disabled:cursor-not-allowed"
-                  style={{
-                    background: `linear-gradient(to right, ${color} 0%, ${color} ${pct}%, #e2e8f0 ${pct}%, #e2e8f0 100%)`,
-                    ["--slider-color" as string]: color,
-                    ["--slider-shadow" as string]: hexToRgba(color, 0.25),
-                  }}
-                />
+                {/* Slider in white container */}
+                <div
+                  className="rounded-xl px-3 py-2"
+                  style={{ background: "#fff" }}
+                >
+                  <input
+                    type="range"
+                    min={min}
+                    max={max}
+                    step={field.step ?? 1}
+                    value={value}
+                    onChange={(e) => onChange(field.id, parseInt(e.target.value))}
+                    disabled={readOnly}
+                    className="radar-slider w-full h-1.5 appearance-none rounded-full cursor-pointer outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+                    style={{
+                      background: `linear-gradient(to right, ${color} 0%, ${color} ${pct}%, #e2e8f0 ${pct}%, #e2e8f0 100%)`,
+                      ["--slider-color" as string]: color,
+                      ["--slider-shadow" as string]: hexToRgba(color, 0.25),
+                    }}
+                  />
+                </div>
               </div>
             </div>
           );

@@ -77,35 +77,55 @@ export default function DynamicTable({
   return (
     <div className="w-full max-w-4xl mx-auto">
       {/* Header */}
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2.5">
-          <SectionIcon icon={section?.icon} size={22} />
+      <div
+        className="flex items-center justify-between mb-5 px-6 py-4 overflow-hidden"
+        style={{
+          backgroundColor: `${color}14`,
+          borderRadius: "var(--card-radius, 16px)",
+          boxShadow: "0 2px 20px rgba(0,0,0,0.04), 0 1px 4px rgba(0,0,0,0.06)",
+        }}
+      >
+        <div className="flex items-center gap-3">
+          <SectionIcon icon={section?.icon} size={24} />
           <div>
-            <h3 className="font-semibold text-gray-800">{section?.label}</h3>
+            <h3 className="font-bold text-base" style={{ color }}>
+              {section?.label}
+            </h3>
             {section?.description && (
-              <p className="text-xs text-gray-400 mt-0.5">{section.description}</p>
+              <p className="text-xs text-gray-500 mt-0.5">{section.description}</p>
             )}
           </div>
         </div>
-        <span className="text-sm text-gray-500">
+        <span
+          className="text-sm font-semibold px-3 py-1 rounded-full"
+          style={{ backgroundColor: `${color}18`, color }}
+        >
           {rows.length} {rows.length === 1 ? "meta" : "metas"}
         </span>
       </div>
 
       {/* Desktop: table layout */}
-      <div className="hidden md:block bg-white border border-gray-200 rounded-lg overflow-hidden">
+      <div
+        className="hidden md:block overflow-hidden"
+        style={{
+          backgroundColor: `${color}0A`,
+          borderRadius: "var(--card-radius, 16px)",
+          boxShadow: "0 2px 20px rgba(0,0,0,0.04), 0 1px 4px rgba(0,0,0,0.06)",
+        }}
+      >
         {/* Table header */}
         <div
-          className="flex items-center gap-0 px-4 py-2.5 border-b border-gray-200"
-          style={{ backgroundColor: "#f9fafb" }}
+          className="flex items-center gap-0 px-5 py-3"
+          style={{ backgroundColor: `${color}10` }}
         >
-          <div className="w-10 shrink-0 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+          <div className="w-12 shrink-0 text-xs font-semibold uppercase tracking-wider" style={{ color }}>
             #
           </div>
           {fields.map((field) => (
             <div
               key={field.id}
-              className="flex-1 text-xs font-semibold text-gray-500 uppercase tracking-wider px-2"
+              className="flex-1 text-xs font-semibold uppercase tracking-wider px-2"
+              style={{ color }}
             >
               {field.label}
             </div>
@@ -117,18 +137,16 @@ export default function DynamicTable({
         {rows.map((row, index) => (
           <div
             key={row.id}
-            className={`flex items-start gap-0 px-4 py-2.5 border-b border-gray-100 last:border-b-0 ${
-              index % 2 === 1 ? "bg-gray-50/50" : "bg-white"
-            }`}
+            className="flex items-start gap-0 px-5 py-3"
+            style={{
+              backgroundColor: index % 2 === 0 ? "transparent" : `${color}06`,
+            }}
           >
             {/* Row number */}
-            <div className="w-10 shrink-0 pt-2">
+            <div className="w-12 shrink-0 pt-2">
               <span
-                className="inline-flex items-center justify-center w-6 h-6 rounded text-xs font-semibold"
-                style={{
-                  backgroundColor: `${color}12`,
-                  color,
-                }}
+                className="inline-flex items-center justify-center w-7 h-7 rounded-full text-xs font-bold text-white"
+                style={{ backgroundColor: color }}
               >
                 {index + 1}
               </span>
@@ -145,7 +163,10 @@ export default function DynamicTable({
                     maxLength={field.maxLength}
                     readOnly={readOnly}
                     rows={2}
-                    className="w-full rounded-md border border-gray-200 bg-white px-2.5 py-1.5 text-sm text-gray-700 placeholder:text-gray-300 resize-none transition-colors focus:outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-200"
+                    className="w-full rounded-xl border-0 bg-white px-3 py-2 text-sm text-gray-700 placeholder:text-gray-300 resize-none outline-none transition-shadow focus:shadow-md"
+                    style={{
+                      boxShadow: "0 1px 2px rgba(0,0,0,0.04)",
+                    }}
                   />
                 ) : (
                   <input
@@ -155,19 +176,22 @@ export default function DynamicTable({
                     placeholder={field.placeholder}
                     maxLength={field.maxLength}
                     readOnly={readOnly}
-                    className="w-full rounded-md border border-gray-200 bg-white px-2.5 py-1.5 text-sm text-gray-700 placeholder:text-gray-300 transition-colors focus:outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-200"
+                    className="w-full rounded-xl border-0 bg-white px-3 py-2 text-sm text-gray-700 placeholder:text-gray-300 outline-none transition-shadow focus:shadow-md"
+                    style={{
+                      boxShadow: "0 1px 2px rgba(0,0,0,0.04)",
+                    }}
                   />
                 )}
               </div>
             ))}
 
-            {/* Delete button - always visible */}
+            {/* Delete button */}
             {!readOnly && (
               <div className="w-10 shrink-0 pt-1.5">
                 <button
                   onClick={() => removeRow(row.id)}
                   disabled={rows.length <= 1}
-                  className="w-8 h-8 rounded-md flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                  className="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                   title="Remover meta"
                 >
                   <Trash2 className="w-4 h-4" />
@@ -187,18 +211,20 @@ export default function DynamicTable({
           return (
             <div
               key={row.id}
-              className="bg-white border border-gray-200 rounded-lg overflow-hidden"
+              className="overflow-hidden"
+              style={{
+                backgroundColor: `${color}14`,
+                borderRadius: "var(--card-radius, 16px)",
+                boxShadow: "0 2px 20px rgba(0,0,0,0.04), 0 1px 4px rgba(0,0,0,0.06)",
+              }}
             >
               <button
                 onClick={() => toggleExpand(row.id)}
-                className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-gray-50 transition-colors"
+                className="w-full flex items-center gap-3 px-5 py-4 text-left transition-colors"
               >
                 <span
-                  className="inline-flex items-center justify-center w-7 h-7 rounded text-xs font-semibold shrink-0"
-                  style={{
-                    backgroundColor: `${color}12`,
-                    color,
-                  }}
+                  className="inline-flex items-center justify-center w-8 h-8 rounded-full text-xs font-bold text-white shrink-0"
+                  style={{ backgroundColor: color }}
                 >
                   {index + 1}
                 </span>
@@ -211,10 +237,10 @@ export default function DynamicTable({
               </button>
 
               {isExpanded && (
-                <div className="px-4 pb-4 pt-1 space-y-3 border-t border-gray-100">
+                <div className="px-5 pb-5 pt-1 space-y-3">
                   {fields.map((field) => (
                     <div key={field.id}>
-                      <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">
+                      <label className="text-xs font-semibold uppercase tracking-wider mb-1.5 block" style={{ color }}>
                         {field.label}
                       </label>
                       {field.type === "text_long" ? (
@@ -225,7 +251,10 @@ export default function DynamicTable({
                           maxLength={field.maxLength}
                           readOnly={readOnly}
                           rows={3}
-                          className="w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 placeholder:text-gray-300 resize-none transition-colors focus:outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-200"
+                          className="w-full rounded-xl border-0 bg-white px-4 py-3 text-sm text-gray-700 placeholder:text-gray-300 resize-none outline-none transition-shadow focus:shadow-md"
+                          style={{
+                            boxShadow: "0 1px 2px rgba(0,0,0,0.04)",
+                          }}
                         />
                       ) : (
                         <input
@@ -235,7 +264,10 @@ export default function DynamicTable({
                           placeholder={field.placeholder}
                           maxLength={field.maxLength}
                           readOnly={readOnly}
-                          className="w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 placeholder:text-gray-300 transition-colors focus:outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-200"
+                          className="w-full rounded-xl border-0 bg-white px-4 py-3 text-sm text-gray-700 placeholder:text-gray-300 outline-none transition-shadow focus:shadow-md"
+                          style={{
+                            boxShadow: "0 1px 2px rgba(0,0,0,0.04)",
+                          }}
                         />
                       )}
                     </div>
@@ -244,7 +276,7 @@ export default function DynamicTable({
                     <button
                       onClick={() => removeRow(row.id)}
                       disabled={rows.length <= 1}
-                      className="flex items-center gap-1.5 text-xs text-gray-400 hover:text-red-500 disabled:opacity-30 disabled:cursor-not-allowed transition-colors px-2 py-1.5 rounded-md hover:bg-red-50"
+                      className="flex items-center gap-1.5 text-xs text-gray-400 hover:text-red-500 disabled:opacity-30 disabled:cursor-not-allowed transition-colors px-2 py-1.5 rounded-lg hover:bg-red-50"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                       Remover esta meta
@@ -261,7 +293,13 @@ export default function DynamicTable({
       {!readOnly && (
         <button
           onClick={addRow}
-          className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 border-dashed border-gray-300 text-gray-500 font-medium text-sm hover:border-gray-400 hover:text-gray-600 hover:bg-gray-50 transition-colors"
+          className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-3.5 font-semibold text-sm transition-all hover:shadow-md"
+          style={{
+            border: `2px dashed ${color}40`,
+            borderRadius: "var(--card-radius, 16px)",
+            color,
+            backgroundColor: `${color}08`,
+          }}
         >
           <Plus className="w-4 h-4" />
           Adicionar Meta

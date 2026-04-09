@@ -169,6 +169,7 @@ export default function PublicFormPage({
   const buttonColor = brand.buttonColor || primaryColor;
   const buttonTextColor = brand.buttonTextColor || "#FFFFFF";
   const buttonRadius = brand.buttonRadius || "0.75rem";
+  const cardRadius = brand.cardRadius || "16px";
   const fontFamily = brand.fontFamily || undefined;
   const headingWeight = brand.headingWeight || "600";
   const bodyWeight = brand.bodyWeight || "400";
@@ -605,6 +606,8 @@ export default function PublicFormPage({
         backgroundColor,
         fontFamily: fontFamily || undefined,
         color: textColor || undefined,
+        ["--card-radius" as string]: cardRadius,
+        ["--button-radius" as string]: buttonRadius,
       }}
     >
       <BrandedHeader />

@@ -111,9 +111,12 @@ export default function ToolRenderer({
         <div className="mt-8 flex justify-center">
           <button
             onClick={() => onSubmit(values)}
-            className="px-8 py-3 rounded-xl text-white font-semibold text-lg
-              shadow-lg hover:shadow-xl transition-all active:scale-95"
-            style={{ backgroundColor: schema.theme?.primaryColor || "#2D5A7B" }}
+            className="px-8 py-3 text-white font-semibold text-lg
+              shadow-md hover:shadow-lg transition-all duration-200 active:scale-95"
+            style={{
+              borderRadius: "var(--card-radius, 16px)",
+              background: `linear-gradient(135deg, ${schema.theme?.primaryColor || "#2D5A7B"}, ${schema.theme?.primaryColor || "#2D5A7B"}dd)`,
+            }}
           >
             Enviar Respostas
           </button>

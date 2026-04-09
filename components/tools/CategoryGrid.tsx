@@ -23,11 +23,19 @@ export default function CategoryGrid({
   return (
     <div className="w-full max-w-5xl mx-auto">
       {/* Summary bar */}
-      <div className="mb-6 bg-white border border-gray-200 rounded-lg px-5 py-4 flex items-center justify-between">
+      <div
+        className="mb-6 px-5 py-4 flex items-center justify-between"
+        style={{
+          backgroundColor: "#6366f10C",
+          borderRadius: "var(--card-radius, 16px)",
+          boxShadow:
+            "0 2px 20px rgba(0,0,0,0.04), 0 1px 4px rgba(0,0,0,0.06)",
+        }}
+      >
         <span className="text-sm font-medium text-gray-600">
-          Forcas selecionadas
+          Forças selecionadas
         </span>
-        <span className="text-sm font-semibold text-gray-800">
+        <span className="text-sm font-bold text-gray-800">
           {totalSelected} de {totalFields}
         </span>
       </div>
@@ -35,31 +43,42 @@ export default function CategoryGrid({
       {/* Category cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         {sections.map((section) => {
-          const selectedInCategory = section.fields.filter((f) => values[f.id]).length;
+          const selectedInCategory = section.fields.filter(
+            (f) => values[f.id]
+          ).length;
           const color = section.color || "#2D5A7B";
 
           return (
             <div
               key={section.id}
-              className="bg-white border border-gray-200 rounded-lg overflow-hidden"
+              className="overflow-hidden"
+              style={{
+                backgroundColor: `${color}0C`,
+                borderRadius: "var(--card-radius, 16px)",
+                boxShadow:
+                  "0 2px 20px rgba(0,0,0,0.04), 0 1px 4px rgba(0,0,0,0.06)",
+              }}
             >
-              {/* Colored top border */}
+              {/* Top accent bar */}
               <div
                 className="h-[3px] w-full"
                 style={{ backgroundColor: color }}
               />
 
-              <div className="p-4">
+              <div className="p-5">
                 {/* Category header */}
                 <div className="flex items-center gap-2.5 mb-1">
                   <SectionIcon icon={section.icon} size={20} />
-                  <h3 className="font-semibold text-sm text-gray-800 flex-1 min-w-0 truncate">
+                  <h3
+                    className="font-bold text-sm flex-1 min-w-0 truncate"
+                    style={{ color }}
+                  >
                     {section.label}
                   </h3>
                   <span
-                    className="text-xs font-medium px-2 py-0.5 rounded-full shrink-0"
+                    className="text-xs font-semibold px-2.5 py-0.5 rounded-full shrink-0"
                     style={{
-                      backgroundColor: `${color}12`,
+                      backgroundColor: `${color}14`,
                       color,
                     }}
                   >
@@ -74,42 +93,65 @@ export default function CategoryGrid({
                 )}
 
                 {/* Checkbox list */}
-                <div className="space-y-1">
+                <div className="space-y-1.5">
                   {section.fields.map((field) => {
                     const isChecked = !!values[field.id];
 
                     return (
                       <label
                         key={field.id}
-                        className={`flex items-start gap-3 px-3 py-2 rounded-md cursor-pointer transition-colors ${
-                          isChecked ? "bg-gray-50" : "hover:bg-gray-50"
-                        }`}
+                        className="flex items-start gap-3 px-3 py-2 rounded-full cursor-pointer transition-all duration-150"
+                        style={{
+                          backgroundColor: isChecked ? "white" : "transparent",
+                          boxShadow: isChecked
+                            ? "0 1px 6px rgba(0,0,0,0.06)"
+                            : "none",
+                        }}
+                        onMouseEnter={(e) => {
+                          if (!isChecked) {
+                            (e.currentTarget as HTMLElement).style.backgroundColor = "rgba(255,255,255,0.6)";
+                          }
+                        }}
+                        onMouseLeave={(e) => {
+                          if (!isChecked) {
+                            (e.currentTarget as HTMLElement).style.backgroundColor = "transparent";
+                          }
+                        }}
                       >
                         {/* Checkbox */}
                         <div className="relative flex-shrink-0 mt-0.5">
                           <input
                             type="checkbox"
                             checked={isChecked}
-                            onChange={(e) => onChange(field.id, e.target.checked)}
+                            onChange={(e) =>
+                              onChange(field.id, e.target.checked)
+                            }
                             disabled={readOnly}
                             className="sr-only peer"
                           />
                           <div
-                            className="w-[18px] h-[18px] rounded flex items-center justify-center border transition-colors"
+                            className="w-[18px] h-[18px] rounded-full flex items-center justify-center transition-colors"
                             style={{
                               backgroundColor: isChecked ? color : "white",
-                              borderColor: isChecked ? color : "#d1d5db",
+                              border: isChecked
+                                ? "none"
+                                : "2px solid #d1d5db",
                             }}
                           >
                             {isChecked && (
-                              <Check className="w-3 h-3 text-white" strokeWidth={3} />
+                              <Check
+                                className="w-3 h-3 text-white"
+                                strokeWidth={3}
+                              />
                             )}
                           </div>
                         </div>
 
                         <span
                           className={`text-sm leading-snug ${
-                            isChecked ? "text-gray-800 font-medium" : "text-gray-600"
+                            isChecked
+                              ? "text-gray-800 font-medium"
+                              : "text-gray-600"
                           }`}
                         >
                           {field.label}
@@ -126,9 +168,17 @@ export default function CategoryGrid({
 
       {/* Selected strengths summary */}
       {totalSelected > 0 && (
-        <div className="mt-6 bg-white border border-gray-200 rounded-lg p-5">
-          <h4 className="text-sm font-semibold text-gray-700 mb-3">
-            Suas forcas selecionadas
+        <div
+          className="mt-6 p-5"
+          style={{
+            backgroundColor: "#6366f10C",
+            borderRadius: "var(--card-radius, 16px)",
+            boxShadow:
+              "0 2px 20px rgba(0,0,0,0.04), 0 1px 4px rgba(0,0,0,0.06)",
+          }}
+        >
+          <h4 className="text-sm font-bold text-gray-700 mb-3">
+            Suas forças selecionadas
           </h4>
           <div className="flex flex-wrap gap-2">
             {sections.flatMap((section) =>
@@ -139,10 +189,10 @@ export default function CategoryGrid({
                   return (
                     <span
                       key={f.id}
-                      className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-md font-medium border"
+                      className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full font-medium"
                       style={{
-                        backgroundColor: `${c}08`,
-                        borderColor: `${c}25`,
+                        backgroundColor: "white",
+                        boxShadow: "0 1px 4px rgba(0,0,0,0.06)",
                         color: c,
                       }}
                     >
