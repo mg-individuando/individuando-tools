@@ -146,7 +146,7 @@ export default function NovaFerramentaPage() {
         title,
         slug,
         description: description || null,
-        template_type: selectedTemplate,
+        template_type: template.type,
         schema,
         settings: template.defaultSettings,
         status: "draft",
