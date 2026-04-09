@@ -14,6 +14,8 @@ interface ToolRendererProps {
   initialValues?: Record<string, unknown>;
   readOnly?: boolean;
   onSubmit?: (data: Record<string, unknown>) => void;
+  onSectionClick?: (sectionIndex: number) => void;
+  selectedSectionIndex?: number;
 }
 
 export default function ToolRenderer({
@@ -21,11 +23,18 @@ export default function ToolRenderer({
   initialValues = {},
   readOnly = false,
   onSubmit,
+  onSectionClick,
+  selectedSectionIndex,
 }: ToolRendererProps) {
   const [values, setValues] = useState<Record<string, unknown>>(initialValues);
 
   const handleChange = (fieldId: string, value: unknown) => {
     setValues((prev) => ({ ...prev, [fieldId]: value }));
+  };
+
+  const sectionSelectProps = {
+    onSectionClick,
+    selectedSectionIndex,
   };
 
   const renderTool = () => {
@@ -37,6 +46,7 @@ export default function ToolRenderer({
             values={values as Record<string, string>}
             onChange={(id, val) => handleChange(id, val)}
             readOnly={readOnly}
+            {...sectionSelectProps}
           />
         );
 
@@ -47,6 +57,7 @@ export default function ToolRenderer({
             values={values as Record<string, number>}
             onChange={(id, val) => handleChange(id, val)}
             readOnly={readOnly}
+            {...sectionSelectProps}
           />
         );
 
@@ -57,6 +68,7 @@ export default function ToolRenderer({
             values={values as Record<string, string>}
             onChange={(id, val) => handleChange(id, val)}
             readOnly={readOnly}
+            {...sectionSelectProps}
           />
         );
 
@@ -67,6 +79,7 @@ export default function ToolRenderer({
             values={values as Record<string, boolean>}
             onChange={(id, val) => handleChange(id, val)}
             readOnly={readOnly}
+            {...sectionSelectProps}
           />
         );
 
@@ -77,6 +90,7 @@ export default function ToolRenderer({
             values={values}
             onChange={(id, val) => handleChange(id, val)}
             readOnly={readOnly}
+            {...sectionSelectProps}
           />
         );
 
@@ -88,6 +102,7 @@ export default function ToolRenderer({
             values={values}
             onChange={(id, val) => handleChange(id, val)}
             readOnly={readOnly}
+            {...sectionSelectProps}
           />
         );
 
@@ -98,6 +113,7 @@ export default function ToolRenderer({
             values={values}
             onChange={(id, val) => handleChange(id, val)}
             readOnly={readOnly}
+            {...sectionSelectProps}
           />
         );
     }

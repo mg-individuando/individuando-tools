@@ -267,8 +267,8 @@ export default function AdminLayout({
       </aside>
 
       {/* ── Main content ───────────────────────────────────────── */}
-      <main className="lg:ml-64 pt-14 lg:pt-0 min-h-screen">
-        <div className="p-5 sm:p-6 lg:p-8 max-w-7xl">{children}</div>
+      <main className="lg:ml-64 pt-14 lg:pt-0">
+        <div className="p-5 sm:p-6 lg:p-8 max-w-7xl mx-auto">{children}</div>
       </main>
     </div>
   );

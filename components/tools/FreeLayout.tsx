@@ -9,6 +9,8 @@ interface FreeLayoutProps {
   values: Record<string, unknown>;
   onChange: (fieldId: string, value: unknown) => void;
   readOnly?: boolean;
+  onSectionClick?: (sectionIndex: number) => void;
+  selectedSectionIndex?: number;
 }
 
 export default function FreeLayout({
@@ -16,6 +18,8 @@ export default function FreeLayout({
   values,
   onChange,
   readOnly = false,
+  onSectionClick,
+  selectedSectionIndex,
 }: FreeLayoutProps) {
   const [focusedField, setFocusedField] = useState<string | null>(null);
 
@@ -229,13 +233,15 @@ export default function FreeLayout({
 
   return (
     <div className="w-full max-w-3xl mx-auto space-y-4">
-      {sections.map((section) => {
+      {sections.map((section, sectionIndex) => {
         const color = section.color || "#0080ff";
+        const isSelected = onSectionClick && selectedSectionIndex === sectionIndex;
 
         return (
           <div
             key={section.id}
-            className="overflow-hidden transition-all duration-200"
+            className={`overflow-hidden transition-all duration-200 ${onSectionClick ? "cursor-pointer" : ""} ${isSelected ? "ring-2 ring-[#0080ff] ring-offset-2" : onSectionClick ? "hover:ring-1 hover:ring-[#0080ff]/30 hover:ring-offset-1" : ""}`}
+            onClick={onSectionClick ? (e) => { e.stopPropagation(); onSectionClick(sectionIndex); } : undefined}
             style={{
               backdropFilter: "blur(12px)",
               WebkitBackdropFilter: "blur(12px)",

@@ -348,6 +348,7 @@ interface BannerEditorProps {
   onChange: (config: BannerConfig) => void;
   logoUrl?: string;
   clientName?: string;
+  onRecoloredLogo?: (url: string | null) => void;
 }
 
 export function BannerEditor({
@@ -355,6 +356,7 @@ export function BannerEditor({
   onChange,
   logoUrl,
   clientName,
+  onRecoloredLogo,
 }: BannerEditorProps) {
   const [activeSection, setActiveSection] = useState<string | null>("ai");
   const [aiPrompt, setAiPrompt] = useState("");
@@ -369,19 +371,20 @@ export function BannerEditor({
     onChange({ ...config, individuandoVariant: best });
   }, [config, logoUrl, onChange]);
 
-  // Recolor client logo when logoColor changes (for SVGs)
+  // Recolor client logo when logoColor changes
   useEffect(() => {
     if (!logoUrl || !config.logoColorEnabled || !config.logoColor) {
       setRecoloredClientLogo(null);
+      onRecoloredLogo?.(null);
       return;
     }
-    if (logoUrl.endsWith(".svg") || logoUrl.includes("image/svg")) {
-      recolorSvg(logoUrl, config.logoColor).then(setRecoloredClientLogo);
-    } else {
-      // For raster images, use canvas-based recoloring
-      recolorRasterImage(logoUrl, config.logoColor).then(setRecoloredClientLogo);
-    }
-  }, [logoUrl, config.logoColor, config.logoColorEnabled]);
+    const isSvg = logoUrl.endsWith(".svg") || logoUrl.includes("image/svg");
+    const recolorFn = isSvg ? recolorSvg : recolorRasterImage;
+    recolorFn(logoUrl, config.logoColor).then((url) => {
+      setRecoloredClientLogo(url);
+      onRecoloredLogo?.(url);
+    });
+  }, [logoUrl, config.logoColor, config.logoColorEnabled]); // eslint-disable-line react-hooks/exhaustive-deps
 
   function update<K extends keyof BannerConfig>(key: K, value: BannerConfig[K]) {
     onChange({ ...config, [key]: value });
@@ -880,8 +883,8 @@ export function BannerEditor({
                 </div>
               </div>
 
-              {/* Color override (SVG only) */}
-              {logoUrl && (logoUrl.endsWith(".svg") || logoUrl.includes("image/svg")) && (
+              {/* Color override */}
+              {logoUrl && (
                 <div className="space-y-2">
                   <label className="flex items-center gap-2 text-sm">
                     <input
@@ -890,7 +893,7 @@ export function BannerEditor({
                       onChange={(e) => update("logoColorEnabled", e.target.checked)}
                       className="h-4 w-4 rounded border-gray-300"
                     />
-                    Alterar cor do logo (SVG)
+                    Alterar cor do logo
                   </label>
                   {config.logoColorEnabled && (
                     <div className="flex items-center gap-2 ml-6">

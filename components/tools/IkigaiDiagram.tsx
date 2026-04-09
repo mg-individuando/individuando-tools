@@ -17,6 +17,8 @@ interface IkigaiDiagramProps {
   values: Record<string, string>;
   onChange: (fieldId: string, value: string) => void;
   readOnly?: boolean;
+  onSectionClick?: (sectionIndex: number) => void;
+  selectedSectionIndex?: number;
 }
 
 export default function IkigaiDiagram({
@@ -24,6 +26,8 @@ export default function IkigaiDiagram({
   values,
   onChange,
   readOnly = false,
+  onSectionClick,
+  selectedSectionIndex,
 }: IkigaiDiagramProps) {
   const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({
     circles: true,

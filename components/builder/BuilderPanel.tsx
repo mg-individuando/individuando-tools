@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import type { ToolSchema, Section, Field } from "@/lib/schemas/tool-schema";
 import ToolRenderer from "@/components/tools/ToolRenderer";
 import IconPicker from "@/components/ui/icon-picker";
@@ -15,6 +15,7 @@ import {
   ChevronRight,
   Save,
   Undo2,
+  Pencil,
 } from "lucide-react";
 
 interface BuilderPanelProps {
@@ -141,14 +142,46 @@ export default function BuilderPanel({ schema, onChange, onSave, saving }: Build
           </div>
         </div>
         <div className="p-6">
+          {/* Inline-editable title */}
           <div className="text-center mb-6">
-            <h2 className="text-xl font-bold" style={{ color: schema.theme?.primaryColor }}>
-              {schema.title}
-            </h2>
-            {schema.description && <p className="text-gray-500 mt-2 text-sm">{schema.description}</p>}
-            {schema.instructions && <p className="text-xs text-gray-400 mt-2 italic">{schema.instructions}</p>}
+            <InlineText
+              value={schema.title}
+              onChange={(v) => onChange({ ...schema, title: v })}
+              onFocus={() => setSelected({ type: "tool" })}
+              className="text-xl font-bold inline-block"
+              style={{ color: schema.theme?.primaryColor }}
+              placeholder="Título da ferramenta"
+              as="h2"
+            />
+            {(schema.description || selected?.type === "tool") && (
+              <InlineText
+                value={schema.description || ""}
+                onChange={(v) => onChange({ ...schema, description: v })}
+                onFocus={() => setSelected({ type: "tool" })}
+                className="text-gray-500 mt-2 text-sm inline-block"
+                placeholder="Descrição (clique para editar)"
+                multiline
+              />
+            )}
+            {(schema.instructions || selected?.type === "tool") && (
+              <InlineText
+                value={schema.instructions || ""}
+                onChange={(v) => onChange({ ...schema, instructions: v })}
+                onFocus={() => setSelected({ type: "tool" })}
+                className="text-xs text-gray-400 mt-2 italic inline-block"
+                placeholder="Instruções (clique para editar)"
+                multiline
+              />
+            )}
           </div>
-          <ToolRenderer schema={schema} readOnly={false} />
+
+          {/* Tool sections with click-to-select */}
+          <ToolRenderer
+            schema={schema}
+            readOnly={false}
+            onSectionClick={(si) => setSelected({ type: "section", sectionIndex: si })}
+            selectedSectionIndex={selected?.type === "section" ? selected.sectionIndex : undefined}
+          />
         </div>
       </div>
 
@@ -420,5 +453,91 @@ export default function BuilderPanel({ schema, onChange, onSave, saving }: Build
         />
       )}
     </div>
+  );
+}
+
+/* ── Inline Click-to-Edit Text Component ───────────────────── */
+function InlineText({
+  value,
+  onChange,
+  onFocus,
+  className = "",
+  style,
+  placeholder,
+  multiline = false,
+  as: Tag = "p",
+}: {
+  value: string;
+  onChange: (value: string) => void;
+  onFocus?: () => void;
+  className?: string;
+  style?: React.CSSProperties;
+  placeholder?: string;
+  multiline?: boolean;
+  as?: "h2" | "p" | "span";
+}) {
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState(value);
+  const inputRef = useRef<HTMLInputElement | HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    setDraft(value);
+  }, [value]);
+
+  useEffect(() => {
+    if (editing && inputRef.current) {
+      inputRef.current.focus();
+      inputRef.current.select();
+    }
+  }, [editing]);
+
+  function commit() {
+    setEditing(false);
+    if (draft !== value) onChange(draft);
+  }
+
+  function handleKeyDown(e: React.KeyboardEvent) {
+    if (e.key === "Enter" && !multiline) {
+      e.preventDefault();
+      commit();
+    }
+    if (e.key === "Escape") {
+      setDraft(value);
+      setEditing(false);
+    }
+  }
+
+  if (editing) {
+    const shared = {
+      ref: inputRef as any,
+      value: draft,
+      onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => setDraft(e.target.value),
+      onBlur: commit,
+      onKeyDown: handleKeyDown,
+      className: `w-full bg-white border border-[#0080ff]/30 rounded-lg px-2 py-1 text-center focus:ring-2 focus:ring-[#0080ff]/20 focus:border-[#0080ff] outline-none transition-all ${className}`,
+      style,
+      placeholder,
+    };
+
+    return multiline ? (
+      <textarea {...shared} rows={2} />
+    ) : (
+      <input type="text" {...shared} />
+    );
+  }
+
+  return (
+    <Tag
+      onClick={() => {
+        setEditing(true);
+        onFocus?.();
+      }}
+      className={`cursor-pointer rounded-lg px-2 py-0.5 transition-all hover:bg-[#0080ff]/5 hover:ring-1 hover:ring-[#0080ff]/20 group relative ${className}`}
+      style={style}
+      title="Clique para editar"
+    >
+      {value || <span className="opacity-40">{placeholder}</span>}
+      <Pencil className="w-3 h-3 text-[#0080ff]/40 inline ml-1 opacity-0 group-hover:opacity-100 transition-opacity" />
+    </Tag>
   );
 }

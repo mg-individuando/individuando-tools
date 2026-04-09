@@ -9,6 +9,8 @@ interface CategoryGridProps {
   values: Record<string, boolean>;
   onChange: (fieldId: string, value: boolean) => void;
   readOnly?: boolean;
+  onSectionClick?: (sectionIndex: number) => void;
+  selectedSectionIndex?: number;
 }
 
 export default function CategoryGrid({
@@ -16,6 +18,8 @@ export default function CategoryGrid({
   values,
   onChange,
   readOnly = false,
+  onSectionClick,
+  selectedSectionIndex,
 }: CategoryGridProps) {
   const totalSelected = Object.values(values).filter(Boolean).length;
   const totalFields = sections.reduce((sum, s) => sum + s.fields.length, 0);

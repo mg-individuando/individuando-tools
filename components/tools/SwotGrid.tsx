@@ -9,6 +9,8 @@ interface SwotGridProps {
   values: Record<string, string>;
   onChange: (fieldId: string, value: string) => void;
   readOnly?: boolean;
+  onSectionClick?: (sectionIndex: number) => void;
+  selectedSectionIndex?: number;
 }
 
 export default function SwotGrid({
@@ -16,33 +18,37 @@ export default function SwotGrid({
   values,
   onChange,
   readOnly = false,
+  onSectionClick,
+  selectedSectionIndex,
 }: SwotGridProps) {
   const [focusedField, setFocusedField] = useState<string | null>(null);
 
   const positionOrder = ["top-left", "top-right", "bottom-left", "bottom-right"];
   const orderedSections = useMemo(() => {
-    const copy = [...sections];
-    copy.sort((a, b) => {
-      const ai = positionOrder.indexOf(a.position || "");
-      const bi = positionOrder.indexOf(b.position || "");
+    const indexed = sections.map((s, i) => ({ section: s, originalIndex: i }));
+    indexed.sort((a, b) => {
+      const ai = positionOrder.indexOf(a.section.position || "");
+      const bi = positionOrder.indexOf(b.section.position || "");
       return ai - bi;
     });
-    return copy;
+    return indexed;
   }, [sections]);
 
   return (
     <div className="w-full max-w-4xl mx-auto">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {orderedSections.map((section) => {
+        {orderedSections.map(({ section, originalIndex }) => {
           const field = section.fields[0];
           const color = section.color || "#0080ff";
+          const isSelected = onSectionClick && selectedSectionIndex === originalIndex;
           const charCount = (values[field?.id || ""] || "").length;
           const maxLen = field?.maxLength || 0;
 
           return (
             <div
               key={section.id}
-              className="group overflow-hidden transition-all duration-200"
+              className={`group overflow-hidden transition-all duration-200 ${onSectionClick ? "cursor-pointer" : ""} ${isSelected ? "ring-2 ring-[#0080ff] ring-offset-2" : onSectionClick ? "hover:ring-1 hover:ring-[#0080ff]/30 hover:ring-offset-1" : ""}`}
+              onClick={onSectionClick ? (e) => { e.stopPropagation(); onSectionClick(originalIndex); } : undefined}
               style={{
                 backdropFilter: "blur(12px)",
                 WebkitBackdropFilter: "blur(12px)",

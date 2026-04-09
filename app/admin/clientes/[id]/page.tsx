@@ -84,6 +84,7 @@ export default function EditClientPage({
   const [showPartnerLogo, setShowPartnerLogo] = useState(false);
   // bannerConfig is managed inline via BannerEditor
   const [previewFullscreen, setPreviewFullscreen] = useState(false);
+  const [recoloredLogoUrl, setRecoloredLogoUrl] = useState<string | null>(null);
 
   // Brand config (extra header fields stored as arbitrary keys in the JSONB)
   const [brand, setBrand] = useState<Record<string, any>>({
@@ -208,6 +209,7 @@ export default function EditClientPage({
   }
 
   // headerHeight is now managed via bannerConfig
+  const previewLogo = recoloredLogoUrl || logoUrl;
 
   return (
     <div className="space-y-8 max-w-7xl mx-auto">
@@ -480,6 +482,7 @@ export default function EditClientPage({
                 onChange={(cfg) => updateBrand("bannerConfig", cfg)}
                 logoUrl={logoUrl}
                 clientName={name}
+                onRecoloredLogo={setRecoloredLogoUrl}
               />
             </CardContent>
           </Card>
@@ -536,7 +539,7 @@ export default function EditClientPage({
           </Card>
 
           {/* Bottom Save */}
-          <div className="flex justify-end pb-8">
+          <div className="flex justify-end pb-4">
             <Button
               onClick={handleSave}
               disabled={saving}
@@ -597,8 +600,8 @@ export default function EditClientPage({
                       {/* Client logo */}
                       {brand.bannerConfig?.showClientLogo !== false && (
                         <div className="flex items-center shrink-0" style={{ order: brand.bannerConfig?.clientLogoPosition === "right" ? 3 : 1 }}>
-                          {logoUrl ? (
-                            <img src={logoUrl} alt="Logo" className="object-contain" style={{ height: `${Math.min(brand.bannerConfig?.clientLogoSize || 40, 36)}px`, maxWidth: "90px" }} />
+                          {previewLogo ? (
+                            <img src={previewLogo} alt="Logo" className="object-contain" style={{ height: `${Math.min(brand.bannerConfig?.clientLogoSize || 40, 36)}px`, maxWidth: "90px" }} />
                           ) : (
                             <div className="rounded-lg flex items-center justify-center text-white text-xs font-bold shrink-0" style={{ backgroundColor: "rgba(255,255,255,0.2)", width: "28px", height: "28px" }}>
                               {name ? name.charAt(0).toUpperCase() : "C"}
@@ -687,8 +690,8 @@ export default function EditClientPage({
                       <div className="flex items-center w-full h-full gap-4 relative z-10">
                         {brand.bannerConfig?.showClientLogo !== false && (
                           <div className="flex items-center shrink-0" style={{ order: brand.bannerConfig?.clientLogoPosition === "right" ? 3 : 1 }}>
-                            {logoUrl ? (
-                              <img src={logoUrl} alt="Logo" className="object-contain" style={{ height: `${brand.bannerConfig?.clientLogoSize || 48}px`, maxWidth: "180px" }} />
+                            {previewLogo ? (
+                              <img src={previewLogo} alt="Logo" className="object-contain" style={{ height: `${brand.bannerConfig?.clientLogoSize || 48}px`, maxWidth: "180px" }} />
                             ) : (
                               <div className="rounded-lg flex items-center justify-center text-white text-lg font-bold" style={{ backgroundColor: "rgba(255,255,255,0.2)", width: "48px", height: "48px" }}>
                                 {name ? name.charAt(0).toUpperCase() : "C"}

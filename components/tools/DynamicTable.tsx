@@ -10,6 +10,8 @@ interface DynamicTableProps {
   values: Record<string, unknown>;
   onChange: (fieldId: string, value: unknown) => void;
   readOnly?: boolean;
+  onSectionClick?: (sectionIndex: number) => void;
+  selectedSectionIndex?: number;
 }
 
 interface MetaRow {
@@ -22,6 +24,8 @@ export default function DynamicTable({
   values,
   onChange,
   readOnly = false,
+  onSectionClick,
+  selectedSectionIndex,
 }: DynamicTableProps) {
   const section = sections[0];
   const fields = section?.fields || [];
