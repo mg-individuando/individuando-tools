@@ -23,15 +23,9 @@ export default function CategoryGrid({
   return (
     <div className="w-full max-w-5xl mx-auto">
       {/* Summary bar */}
-      <div
-        className="mb-6 px-5 py-4 flex items-center justify-between shadow-soft"
-        style={{
-          backgroundColor: "color-mix(in srgb, var(--brand) 5%, transparent)",
-          borderRadius: "var(--card-radius, 16px)",
-        }}
-      >
+      <div className="mb-6 bg-card border border-border rounded-xl p-5 flex items-center justify-between">
         <span className="text-sm font-medium text-muted-foreground">
-          Forças selecionadas
+          Forcas selecionadas
         </span>
         <span className="text-sm font-bold text-foreground">
           {totalSelected} de {totalFields}
@@ -45,75 +39,64 @@ export default function CategoryGrid({
             (f) => values[f.id]
           ).length;
           const color = section.color || "var(--brand)";
-          const colorBg = section.color ? `${section.color}0C` : "color-mix(in srgb, var(--brand) 5%, transparent)";
 
           return (
             <div
               key={section.id}
-              className="overflow-hidden shadow-soft"
-              style={{
-                backgroundColor: colorBg,
-                borderRadius: "var(--card-radius, 16px)",
-              }}
+              className="bg-card border border-border rounded-xl overflow-hidden hover:shadow-md transition-all duration-200"
+              style={{ borderTop: `3px solid ${color}` }}
             >
-              {/* Top accent bar */}
-              <div
-                className="h-[3px] w-full"
-                style={{ backgroundColor: color }}
-              />
-
               <div className="p-5">
                 {/* Category header */}
                 <div className="flex items-center gap-2.5 mb-1">
-                  <SectionIcon icon={section.icon} size={20} />
+                  <div
+                    className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
+                    style={{
+                      backgroundColor: section.color
+                        ? `${section.color}14`
+                        : "color-mix(in srgb, var(--brand) 8%, transparent)",
+                    }}
+                  >
+                    <SectionIcon icon={section.icon} size={18} />
+                  </div>
                   <h3
-                    className="font-bold text-sm flex-1 min-w-0 truncate"
+                    className="font-semibold text-sm flex-1 min-w-0 truncate"
                     style={{ color }}
                   >
                     {section.label}
                   </h3>
                   <span
-                    className="text-xs font-semibold px-2.5 py-0.5 rounded-full shrink-0"
+                    className="rounded-full text-xs px-2 py-0.5 font-semibold shrink-0"
                     style={{
-                      backgroundColor: section.color ? `${section.color}14` : "color-mix(in srgb, var(--brand) 8%, transparent)",
+                      backgroundColor: section.color
+                        ? `${section.color}14`
+                        : "color-mix(in srgb, var(--brand) 8%, transparent)",
                       color,
                     }}
                   >
-                    {selectedInCategory} de {section.fields.length}
+                    {selectedInCategory}/{section.fields.length}
                   </span>
                 </div>
 
                 {section.description && (
-                  <p className="text-xs text-muted-foreground/60 mb-3 leading-relaxed">
+                  <p className="text-xs text-muted-foreground/60 mb-3 leading-relaxed ml-[42px]">
                     {section.description}
                   </p>
                 )}
 
                 {/* Checkbox list */}
-                <div className="space-y-1.5">
+                <div className="space-y-1">
                   {section.fields.map((field) => {
                     const isChecked = !!values[field.id];
 
                     return (
                       <label
                         key={field.id}
-                        className="flex items-start gap-3 px-3 py-2 rounded-full cursor-pointer transition-all duration-150"
-                        style={{
-                          backgroundColor: isChecked ? "var(--card)" : "transparent",
-                          boxShadow: isChecked
-                            ? "var(--shadow-xs)"
-                            : "none",
-                        }}
-                        onMouseEnter={(e) => {
-                          if (!isChecked) {
-                            (e.currentTarget as HTMLElement).style.backgroundColor = "color-mix(in srgb, var(--card) 60%, transparent)";
-                          }
-                        }}
-                        onMouseLeave={(e) => {
-                          if (!isChecked) {
-                            (e.currentTarget as HTMLElement).style.backgroundColor = "transparent";
-                          }
-                        }}
+                        className={`flex items-start gap-3 px-3 py-2 rounded-lg cursor-pointer transition-colors duration-150 ${
+                          isChecked
+                            ? "bg-muted/60"
+                            : "hover:bg-muted/50"
+                        }`}
                       >
                         {/* Checkbox */}
                         <div className="relative flex-shrink-0 mt-0.5">
@@ -127,9 +110,9 @@ export default function CategoryGrid({
                             className="sr-only peer"
                           />
                           <div
-                            className="w-[18px] h-[18px] rounded-full flex items-center justify-center transition-colors"
+                            className="w-[18px] h-[18px] rounded flex items-center justify-center transition-colors"
                             style={{
-                              backgroundColor: isChecked ? color : "var(--card)",
+                              backgroundColor: isChecked ? color : "transparent",
                               border: isChecked
                                 ? "none"
                                 : "2px solid var(--border)",
@@ -165,15 +148,9 @@ export default function CategoryGrid({
 
       {/* Selected strengths summary */}
       {totalSelected > 0 && (
-        <div
-          className="mt-6 p-5 shadow-soft"
-          style={{
-            backgroundColor: "color-mix(in srgb, var(--brand) 5%, transparent)",
-            borderRadius: "var(--card-radius, 16px)",
-          }}
-        >
+        <div className="mt-6 bg-card border border-border rounded-xl p-5">
           <h4 className="text-sm font-bold text-foreground mb-3">
-            Suas forças selecionadas
+            Suas forcas selecionadas
           </h4>
           <div className="flex flex-wrap gap-2">
             {sections.flatMap((section) =>
@@ -184,12 +161,8 @@ export default function CategoryGrid({
                   return (
                     <span
                       key={f.id}
-                      className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full font-medium"
-                      style={{
-                        backgroundColor: "var(--card)",
-                        boxShadow: "var(--shadow-xs)",
-                        color: c,
-                      }}
+                      className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 bg-muted text-xs font-medium"
+                      style={{ color: c }}
                     >
                       <Check className="w-3 h-3" strokeWidth={2.5} />
                       {f.label?.split("\u2014")[0]?.trim()}

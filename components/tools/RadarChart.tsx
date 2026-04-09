@@ -100,12 +100,7 @@ export default function RadarChart({
   return (
     <div className="flex flex-col items-center gap-8 w-full">
       {/* Radar SVG Section */}
-      <div
-        className="relative w-full max-w-[460px] mx-auto p-4 bg-secondary shadow-soft"
-        style={{
-          borderRadius: "var(--card-radius, 16px)",
-        }}
-      >
+      <div className="relative w-full max-w-[460px] mx-auto p-4 bg-card border border-border rounded-xl hover:shadow-md transition-all duration-200">
         <svg
           viewBox={`0 0 ${size} ${size}`}
           className="w-full"
@@ -180,12 +175,7 @@ export default function RadarChart({
               y={l.y}
               textAnchor={l.anchor}
               dominantBaseline="central"
-              style={{
-                fontSize: "11px",
-                fontWeight: 600,
-                fill: "var(--foreground)",
-                letterSpacing: "0.01em",
-              }}
+              className="text-[11px] font-semibold fill-foreground tracking-tight"
             >
               {l.label}
             </text>
@@ -206,33 +196,33 @@ export default function RadarChart({
           return (
             <div
               key={section.id}
-              className="overflow-hidden shadow-soft"
-              style={{
-                background: hexToRgba(color, 0.08),
-                borderRadius: "var(--card-radius, 16px)",
-              }}
+              className="bg-card border border-border rounded-xl overflow-hidden hover:shadow-md transition-all duration-200"
+              style={{ borderLeft: `4px solid ${color}` }}
             >
               <div className="px-4 py-3.5">
                 {/* Label + value */}
                 <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-2">
-                    <SectionIcon icon={section.icon} size={18} />
-                    <span className="text-sm font-semibold text-foreground leading-tight">
+                  <div className="flex items-center gap-2.5">
+                    <div
+                      className="w-8 h-8 rounded-lg flex items-center justify-center"
+                      style={{ backgroundColor: `${color}14` }}
+                    >
+                      <SectionIcon icon={section.icon} size={18} />
+                    </div>
+                    <span className="font-semibold text-sm text-foreground leading-tight">
                       {section.label}
                     </span>
                   </div>
                   <span
-                    className="inline-flex items-center justify-center w-9 h-9 rounded-full text-sm font-bold text-white"
+                    className="inline-flex items-center justify-center w-7 h-7 rounded-md text-xs font-bold text-white"
                     style={{ backgroundColor: color }}
                   >
                     {value}
                   </span>
                 </div>
 
-                {/* Slider in white container */}
-                <div
-                  className="rounded-xl px-3 py-2 bg-card"
-                >
+                {/* Slider */}
+                <div className="px-1">
                   <input
                     type="range"
                     min={min}

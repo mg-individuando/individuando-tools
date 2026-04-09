@@ -19,8 +19,7 @@ export default function FreeLayout({
 }: FreeLayoutProps) {
   const [focusedField, setFocusedField] = useState<string | null>(null);
 
-  function renderField(field: Field, sectionColor: string, rawColor?: string) {
-    const focusRing = rawColor ? `0 0 0 3px ${rawColor}33` : `0 0 0 3px color-mix(in srgb, var(--brand) 20%, transparent)`;
+  function renderField(field: Field, sectionColor: string) {
     const fieldValue = values[field.id];
 
     switch (field.type) {
@@ -28,7 +27,7 @@ export default function FreeLayout({
         return (
           <div key={field.id} className="space-y-1.5">
             {field.label && (
-              <label className="text-sm font-medium text-muted-foreground">
+              <label className="text-xs font-medium text-muted-foreground">
                 {field.label}
                 {field.required && <span className="text-destructive/70 ml-0.5">*</span>}
               </label>
@@ -41,20 +40,20 @@ export default function FreeLayout({
               maxLength={field.maxLength}
               required={field.required}
               readOnly={readOnly}
-              className="w-full rounded-xl border-0 bg-card px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/50 outline-none transition-shadow"
-              style={{
-                boxShadow:
-                  focusedField === field.id
-                    ? focusRing
-                    : "var(--shadow-xs)",
-              }}
+              className={[
+                "w-full rounded-lg border bg-muted/40 px-3 py-2.5 text-sm text-foreground",
+                "placeholder:text-muted-foreground/50 outline-none transition-all duration-200",
+                focusedField === field.id
+                  ? "bg-card border-primary/40 ring-2 ring-primary/10"
+                  : "border-border",
+              ].join(" ")}
               onFocus={() => setFocusedField(field.id)}
               onBlur={() => setFocusedField(null)}
             />
             {field.maxLength != null && field.maxLength > 0 && (
               <div className="text-right">
-                <span className="text-xs text-muted-foreground/60">
-                  {((fieldValue as string) || "").length} / {field.maxLength}
+                <span className="text-[10px] text-muted-foreground/50">
+                  {((fieldValue as string) || "").length}/{field.maxLength}
                 </span>
               </div>
             )}
@@ -65,7 +64,7 @@ export default function FreeLayout({
         return (
           <div key={field.id} className="space-y-1.5">
             {field.label && (
-              <label className="text-sm font-medium text-muted-foreground">
+              <label className="text-xs font-medium text-muted-foreground">
                 {field.label}
                 {field.required && <span className="text-destructive/70 ml-0.5">*</span>}
               </label>
@@ -78,20 +77,20 @@ export default function FreeLayout({
               required={field.required}
               readOnly={readOnly}
               rows={4}
-              className="w-full rounded-xl border-0 bg-card px-4 py-3 text-sm leading-relaxed text-foreground placeholder:text-muted-foreground/50 outline-none resize-none transition-shadow"
-              style={{
-                boxShadow:
-                  focusedField === field.id
-                    ? focusRing
-                    : "var(--shadow-xs)",
-              }}
+              className={[
+                "w-full rounded-lg border bg-muted/40 px-3 py-2.5 text-sm leading-relaxed text-foreground",
+                "placeholder:text-muted-foreground/50 outline-none resize-none transition-all duration-200",
+                focusedField === field.id
+                  ? "bg-card border-primary/40 ring-2 ring-primary/10"
+                  : "border-border",
+              ].join(" ")}
               onFocus={() => setFocusedField(field.id)}
               onBlur={() => setFocusedField(null)}
             />
             {field.maxLength != null && field.maxLength > 0 && (
               <div className="text-right">
-                <span className="text-xs text-muted-foreground/60">
-                  {((fieldValue as string) || "").length} / {field.maxLength}
+                <span className="text-[10px] text-muted-foreground/50">
+                  {((fieldValue as string) || "").length}/{field.maxLength}
                 </span>
               </div>
             )}
@@ -104,21 +103,21 @@ export default function FreeLayout({
         const step = field.step ?? 1;
         const val = (fieldValue as number) ?? (field.defaultValue as number) ?? min;
         return (
-          <div key={field.id} className="space-y-3">
+          <div key={field.id} className="space-y-2.5">
             {field.label && (
               <div className="flex items-center justify-between">
-                <label className="text-sm font-medium text-muted-foreground">
+                <label className="text-xs font-medium text-muted-foreground">
                   {field.label}
                 </label>
                 <span
-                  className="inline-flex items-center justify-center w-10 h-10 rounded-full text-sm font-bold text-white"
+                  className="inline-flex items-center justify-center w-7 h-7 rounded-md text-xs font-bold text-white"
                   style={{ backgroundColor: sectionColor }}
                 >
                   {val}
                 </span>
               </div>
             )}
-            <div className="bg-card rounded-xl p-4" style={{ boxShadow: "var(--shadow-xs)" }}>
+            <div>
               <input
                 type="range"
                 min={min}
@@ -127,12 +126,12 @@ export default function FreeLayout({
                 value={val}
                 onChange={(e) => onChange(field.id, parseInt(e.target.value))}
                 disabled={readOnly}
-                className="w-full h-2 rounded-full appearance-none cursor-pointer"
+                className="w-full h-1.5 rounded-full appearance-none cursor-pointer"
                 style={{
                   background: `linear-gradient(to right, ${sectionColor} 0%, ${sectionColor} ${((val - min) / (max - min)) * 100}%, var(--border) ${((val - min) / (max - min)) * 100}%, var(--border) 100%)`,
                 }}
               />
-              <div className="flex justify-between text-[10px] text-muted-foreground/60 mt-1.5">
+              <div className="flex justify-between text-[10px] text-muted-foreground/50 mt-1">
                 <span>{min}</span>
                 <span>{max}</span>
               </div>
@@ -145,8 +144,7 @@ export default function FreeLayout({
         return (
           <div key={field.id}>
             <label
-              className="flex items-center gap-3 cursor-pointer rounded-xl bg-card px-4 py-3 transition-shadow hover:shadow-sm"
-              style={{ boxShadow: "var(--shadow-xs)" }}
+              className="flex items-center gap-3 cursor-pointer rounded-lg px-3 py-2.5 transition-all duration-200 hover:bg-muted/50"
             >
               <input
                 type="checkbox"
@@ -165,14 +163,13 @@ export default function FreeLayout({
         return (
           <div key={field.id} className="space-y-1.5">
             {field.label && (
-              <label className="text-sm font-medium text-muted-foreground">{field.label}</label>
+              <label className="text-xs font-medium text-muted-foreground">{field.label}</label>
             )}
-            <div className="space-y-2">
+            <div className="space-y-1">
               {field.options?.map((opt) => (
                 <label
                   key={opt.value}
-                  className="flex items-center gap-3 cursor-pointer rounded-xl bg-card px-4 py-3 transition-shadow hover:shadow-sm"
-                  style={{ boxShadow: "var(--shadow-xs)" }}
+                  className="flex items-center gap-3 cursor-pointer rounded-lg px-3 py-2.5 transition-all duration-200 hover:bg-muted/50"
                 >
                   <input
                     type="radio"
@@ -195,19 +192,19 @@ export default function FreeLayout({
         return (
           <div key={field.id} className="space-y-1.5">
             {field.label && (
-              <label className="text-sm font-medium text-muted-foreground">{field.label}</label>
+              <label className="text-xs font-medium text-muted-foreground">{field.label}</label>
             )}
             <select
               value={(fieldValue as string) || ""}
               onChange={(e) => onChange(field.id, e.target.value)}
               disabled={readOnly}
-              className="w-full rounded-xl border-0 bg-card px-4 py-3 text-sm text-foreground outline-none transition-shadow"
-              style={{
-                boxShadow:
-                  focusedField === field.id
-                    ? focusRing
-                    : "var(--shadow-xs)",
-              }}
+              className={[
+                "w-full rounded-lg border bg-muted/40 px-3 py-2.5 text-sm text-foreground",
+                "outline-none transition-all duration-200",
+                focusedField === field.id
+                  ? "bg-card border-primary/40 ring-2 ring-primary/10"
+                  : "border-border",
+              ].join(" ")}
               onFocus={() => setFocusedField(field.id)}
               onBlur={() => setFocusedField(null)}
             >
@@ -225,20 +222,20 @@ export default function FreeLayout({
         return (
           <div key={field.id} className="space-y-1.5">
             {field.label && (
-              <label className="text-sm font-medium text-muted-foreground">{field.label}</label>
+              <label className="text-xs font-medium text-muted-foreground">{field.label}</label>
             )}
             <input
               type="date"
               value={(fieldValue as string) || ""}
               onChange={(e) => onChange(field.id, e.target.value)}
               readOnly={readOnly}
-              className="w-full rounded-xl border-0 bg-card px-4 py-3 text-sm text-foreground outline-none transition-shadow"
-              style={{
-                boxShadow:
-                  focusedField === field.id
-                    ? focusRing
-                    : "var(--shadow-xs)",
-              }}
+              className={[
+                "w-full rounded-lg border bg-muted/40 px-3 py-2.5 text-sm text-foreground",
+                "outline-none transition-all duration-200",
+                focusedField === field.id
+                  ? "bg-card border-primary/40 ring-2 ring-primary/10"
+                  : "border-border",
+              ].join(" ")}
               onFocus={() => setFocusedField(field.id)}
               onBlur={() => setFocusedField(null)}
             />
@@ -251,47 +248,45 @@ export default function FreeLayout({
   }
 
   return (
-    <div className="w-full max-w-3xl mx-auto space-y-6">
+    <div className="w-full max-w-3xl mx-auto space-y-4">
       {sections.map((section) => {
         const color = section.color || "var(--brand)";
-        const colorBg = section.color ? `${section.color}14` : "color-mix(in srgb, var(--brand) 8%, transparent)";
+        const iconBg = section.color ? `${section.color}14` : "color-mix(in srgb, var(--brand) 8%, transparent)";
 
         return (
           <div
             key={section.id}
-            className="overflow-hidden shadow-soft"
-            style={{
-              backgroundColor: colorBg,
-              borderRadius: "var(--card-radius, 16px)",
-            }}
+            className="bg-card border border-border rounded-xl overflow-hidden hover:shadow-md transition-all duration-200"
+            style={{ borderLeft: `4px solid ${color}` }}
           >
-            {/* Top accent bar */}
-            <div
-              className="h-[3px] w-full"
-              style={{ backgroundColor: color }}
-            />
-
             {/* Section header */}
-            <div className="px-6 pt-5 pb-2">
-              <div className="flex items-center gap-3 mb-1">
-                <SectionIcon icon={section.icon} size={24} />
-                <h3
-                  className="font-bold text-base leading-tight"
-                  style={{ color }}
+            <div className="px-5 pt-4 pb-2">
+              <div className="flex items-center gap-2.5">
+                <div
+                  className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+                  style={{ backgroundColor: iconBg }}
                 >
-                  {section.label}
-                </h3>
+                  <SectionIcon icon={section.icon} size={18} />
+                </div>
+                <div className="min-w-0">
+                  <h3
+                    className="font-semibold text-sm leading-tight"
+                    style={{ color }}
+                  >
+                    {section.label}
+                  </h3>
+                  {section.description && (
+                    <p className="text-xs text-muted-foreground leading-snug mt-0.5">
+                      {section.description}
+                    </p>
+                  )}
+                </div>
               </div>
-              {section.description && (
-                <p className="text-sm text-muted-foreground leading-relaxed mt-1 ml-[36px]">
-                  {section.description}
-                </p>
-              )}
             </div>
 
             {/* Section fields */}
-            <div className="px-6 pb-6 pt-2 space-y-4">
-              {section.fields.map((field) => renderField(field, color, section.color))}
+            <div className="px-5 pb-5 pt-2 space-y-3.5">
+              {section.fields.map((field) => renderField(field, color))}
             </div>
           </div>
         );

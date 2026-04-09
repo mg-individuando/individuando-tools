@@ -69,13 +69,13 @@ export default function IkigaiDiagram({
       <div className="mb-6">
         <button
           onClick={() => toggleGroup("circles")}
-          className="w-full flex items-center justify-between px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg mb-3 hover:bg-gray-100 transition-colors"
+          className="w-full flex items-center justify-between px-4 py-3 bg-muted/50 border border-border rounded-xl mb-3 hover:bg-muted/70 transition-colors"
         >
-          <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">
+          <h3 className="text-sm font-semibold text-foreground uppercase tracking-wide">
             Quatro Pilares
           </h3>
           <ChevronDown
-            className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${expandedGroups.circles ? "rotate-180" : ""}`}
+            className={`w-4 h-4 text-muted-foreground transition-transform duration-200 ${expandedGroups.circles ? "rotate-180" : ""}`}
           />
         </button>
 
@@ -90,10 +90,10 @@ export default function IkigaiDiagram({
               return (
                 <div
                   key={section.id}
-                  className="bg-white border border-gray-200 rounded-lg overflow-hidden"
+                  className="bg-card border border-border rounded-xl overflow-hidden hover:shadow-md transition-all duration-200"
                 >
                   <div className="flex items-stretch">
-                    {/* Colored left border */}
+                    {/* Colored left accent */}
                     <div
                       className="w-1 shrink-0"
                       style={{ backgroundColor: baseColor }}
@@ -101,14 +101,22 @@ export default function IkigaiDiagram({
                     <div className="flex-1 p-4">
                       {/* Header */}
                       <div className="flex items-center gap-2.5 mb-1">
-                        <SectionIcon icon={section.icon} size={20} />
-                        <h4 className="font-semibold text-[15px] text-gray-800">
+                        <div
+                          className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
+                          style={{ backgroundColor: `${baseColor}14` }}
+                        >
+                          <SectionIcon icon={section.icon} size={18} />
+                        </div>
+                        <h4
+                          className="font-semibold text-[15px]"
+                          style={{ color: baseColor }}
+                        >
                           {section.label}
                         </h4>
                       </div>
 
                       {section.description && (
-                        <p className="text-xs text-gray-400 mb-3 leading-relaxed">
+                        <p className="text-xs text-muted-foreground mb-3 leading-relaxed ml-[42px]">
                           {section.description}
                         </p>
                       )}
@@ -123,11 +131,11 @@ export default function IkigaiDiagram({
                             required={field.required}
                             readOnly={readOnly}
                             rows={4}
-                            className="w-full rounded-md border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-700 placeholder:text-gray-300 resize-none transition-colors focus:outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-200"
+                            className="w-full border border-border bg-muted/40 rounded-lg px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/50 resize-none transition-all duration-200 focus:outline-none focus:border-ring focus:ring-2 focus:ring-ring/20"
                           />
                           {maxLen > 0 && (
                             <div className="mt-1.5 text-right">
-                              <span className={`text-xs tabular-nums ${charCount > maxLen * 0.9 ? "text-red-500" : "text-gray-400"}`}>
+                              <span className={`text-xs tabular-nums ${charCount > maxLen * 0.9 ? "text-destructive" : "text-muted-foreground"}`}>
                                 {charCount}/{maxLen}
                               </span>
                             </div>
@@ -147,13 +155,13 @@ export default function IkigaiDiagram({
       <div className="mb-6">
         <button
           onClick={() => toggleGroup("intersections")}
-          className="w-full flex items-center justify-between px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg mb-3 hover:bg-gray-100 transition-colors"
+          className="w-full flex items-center justify-between px-4 py-3 bg-muted/50 border border-border rounded-xl mb-3 hover:bg-muted/70 transition-colors"
         >
-          <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">
+          <h3 className="text-sm font-semibold text-foreground uppercase tracking-wide">
             Intersecoes
           </h3>
           <ChevronDown
-            className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${expandedGroups.intersections ? "rotate-180" : ""}`}
+            className={`w-4 h-4 text-muted-foreground transition-transform duration-200 ${expandedGroups.intersections ? "rotate-180" : ""}`}
           />
         </button>
 
@@ -168,7 +176,7 @@ export default function IkigaiDiagram({
               return (
                 <div
                   key={section.id}
-                  className="bg-white border border-gray-200 rounded-lg overflow-hidden"
+                  className="bg-muted/30 border border-border rounded-xl overflow-hidden hover:shadow-md transition-all duration-200"
                 >
                   <div className="flex items-stretch">
                     <div
@@ -176,8 +184,13 @@ export default function IkigaiDiagram({
                       style={{ backgroundColor: baseColor }}
                     />
                     <div className="flex-1 p-4">
-                      <div className="flex items-center gap-2 mb-1">
-                        <SectionIcon icon={section.icon} size={18} />
+                      <div className="flex items-center gap-2.5 mb-1">
+                        <div
+                          className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
+                          style={{ backgroundColor: `${baseColor}14` }}
+                        >
+                          <SectionIcon icon={section.icon} size={18} />
+                        </div>
                         <h4
                           className="font-semibold text-sm"
                           style={{ color: baseColor }}
@@ -187,7 +200,7 @@ export default function IkigaiDiagram({
                       </div>
 
                       {section.description && (
-                        <p className="text-xs text-gray-400 mb-2.5 leading-relaxed">
+                        <p className="text-xs text-muted-foreground mb-2.5 leading-relaxed ml-[42px]">
                           {section.description}
                         </p>
                       )}
@@ -201,11 +214,11 @@ export default function IkigaiDiagram({
                             maxLength={field.maxLength}
                             readOnly={readOnly}
                             rows={2}
-                            className="w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 placeholder:text-gray-300 resize-none transition-colors focus:outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-200"
+                            className="w-full border border-border bg-muted/40 rounded-lg px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/50 resize-none transition-all duration-200 focus:outline-none focus:border-ring focus:ring-2 focus:ring-ring/20"
                           />
                           {maxLen > 0 && (
                             <div className="mt-1.5 text-right">
-                              <span className={`text-xs tabular-nums ${charCount > maxLen * 0.9 ? "text-red-500" : "text-gray-400"}`}>
+                              <span className={`text-xs tabular-nums ${charCount > maxLen * 0.9 ? "text-destructive" : "text-muted-foreground"}`}>
                                 {charCount}/{maxLen}
                               </span>
                             </div>
@@ -226,13 +239,13 @@ export default function IkigaiDiagram({
         <div>
           <button
             onClick={() => toggleGroup("center")}
-            className="w-full flex items-center justify-between px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg mb-3 hover:bg-gray-100 transition-colors"
+            className="w-full flex items-center justify-between px-4 py-3 bg-muted/50 border border-border rounded-xl mb-3 hover:bg-muted/70 transition-colors"
           >
-            <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">
+            <h3 className="text-sm font-semibold text-foreground uppercase tracking-wide">
               Seu Ikigai
             </h3>
             <ChevronDown
-              className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${expandedGroups.center ? "rotate-180" : ""}`}
+              className={`w-4 h-4 text-muted-foreground transition-transform duration-200 ${expandedGroups.center ? "rotate-180" : ""}`}
             />
           </button>
 
@@ -244,7 +257,10 @@ export default function IkigaiDiagram({
               const maxLen = field?.maxLength || 0;
 
               return (
-                <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+                <div
+                  className="bg-card border border-border rounded-xl overflow-hidden hover:shadow-md transition-all duration-200"
+                  style={{ borderTop: `3px solid ${baseColor}` }}
+                >
                   <div className="flex items-stretch">
                     <div
                       className="w-1 shrink-0"
@@ -252,14 +268,22 @@ export default function IkigaiDiagram({
                     />
                     <div className="flex-1 p-5">
                       <div className="flex items-center gap-2.5 mb-1">
-                        <SectionIcon icon={centerSection.icon} size={22} />
-                        <h4 className="font-bold text-lg text-gray-800">
+                        <div
+                          className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
+                          style={{ backgroundColor: `${baseColor}14` }}
+                        >
+                          <SectionIcon icon={centerSection.icon} size={20} />
+                        </div>
+                        <h4
+                          className="font-bold text-lg"
+                          style={{ color: baseColor }}
+                        >
                           {centerSection.label}
                         </h4>
                       </div>
 
                       {centerSection.description && (
-                        <p className="text-sm text-gray-400 mb-4 leading-relaxed">
+                        <p className="text-sm text-muted-foreground mb-4 leading-relaxed ml-[42px]">
                           {centerSection.description}
                         </p>
                       )}
@@ -274,11 +298,11 @@ export default function IkigaiDiagram({
                             required={field.required}
                             readOnly={readOnly}
                             rows={4}
-                            className="w-full rounded-md border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-700 placeholder:text-gray-300 resize-none transition-colors focus:outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-200"
+                            className="w-full border border-border bg-muted/40 rounded-lg px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/50 resize-none transition-all duration-200 focus:outline-none focus:border-ring focus:ring-2 focus:ring-ring/20"
                           />
                           {maxLen > 0 && (
                             <div className="mt-1.5 text-right">
-                              <span className={`text-xs tabular-nums ${charCount > maxLen * 0.9 ? "text-red-500" : "text-gray-400"}`}>
+                              <span className={`text-xs tabular-nums ${charCount > maxLen * 0.9 ? "text-destructive" : "text-muted-foreground"}`}>
                                 {charCount}/{maxLen}
                               </span>
                             </div>
