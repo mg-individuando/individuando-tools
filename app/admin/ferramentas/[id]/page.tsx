@@ -62,6 +62,8 @@ export default function EditToolPage({
   const [editableSchema, setEditableSchema] = useState<ToolSchema | null>(null);
   const [saving, setSaving] = useState(false);
   const [emailList, setEmailList] = useState("");
+  const [clients, setClients] = useState<{id: string; name: string; logo_url: string | null}[]>([]);
+  const [selectedClient, setSelectedClient] = useState<string>("");
   const qrRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
@@ -90,7 +92,16 @@ export default function EditToolPage({
         setDescription(t.description || "");
         setSettings(t.settings as ToolSettings);
         setEditableSchema(t.schema as ToolSchema);
+        setSelectedClient(t.client_id || "");
       }
+
+      // Load clients
+      const { data: clientsData } = await supabase
+        .from("clients")
+        .select("id, name, logo_url")
+        .eq("is_active", true)
+        .order("name");
+      if (clientsData) setClients(clientsData);
     }
     loadTool();
   }, [id]);
@@ -118,11 +129,12 @@ export default function EditToolPage({
         description,
         schema,
         settings,
+        client_id: selectedClient || null,
       })
       .eq("id", tool.id);
 
     setSaving(false);
-    setTool({ ...tool, title, description, schema, settings });
+    setTool({ ...tool, title, description, schema, settings, client_id: selectedClient || null });
     setEditableSchema(schema);
     toast.success("Alterações salvas com sucesso!");
   }
@@ -141,6 +153,7 @@ export default function EditToolPage({
         description: newDesc,
         schema: editableSchema,
         settings,
+        client_id: selectedClient || null,
       })
       .eq("id", tool.id);
 
@@ -153,6 +166,7 @@ export default function EditToolPage({
       description: newDesc,
       schema: editableSchema,
       settings,
+      client_id: selectedClient || null,
     });
     toast.success("Builder salvo com sucesso!");
   }
@@ -647,6 +661,44 @@ export default function EditToolPage({
       ) : (
         /* Settings Tab */
         <div className="space-y-6 max-w-xl">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Cliente</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label>Vincular a um cliente</Label>
+                <p className="text-xs text-muted-foreground">
+                  As cores, fontes e logo do cliente serão aplicadas na ferramenta publicada.
+                </p>
+                <select
+                  value={selectedClient}
+                  onChange={(e) => setSelectedClient(e.target.value)}
+                  className="w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 focus:border-[#2D5A7B] focus:ring-2 focus:ring-[#2D5A7B]/10 outline-none transition-all"
+                >
+                  <option value="">Sem cliente (padrão Individuando)</option>
+                  {clients.map((c) => (
+                    <option key={c.id} value={c.id}>{c.name}</option>
+                  ))}
+                </select>
+              </div>
+              {selectedClient && (
+                <div className="flex items-center gap-2 p-3 rounded-lg bg-gray-50 border">
+                  {clients.find(c => c.id === selectedClient)?.logo_url ? (
+                    <img src={clients.find(c => c.id === selectedClient)!.logo_url!} alt="" className="h-8 object-contain" />
+                  ) : (
+                    <div className="w-8 h-8 rounded-lg bg-[#2D5A7B] flex items-center justify-center text-white text-sm font-bold">
+                      {clients.find(c => c.id === selectedClient)?.name?.charAt(0) || "C"}
+                    </div>
+                  )}
+                  <span className="text-sm font-medium text-gray-700">
+                    {clients.find(c => c.id === selectedClient)?.name}
+                  </span>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
           <Card>
             <CardHeader>
               <CardTitle className="text-lg">Informações Básicas</CardTitle>

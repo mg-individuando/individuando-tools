@@ -181,75 +181,151 @@ export default function PublicFormPage({
   const idFields =
     (settings.identificationFields as IdentificationField[]) || [];
 
+  const bannerConfig = brand.bannerConfig as Record<string, any> | undefined;
+
   /* ── Branded Header Component ── */
   function BrandedHeader({ compact = false }: { compact?: boolean }) {
     if (client) {
+      // Determine header background style
+      const headerStyle: React.CSSProperties = {
+        borderBottom: "1px solid rgba(0,0,0,0.06)",
+      };
+
+      if (bannerConfig) {
+        // Apply banner config styling
+        if (bannerConfig.backgroundType === "gradient") {
+          headerStyle.background = `linear-gradient(${bannerConfig.gradientDirection || "to right"}, ${bannerConfig.gradientFrom}, ${bannerConfig.gradientTo})`;
+        } else if (bannerConfig.backgroundType === "solid") {
+          headerStyle.backgroundColor = bannerConfig.backgroundColor;
+        } else if (bannerConfig.backgroundType === "image" && bannerConfig.backgroundImage) {
+          headerStyle.backgroundImage = `url(${bannerConfig.backgroundImage})`;
+          headerStyle.backgroundSize = "cover";
+          headerStyle.backgroundPosition = "center";
+        } else {
+          headerStyle.backgroundColor = headerBg || "#FFFFFF";
+        }
+      } else {
+        headerStyle.backgroundColor = headerBg || "#FFFFFF";
+        if (brand.headerBgImage) {
+          headerStyle.backgroundImage = `url(${brand.headerBgImage})`;
+          headerStyle.backgroundSize = "cover";
+          headerStyle.backgroundPosition = "center";
+        }
+      }
+
+      const headerHeight = brand.headerHeight === "compact" ? "60px" : brand.headerHeight === "tall" ? "120px" : "80px";
+      const hasOverlay = bannerConfig?.overlayOpacity > 0;
+
       return (
-        <header
-          className="w-full sticky top-0 z-10"
-          style={{
-            backgroundColor: headerBg || "#FFFFFF",
-            borderBottom: "1px solid rgba(0,0,0,0.06)",
-            backgroundImage: brand.headerBgImage
-              ? `url(${brand.headerBgImage})`
-              : undefined,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-          }}
-        >
+        <header className="w-full sticky top-0 z-10 relative" style={headerStyle}>
+          {hasOverlay && (
+            <div
+              className="absolute inset-0 pointer-events-none"
+              style={{ backgroundColor: `rgba(0,0,0,${bannerConfig!.overlayOpacity / 100})` }}
+            />
+          )}
           <div
-            className="max-w-4xl mx-auto px-4 flex items-center justify-between"
-            style={{
-              height: brand.headerHeight === "compact" ? "60px" : brand.headerHeight === "tall" ? "120px" : "80px",
-            }}
+            className="max-w-4xl mx-auto px-4 flex items-center relative z-10"
+            style={{ height: headerHeight }}
           >
-            <div className="flex items-center gap-3">
-              {client.logo_url && (
-                <img
-                  src={client.logo_url}
-                  alt={client.name}
-                  className="h-10 object-contain max-w-[160px]"
-                />
-              )}
-              {showNameInHeader && !client.logo_url && (
-                <span
-                  style={{
-                    color: headerTextColor,
-                    fontWeight: Number(headingWeight),
-                    fontFamily: fontFamily || undefined,
-                  }}
-                  className="text-lg"
-                >
-                  {client.name}
-                </span>
-              )}
-            </div>
-            {client.show_partner_logo && client.partner_logo_url && (
-              <img
-                src={client.partner_logo_url}
-                alt="Partner"
-                className="h-8 object-contain"
-              />
+            {bannerConfig ? (
+              /* Column-based banner layout */
+              <div className="flex items-center w-full h-full gap-4">
+                {/* Client logo column */}
+                {bannerConfig.showClientLogo !== false && (
+                  <div className="flex items-center shrink-0" style={{ order: bannerConfig.clientLogoPosition === "right" ? 3 : 1 }}>
+                    {client.logo_url ? (
+                      <img
+                        src={client.logo_url}
+                        alt={client.name}
+                        className="object-contain"
+                        style={{ height: `${bannerConfig.clientLogoSize || 40}px`, maxWidth: "160px" }}
+                      />
+                    ) : showNameInHeader ? (
+                      <span
+                        style={{ color: headerTextColor, fontWeight: Number(headingWeight), fontFamily: fontFamily || undefined }}
+                        className="text-lg"
+                      >
+                        {client.name}
+                      </span>
+                    ) : null}
+                  </div>
+                )}
+                {/* Text column */}
+                <div className="flex-1 min-w-0 flex flex-col justify-center" style={{ order: 2 }}>
+                  {bannerConfig.title && (
+                    <p
+                      className="font-semibold leading-tight truncate"
+                      style={{
+                        color: bannerConfig.titleColor || "#FFFFFF",
+                        fontSize: `${bannerConfig.titleSize || 22}px`,
+                        textAlign: bannerConfig.titlePosition || "center",
+                        fontFamily: fontFamily || undefined,
+                      }}
+                    >
+                      {bannerConfig.title}
+                    </p>
+                  )}
+                  {bannerConfig.subtitle && (
+                    <p
+                      className="leading-tight truncate mt-0.5"
+                      style={{
+                        color: bannerConfig.subtitleColor || "rgba(255,255,255,0.75)",
+                        fontSize: `${bannerConfig.subtitleSize || 13}px`,
+                        textAlign: bannerConfig.titlePosition || "center",
+                        fontFamily: fontFamily || undefined,
+                      }}
+                    >
+                      {bannerConfig.subtitle}
+                    </p>
+                  )}
+                </div>
+                {/* Individuando logo column */}
+                {bannerConfig.individuandoVariant && (
+                  <div className="flex items-center shrink-0" style={{ order: bannerConfig.clientLogoPosition === "right" ? 1 : 3 }}>
+                    <img
+                      src={`/logos/individuando/logo-${bannerConfig.individuandoVariant}.svg`}
+                      alt="Individuando"
+                      className="object-contain"
+                      style={{ height: `${bannerConfig.individuandoSize || 36}px`, maxWidth: "140px" }}
+                    />
+                  </div>
+                )}
+              </div>
+            ) : (
+              /* Legacy header layout */
+              <div className="flex items-center justify-between w-full">
+                <div className="flex items-center gap-3">
+                  {client.logo_url && (
+                    <img src={client.logo_url} alt={client.name} className="h-10 object-contain max-w-[160px]" />
+                  )}
+                  {showNameInHeader && !client.logo_url && (
+                    <span style={{ color: headerTextColor, fontWeight: Number(headingWeight), fontFamily: fontFamily || undefined }} className="text-lg">
+                      {client.name}
+                    </span>
+                  )}
+                </div>
+                {client.show_partner_logo && client.partner_logo_url && (
+                  <img src={client.partner_logo_url} alt="Partner" className="h-8 object-contain" />
+                )}
+              </div>
             )}
           </div>
         </header>
       );
     }
 
+    /* Default Individuando header (no client) */
     return (
       <header className="w-full border-b border-gray-100 bg-white/80 backdrop-blur-sm sticky top-0 z-10">
         <div className="max-w-4xl mx-auto px-4 py-3 flex items-center gap-3">
-          <div
-            className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
-            style={{ backgroundColor: primaryColor }}
-          >
-            <span className="text-white font-bold text-sm">I</span>
-          </div>
+          <img
+            src="/logos/individuando/logo-1.svg"
+            alt="Individuando"
+            className="h-8 object-contain"
+          />
           {!compact && (
-            <span
-              className="text-base font-semibold tracking-tight"
-              style={{ color: primaryColor }}
-            >
+            <span className="text-base font-semibold tracking-tight" style={{ color: primaryColor }}>
               Individuando
             </span>
           )}

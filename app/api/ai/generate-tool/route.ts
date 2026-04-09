@@ -191,6 +191,44 @@ Depois, retorne os JSONs:
 \`\`\`
 `;
 
+async function fetchFreepikIcon(keyword: string): Promise<string | null> {
+  const apiKey = process.env.FREEPIK_API_KEY;
+  if (!apiKey) return null;
+
+  try {
+    const url = `https://api.freepik.com/v1/icons?term=${encodeURIComponent(keyword)}&per_page=1&filters[style]=special-lineal`;
+    const resp = await fetch(url, {
+      headers: {
+        "x-freepik-api-key": apiKey,
+        Accept: "application/json",
+      },
+    });
+    if (!resp.ok) return null;
+    const data = await resp.json();
+    return data.data?.[0]?.thumbnails?.[0]?.url || null;
+  } catch {
+    return null;
+  }
+}
+
+async function enrichSchemaWithIcons(schema: any): Promise<any> {
+  if (!schema?.sections) return schema;
+
+  const enrichedSections = await Promise.all(
+    schema.sections.map(async (section: any) => {
+      // Use the icon hint from AI, or fall back to the section label
+      const searchTerm = section.icon || section.label?.split(" ")[0] || "tool";
+      const iconUrl = await fetchFreepikIcon(searchTerm);
+      return {
+        ...section,
+        icon: iconUrl || section.icon || "",
+      };
+    })
+  );
+
+  return { ...schema, sections: enrichedSections };
+}
+
 export async function POST(request: NextRequest) {
   try {
     // Verify authentication
@@ -268,6 +306,11 @@ export async function POST(request: NextRequest) {
       try {
         meta = JSON.parse(metaMatch[1].trim());
       } catch {}
+    }
+
+    // Enrich sections with Freepik icons
+    if (schema) {
+      schema = await enrichSchemaWithIcons(schema);
     }
 
     // Get explanation text (everything before the first json block)
