@@ -176,12 +176,15 @@ export default function IkigaiDiagram({
                       style={{ backgroundColor: baseColor }}
                     />
                     <div className="flex-1 p-4">
-                      <h4
-                        className="font-semibold text-sm mb-1"
-                        style={{ color: baseColor }}
-                      >
-                        {section.label}
-                      </h4>
+                      <div className="flex items-center gap-2 mb-1">
+                        <SectionIcon icon={section.icon} size={18} />
+                        <h4
+                          className="font-semibold text-sm"
+                          style={{ color: baseColor }}
+                        >
+                          {section.label}
+                        </h4>
+                      </div>
 
                       {section.description && (
                         <p className="text-xs text-gray-400 mb-2.5 leading-relaxed">

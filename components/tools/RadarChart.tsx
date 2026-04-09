@@ -2,6 +2,7 @@
 
 import { useMemo, useId } from "react";
 import type { Section } from "@/lib/schemas/tool-schema";
+import SectionIcon from "./SectionIcon";
 
 interface RadarChartProps {
   sections: Section[];
@@ -215,9 +216,12 @@ export default function RadarChart({
               <div className="px-4 py-3.5">
                 {/* Label + value */}
                 <div className="flex items-center justify-between mb-3">
-                  <span className="text-sm font-semibold text-slate-700 leading-tight">
-                    {section.label}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <SectionIcon icon={section.icon} size={18} />
+                    <span className="text-sm font-semibold text-slate-700 leading-tight">
+                      {section.label}
+                    </span>
+                  </div>
                   <span
                     className="text-lg font-bold tabular-nums"
                     style={{ color }}

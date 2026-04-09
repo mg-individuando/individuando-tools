@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import type { Section } from "@/lib/schemas/tool-schema";
-import { Plus, Trash2, Target, ChevronDown } from "lucide-react";
+import { Plus, Trash2, ChevronDown } from "lucide-react";
+import SectionIcon from "./SectionIcon";
 
 interface DynamicTableProps {
   sections: Section[];
@@ -78,7 +79,7 @@ export default function DynamicTable({
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2.5">
-          <Target className="w-5 h-5" style={{ color }} />
+          <SectionIcon icon={section?.icon} size={22} />
           <div>
             <h3 className="font-semibold text-gray-800">{section?.label}</h3>
             {section?.description && (

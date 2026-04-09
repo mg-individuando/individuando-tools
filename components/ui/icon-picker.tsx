@@ -17,8 +17,8 @@ interface IconPickerProps {
   onClose: () => void;
 }
 
-// Only use "special-lineal" style (same as sua_alma project)
-const FIXED_STYLE = "special-lineal";
+// Only use "lineal" (outline) style — same as sua_alma project
+const FIXED_STYLE = "lineal";
 
 export default function IconPicker({ value, onSelect, onClose }: IconPickerProps) {
   const [search, setSearch] = useState("");
@@ -106,7 +106,7 @@ export default function IconPicker({ value, onSelect, onClose }: IconPickerProps
           {/* Style badge */}
           <div className="flex items-center gap-1.5">
             <span className="text-xs px-2.5 py-1.5 rounded-lg bg-purple-100 text-purple-700 font-medium">
-              Special Lineal
+              Outline
             </span>
             <span className="text-xs text-gray-400">Freepik Icons</span>
           </div>
