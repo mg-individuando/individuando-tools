@@ -218,17 +218,18 @@ export default function PublicFormPage({
       const hasOverlay = bannerConfig?.overlayOpacity > 0;
 
       return (
-        <header className="w-full sticky top-0 z-10 relative" style={headerStyle}>
-          {hasOverlay && (
+        <header className="w-full sticky top-0 z-10">
+          <div className="max-w-4xl mx-auto px-4 relative rounded-b-xl overflow-hidden" style={headerStyle}>
+            {hasOverlay && (
+              <div
+                className="absolute inset-0 pointer-events-none"
+                style={{ backgroundColor: `rgba(0,0,0,${bannerConfig!.overlayOpacity / 100})` }}
+              />
+            )}
             <div
-              className="absolute inset-0 pointer-events-none"
-              style={{ backgroundColor: `rgba(0,0,0,${bannerConfig!.overlayOpacity / 100})` }}
-            />
-          )}
-          <div
-            className="max-w-4xl mx-auto px-4 flex items-center relative z-10"
-            style={{ height: headerHeight }}
-          >
+              className="flex items-center relative z-10"
+              style={{ height: headerHeight }}
+            >
             {bannerConfig ? (
               /* Column-based banner layout */
               <div className="flex items-center w-full h-full gap-4">
@@ -317,6 +318,7 @@ export default function PublicFormPage({
                 />
               </div>
             )}
+          </div>
           </div>
         </header>
       );

@@ -45,23 +45,6 @@ const RADIUS_OPTIONS = [
   { value: "9999px", label: "Pill (9999px)" },
 ];
 
-const HEADER_LAYOUT_OPTIONS = [
-  { value: "logo-left", label: "Logo à esquerda" },
-  { value: "logo-center", label: "Logo centralizado" },
-  { value: "logo-right", label: "Logo à direita" },
-];
-
-const HEADER_HEIGHT_OPTIONS = [
-  { value: "compact", label: "Compacto (60px)" },
-  { value: "normal", label: "Normal (80px)" },
-  { value: "tall", label: "Alto (120px)" },
-];
-
-const HEADER_HEIGHT_MAP: Record<string, string> = {
-  compact: "60px",
-  normal: "80px",
-  tall: "120px",
-};
 
 const DEFAULT_BRAND: BrandConfig = {
   primaryColor: "#2D5A7B",
@@ -100,6 +83,7 @@ export default function EditClientPage({
   const [partnerLogoUrl, setPartnerLogoUrl] = useState("");
   const [showPartnerLogo, setShowPartnerLogo] = useState(false);
   // bannerConfig is managed inline via BannerEditor
+  const [previewFullscreen, setPreviewFullscreen] = useState(false);
 
   // Brand config (extra header fields stored as arbitrary keys in the JSONB)
   const [brand, setBrand] = useState<Record<string, any>>({
@@ -223,7 +207,7 @@ export default function EditClientPage({
     );
   }
 
-  const headerHeightPx = HEADER_HEIGHT_MAP[brand.headerHeight] ?? "80px";
+  // headerHeight is now managed via bannerConfig
 
   return (
     <div className="space-y-8 max-w-7xl mx-auto">
@@ -567,160 +551,193 @@ export default function EditClientPage({
 
         {/* Right column: sticky preview */}
         <div className="lg:col-span-1">
-          <div className="sticky top-6">
+          <div className="sticky top-6 space-y-3">
             <Card>
-              <CardHeader>
-                <CardTitle className="font-sans text-[#2D5A7B] flex items-center gap-2">
-                  <Eye className="h-5 w-5" />
-                  Preview
-                </CardTitle>
+              <CardHeader className="pb-2">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="font-sans text-[#2D5A7B] flex items-center gap-2">
+                    <Eye className="h-5 w-5" />
+                    Preview
+                  </CardTitle>
+                  <button
+                    onClick={() => setPreviewFullscreen(!previewFullscreen)}
+                    className="text-xs text-gray-400 hover:text-[#2D5A7B] transition-colors flex items-center gap-1"
+                  >
+                    {previewFullscreen ? "Reduzir" : "Ampliar"}
+                  </button>
+                </div>
               </CardHeader>
               <CardContent>
+                {/* Banner/Header Preview — uses actual banner config */}
                 <div
-                  className="rounded-xl overflow-hidden border"
+                  className="rounded-xl overflow-hidden border shadow-sm"
                   style={{
-                    fontFamily:
-                      brand.fontFamily === "Custom"
-                        ? "sans-serif"
-                        : brand.fontFamily,
+                    fontFamily: brand.fontFamily === "Custom" ? "sans-serif" : brand.fontFamily,
                   }}
                 >
-                  {/* Preview Header */}
+                  {/* Header Preview — mirrors public page exactly */}
                   <div
-                    className="px-4 flex items-center gap-3"
+                    className="px-4 flex items-center relative overflow-hidden"
                     style={{
-                      backgroundColor: brand.headerBg,
-                      color: brand.headerTextColor,
-                      height: headerHeightPx,
+                      height: "80px",
                       ...(brand.bannerConfig?.backgroundType === "gradient"
-                        ? {
-                            background: `linear-gradient(${brand.bannerConfig.gradientDirection}, ${brand.bannerConfig.gradientFrom}, ${brand.bannerConfig.gradientTo})`,
-                          }
+                        ? { background: `linear-gradient(${brand.bannerConfig.gradientDirection || "to right"}, ${brand.bannerConfig.gradientFrom}, ${brand.bannerConfig.gradientTo})` }
                         : brand.bannerConfig?.backgroundType === "solid"
                           ? { backgroundColor: brand.bannerConfig.backgroundColor }
                           : brand.bannerConfig?.backgroundType === "image" && brand.bannerConfig.backgroundImage
-                            ? {
-                                backgroundImage: `url(${brand.bannerConfig.backgroundImage})`,
-                                backgroundSize: "cover",
-                                backgroundPosition: "center",
-                              }
-                            : brand.headerBgImage
-                              ? {
-                                  backgroundImage: `url(${brand.headerBgImage})`,
-                                  backgroundSize: "cover",
-                                  backgroundPosition: "center",
-                                }
-                              : {}),
+                            ? { backgroundImage: `url(${brand.bannerConfig.backgroundImage})`, backgroundSize: "cover", backgroundPosition: "center" }
+                            : { backgroundColor: brand.primaryColor || "#2D5A7B" }),
                     }}
                   >
-                    <div className="flex items-center w-full h-full gap-2 px-1">
+                    {/* Overlay */}
+                    {brand.bannerConfig?.overlayOpacity > 0 && (
+                      <div className="absolute inset-0 pointer-events-none" style={{ backgroundColor: `rgba(0,0,0,${brand.bannerConfig.overlayOpacity / 100})` }} />
+                    )}
+                    <div className="flex items-center w-full h-full gap-2 relative z-10">
+                      {/* Client logo */}
                       {brand.bannerConfig?.showClientLogo !== false && (
                         <div className="flex items-center shrink-0" style={{ order: brand.bannerConfig?.clientLogoPosition === "right" ? 3 : 1 }}>
                           {logoUrl ? (
-                            <img
-                              src={logoUrl}
-                              alt="Logo"
-                              className="object-contain"
-                              style={{ height: `${Math.min(brand.bannerConfig?.clientLogoSize || 40, 40)}px`, maxWidth: "100px" }}
-                            />
+                            <img src={logoUrl} alt="Logo" className="object-contain" style={{ height: `${Math.min(brand.bannerConfig?.clientLogoSize || 40, 36)}px`, maxWidth: "90px" }} />
                           ) : (
-                            <div
-                              className="rounded-lg flex items-center justify-center text-white text-sm font-bold shrink-0"
-                              style={{ backgroundColor: brand.primaryColor, width: "32px", height: "32px" }}
-                            >
+                            <div className="rounded-lg flex items-center justify-center text-white text-xs font-bold shrink-0" style={{ backgroundColor: "rgba(255,255,255,0.2)", width: "28px", height: "28px" }}>
                               {name ? name.charAt(0).toUpperCase() : "C"}
                             </div>
                           )}
                         </div>
                       )}
+                      {/* Text */}
                       <div className="flex-1 min-w-0 flex flex-col justify-center" style={{ order: 2 }}>
-                        {brand.bannerConfig?.title && (
-                          <p className="text-xs font-semibold truncate" style={{ color: brand.bannerConfig.titleColor || "#fff", textAlign: brand.bannerConfig.titlePosition || "center" }}>
-                            {brand.bannerConfig.title}
-                          </p>
-                        )}
-                        {brand.bannerConfig?.subtitle && (
-                          <p className="text-[9px] truncate" style={{ color: brand.bannerConfig.subtitleColor || "rgba(255,255,255,0.7)", textAlign: brand.bannerConfig.titlePosition || "center" }}>
-                            {brand.bannerConfig.subtitle}
-                          </p>
-                        )}
-                        {!brand.bannerConfig?.title && brand.showNameInHeader !== false && (
-                          <span style={{ fontWeight: Number(brand.headingWeight), textAlign: "center" }} className="text-sm text-white">
-                            {name || "Nome do Cliente"}
-                          </span>
+                        {brand.bannerConfig?.title ? (
+                          <>
+                            <p className="text-[11px] font-semibold leading-tight truncate" style={{ color: brand.bannerConfig.titleColor || "#fff", textAlign: brand.bannerConfig.titlePosition || "center" }}>
+                              {brand.bannerConfig.title}
+                            </p>
+                            {brand.bannerConfig.subtitle && (
+                              <p className="text-[8px] leading-tight truncate mt-0.5" style={{ color: brand.bannerConfig.subtitleColor || "rgba(255,255,255,0.7)", textAlign: brand.bannerConfig.titlePosition || "center" }}>
+                                {brand.bannerConfig.subtitle}
+                              </p>
+                            )}
+                          </>
+                        ) : (
+                          <span className="text-xs text-white font-medium text-center">{name || "Nome do Cliente"}</span>
                         )}
                       </div>
-                      {brand.bannerConfig?.individuandoVariant && (
-                        <div className="flex items-center shrink-0" style={{ order: brand.bannerConfig?.clientLogoPosition === "right" ? 1 : 3 }}>
-                          <img
-                            src={`/logos/individuando/logo-${brand.bannerConfig.individuandoVariant}.svg`}
-                            alt="Individuando"
-                            className="object-contain"
-                            style={{ height: `${Math.min(brand.bannerConfig?.individuandoSize || 30, 30)}px`, maxWidth: "90px" }}
-                          />
-                        </div>
-                      )}
+                      {/* Individuando logo */}
+                      <div className="flex items-center shrink-0" style={{ order: brand.bannerConfig?.clientLogoPosition === "right" ? 1 : 3 }}>
+                        <img
+                          src={`/logos/individuando/logo-${brand.bannerConfig?.individuandoVariant || 7}.svg`}
+                          alt="Individuando"
+                          className="object-contain"
+                          style={{ height: `${Math.min(brand.bannerConfig?.individuandoSize || 28, 28)}px`, maxWidth: "80px" }}
+                        />
+                      </div>
                     </div>
                   </div>
 
                   {/* Preview Body */}
-                  <div
-                    className="p-4 space-y-3"
-                    style={{
-                      backgroundColor: brand.backgroundColor,
-                      color: brand.textColor,
-                    }}
-                  >
-                    <h3
-                      className="text-base"
-                      style={{ fontWeight: Number(brand.headingWeight) }}
-                    >
-                      Título de exemplo
-                    </h3>
-                    <p
-                      className="text-xs"
-                      style={{ fontWeight: Number(brand.bodyWeight) }}
-                    >
-                      Este é um texto de exemplo para visualizar como o conteúdo
-                      vai aparecer com as configurações de marca escolhidas.
+                  <div className="p-4 space-y-3" style={{ backgroundColor: brand.backgroundColor, color: brand.textColor }}>
+                    <h3 className="text-base" style={{ fontWeight: Number(brand.headingWeight) }}>Título de exemplo</h3>
+                    <p className="text-xs" style={{ fontWeight: Number(brand.bodyWeight) }}>
+                      Este é um texto de exemplo para visualizar como o conteúdo vai aparecer com as configurações de marca escolhidas.
                     </p>
-
-                    {/* Sample Card */}
-                    <div className="rounded-lg border bg-white p-3 space-y-2">
-                      <label
-                        className="text-xs block"
-                        style={{ fontWeight: Number(brand.labelWeight) }}
-                      >
-                        Campo de exemplo
-                      </label>
+                    <div className="rounded-lg border bg-white p-3 space-y-2" style={{ borderRadius: brand.cardRadius || "16px" }}>
+                      <label className="text-xs block" style={{ fontWeight: Number(brand.labelWeight) }}>Campo de exemplo</label>
                       <div className="h-8 rounded-md border bg-gray-50" />
-                      <button
-                        className="px-3 py-1.5 text-xs"
-                        style={{
-                          backgroundColor: brand.buttonColor,
-                          color: brand.buttonTextColor,
-                          borderRadius: brand.buttonRadius,
-                          fontWeight: Number(brand.bodyWeight),
-                        }}
-                      >
+                      <button className="px-3 py-1.5 text-xs" style={{ backgroundColor: brand.buttonColor, color: brand.buttonTextColor, borderRadius: brand.buttonRadius, fontWeight: Number(brand.bodyWeight) }}>
                         Botão de ação
                       </button>
                     </div>
                   </div>
 
                   {/* Preview Footer */}
-                  <div
-                    className="px-4 py-2 text-center text-[10px] border-t"
-                    style={{
-                      backgroundColor: brand.backgroundColor,
-                      color: brand.secondaryColor,
-                    }}
-                  >
+                  <div className="px-4 py-2 text-center text-[10px] border-t" style={{ backgroundColor: brand.backgroundColor, color: brand.secondaryColor }}>
                     {brand.footerText}
                   </div>
                 </div>
               </CardContent>
             </Card>
+
+            {/* Fullscreen Preview Overlay */}
+            {previewFullscreen && (
+              <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-8" onClick={() => setPreviewFullscreen(false)}>
+                <div className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-auto" onClick={(e) => e.stopPropagation()}>
+                  <div className="flex items-center justify-between px-6 py-4 border-b">
+                    <span className="text-sm font-semibold text-gray-800">Preview — Ferramenta Publicada</span>
+                    <button onClick={() => setPreviewFullscreen(false)} className="text-gray-400 hover:text-gray-600 transition-colors">✕</button>
+                  </div>
+                  <div style={{ fontFamily: brand.fontFamily === "Custom" ? "sans-serif" : brand.fontFamily }}>
+                    {/* Full-size header */}
+                    <div
+                      className="px-6 flex items-center relative overflow-hidden"
+                      style={{
+                        height: "100px",
+                        ...(brand.bannerConfig?.backgroundType === "gradient"
+                          ? { background: `linear-gradient(${brand.bannerConfig.gradientDirection || "to right"}, ${brand.bannerConfig.gradientFrom}, ${brand.bannerConfig.gradientTo})` }
+                          : brand.bannerConfig?.backgroundType === "solid"
+                            ? { backgroundColor: brand.bannerConfig.backgroundColor }
+                            : brand.bannerConfig?.backgroundType === "image" && brand.bannerConfig.backgroundImage
+                              ? { backgroundImage: `url(${brand.bannerConfig.backgroundImage})`, backgroundSize: "cover", backgroundPosition: "center" }
+                              : { backgroundColor: brand.primaryColor || "#2D5A7B" }),
+                      }}
+                    >
+                      {brand.bannerConfig?.overlayOpacity > 0 && (
+                        <div className="absolute inset-0 pointer-events-none" style={{ backgroundColor: `rgba(0,0,0,${brand.bannerConfig.overlayOpacity / 100})` }} />
+                      )}
+                      <div className="flex items-center w-full h-full gap-4 relative z-10">
+                        {brand.bannerConfig?.showClientLogo !== false && (
+                          <div className="flex items-center shrink-0" style={{ order: brand.bannerConfig?.clientLogoPosition === "right" ? 3 : 1 }}>
+                            {logoUrl ? (
+                              <img src={logoUrl} alt="Logo" className="object-contain" style={{ height: `${brand.bannerConfig?.clientLogoSize || 48}px`, maxWidth: "180px" }} />
+                            ) : (
+                              <div className="rounded-lg flex items-center justify-center text-white text-lg font-bold" style={{ backgroundColor: "rgba(255,255,255,0.2)", width: "48px", height: "48px" }}>
+                                {name ? name.charAt(0).toUpperCase() : "C"}
+                              </div>
+                            )}
+                          </div>
+                        )}
+                        <div className="flex-1 min-w-0 flex flex-col justify-center" style={{ order: 2 }}>
+                          {brand.bannerConfig?.title ? (
+                            <>
+                              <p className="font-semibold leading-tight" style={{ color: brand.bannerConfig.titleColor || "#fff", fontSize: `${brand.bannerConfig.titleSize || 22}px`, textAlign: brand.bannerConfig.titlePosition || "center" }}>
+                                {brand.bannerConfig.title}
+                              </p>
+                              {brand.bannerConfig.subtitle && (
+                                <p className="leading-tight mt-1" style={{ color: brand.bannerConfig.subtitleColor || "rgba(255,255,255,0.75)", fontSize: `${brand.bannerConfig.subtitleSize || 13}px`, textAlign: brand.bannerConfig.titlePosition || "center" }}>
+                                  {brand.bannerConfig.subtitle}
+                                </p>
+                              )}
+                            </>
+                          ) : (
+                            <span className="text-lg text-white font-semibold text-center">{name || "Nome do Cliente"}</span>
+                          )}
+                        </div>
+                        <div className="flex items-center shrink-0" style={{ order: brand.bannerConfig?.clientLogoPosition === "right" ? 1 : 3 }}>
+                          <img src={`/logos/individuando/logo-${brand.bannerConfig?.individuandoVariant || 7}.svg`} alt="Individuando" className="object-contain" style={{ height: `${brand.bannerConfig?.individuandoSize || 36}px`, maxWidth: "140px" }} />
+                        </div>
+                      </div>
+                    </div>
+                    {/* Full-size body */}
+                    <div className="p-8 space-y-4" style={{ backgroundColor: brand.backgroundColor, color: brand.textColor }}>
+                      <h3 className="text-xl" style={{ fontWeight: Number(brand.headingWeight) }}>Título de exemplo</h3>
+                      <p className="text-sm leading-relaxed" style={{ fontWeight: Number(brand.bodyWeight) }}>
+                        Este é um texto de exemplo para visualizar como o conteúdo vai aparecer com as configurações de marca escolhidas.
+                      </p>
+                      <div className="rounded-lg border bg-white p-4 space-y-3" style={{ borderRadius: brand.cardRadius || "16px" }}>
+                        <label className="text-sm block" style={{ fontWeight: Number(brand.labelWeight) }}>Campo de exemplo</label>
+                        <div className="h-10 rounded-md border bg-gray-50" />
+                        <button className="px-4 py-2 text-sm" style={{ backgroundColor: brand.buttonColor, color: brand.buttonTextColor, borderRadius: brand.buttonRadius, fontWeight: Number(brand.bodyWeight) }}>
+                          Botão de ação
+                        </button>
+                      </div>
+                    </div>
+                    <div className="px-6 py-3 text-center text-xs border-t" style={{ backgroundColor: brand.backgroundColor, color: brand.secondaryColor }}>
+                      {brand.footerText}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
