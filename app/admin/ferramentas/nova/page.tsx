@@ -190,7 +190,9 @@ export default function NovaFerramentaPage() {
         title: aiTitle,
         slug,
         description: generatedSchema.description || null,
-        template_type: generatedMeta.template_type || "swot",
+        template_type: ["swot", "radar", "ikigai", "category_grid", "dynamic_table", "free_layout", "blank"].includes(generatedMeta.template_type)
+          ? generatedMeta.template_type
+          : generatedSchema.layout || "free_layout",
         schema: generatedSchema,
         settings: generatedSettings || {
           requireName: true,
