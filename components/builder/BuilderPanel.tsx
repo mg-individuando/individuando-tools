@@ -11,8 +11,6 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import {
   Type,
-  AlignLeft,
-  ChevronRight,
   Save,
   Undo2,
   Pencil,
@@ -64,68 +62,6 @@ export default function BuilderPanel({ schema, onChange, onSave, saving }: Build
 
   return (
     <div className="flex h-[calc(100vh-200px)] min-h-[600px] gap-0 rounded-xl border bg-white overflow-hidden">
-      {/* Left Panel — Blocks/Sections palette */}
-      <div className="w-64 flex-shrink-0 border-r bg-gray-50/50 overflow-y-auto">
-        <div className="p-3 border-b bg-white">
-          <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
-            Estrutura
-          </h3>
-        </div>
-
-        {/* Tool-level settings */}
-        <button
-          onClick={() => setSelected({ type: "tool" })}
-          className={`w-full text-left px-3 py-2.5 text-sm flex items-center gap-2 transition-colors
-            ${selected?.type === "tool" ? "bg-[#2D5A7B]/10 text-[#2D5A7B] font-medium" : "hover:bg-gray-100 text-gray-700"}`}
-        >
-          <AlignLeft className="w-4 h-4 flex-shrink-0" />
-          <span className="truncate">Ferramenta</span>
-          <ChevronRight className="w-3 h-3 ml-auto flex-shrink-0" />
-        </button>
-
-        <Separator />
-
-        <div className="p-3">
-          <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">
-            Seções
-          </h4>
-        </div>
-
-        {schema.sections.map((section, si) => (
-          <div key={section.id}>
-            <button
-              onClick={() => setSelected({ type: "section", sectionIndex: si })}
-              className={`w-full text-left px-3 py-2 text-sm flex items-center gap-2 transition-colors
-                ${selected?.type === "section" && selected.sectionIndex === si
-                  ? "bg-[#2D5A7B]/10 text-[#2D5A7B] font-medium"
-                  : "hover:bg-gray-100 text-gray-700"}`}
-            >
-              <div
-                className="w-3 h-3 rounded-full flex-shrink-0"
-                style={{ backgroundColor: section.color || "#9ca3af" }}
-              />
-              <span className="truncate">{section.label}</span>
-              <ChevronRight className="w-3 h-3 ml-auto flex-shrink-0 opacity-50" />
-            </button>
-
-            {/* Fields within section */}
-            {section.fields.map((field, fi) => (
-              <button
-                key={field.id}
-                onClick={() => setSelected({ type: "field", sectionIndex: si, fieldIndex: fi })}
-                className={`w-full text-left pl-8 pr-3 py-1.5 text-xs flex items-center gap-2 transition-colors
-                  ${selected?.type === "field" && selected.sectionIndex === si && selected.fieldIndex === fi
-                    ? "bg-[#2D5A7B]/10 text-[#2D5A7B] font-medium"
-                    : "hover:bg-gray-100 text-gray-500"}`}
-              >
-                <Type className="w-3 h-3 flex-shrink-0" />
-                <span className="truncate">{field.label || field.id}</span>
-              </button>
-            ))}
-          </div>
-        ))}
-      </div>
-
       {/* Center Panel — Live Preview */}
       <div className="flex-1 overflow-y-auto bg-gray-50">
         <div className="p-3 border-b bg-white flex items-center justify-between">

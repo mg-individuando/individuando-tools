@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, use, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -46,6 +46,7 @@ export default function EditToolPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = use(params);
+  const searchParams = useSearchParams();
   const [tool, setTool] = useState<Tool | null>(null);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -56,9 +57,10 @@ export default function EditToolPage({
     showProgressBar: false,
     confirmationMessage: "",
   });
+  const initialTab = (searchParams.get("tab") as "preview" | "builder" | "settings" | "share") || "preview";
   const [activeTab, setActiveTab] = useState<
     "preview" | "builder" | "settings" | "share"
-  >("preview");
+  >(initialTab);
   const [editableSchema, setEditableSchema] = useState<ToolSchema | null>(null);
   const [saving, setSaving] = useState(false);
   const [emailList, setEmailList] = useState("");

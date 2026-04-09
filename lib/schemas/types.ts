@@ -11,6 +11,12 @@ export interface Profile {
   updated_at: string;
 }
 
+export interface CustomFont {
+  url: string;
+  weight: string;
+  name: string;
+}
+
 export interface BrandConfig {
   primaryColor?: string;
   secondaryColor?: string;
@@ -22,6 +28,7 @@ export interface BrandConfig {
   cardRadius?: string;
   fontFamily?: string;
   fontUrl?: string;
+  customFonts?: CustomFont[];
   headingWeight?: string;
   bodyWeight?: string;
   labelWeight?: string;

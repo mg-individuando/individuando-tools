@@ -10,9 +10,9 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { FileUpload } from "@/components/ui/file-upload";
 import { toast } from "sonner";
-import { ArrowLeft, Save, Eye, Trash2 } from "lucide-react";
+import { ArrowLeft, Save, Eye, Trash2, Plus, X } from "lucide-react";
 import Link from "next/link";
-import type { Client, BrandConfig } from "@/lib/schemas/types";
+import type { Client, BrandConfig, CustomFont } from "@/lib/schemas/types";
 import { BannerEditor, type BannerConfig, migrateConfig } from "@/components/ui/banner-editor";
 
 const FONT_OPTIONS = [
@@ -45,6 +45,36 @@ const RADIUS_OPTIONS = [
   { value: "9999px", label: "Pill (9999px)" },
 ];
 
+
+/** Auto-detect font weight from filename */
+function detectWeightFromFilename(filename: string): string {
+  const lower = filename.toLowerCase();
+  if (lower.includes("thin")) return "100";
+  if (lower.includes("extralight") || lower.includes("extra-light") || lower.includes("extra_light")) return "200";
+  if (lower.includes("light")) return "300";
+  if (lower.includes("regular") || lower.includes("normal")) return "400";
+  if (lower.includes("medium")) return "500";
+  if (lower.includes("semibold") || lower.includes("semi-bold") || lower.includes("semi_bold") || lower.includes("demi")) return "600";
+  if (lower.includes("extrabold") || lower.includes("extra-bold") || lower.includes("extra_bold")) return "800";
+  if (lower.includes("black") || lower.includes("heavy")) return "900";
+  if (lower.includes("bold")) return "700";
+  return "400";
+}
+
+function getWeightLabel(weight: string): string {
+  const map: Record<string, string> = {
+    "100": "Thin",
+    "200": "ExtraLight",
+    "300": "Light",
+    "400": "Regular",
+    "500": "Medium",
+    "600": "SemiBold",
+    "700": "Bold",
+    "800": "ExtraBold",
+    "900": "Black",
+  };
+  return map[weight] || weight;
+}
 
 const DEFAULT_BRAND: BrandConfig = {
   primaryColor: "#2D5A7B",
@@ -282,16 +312,6 @@ export default function EditClientPage({
                 onUpload={(url) => setLogoUrl(url)}
               />
 
-              <FileUpload
-                bucket="client-assets"
-                path={`partner-logos/${slug}`}
-                accept="image/png,image/jpeg,image/svg+xml,image/webp"
-                label="Logo parceiro (Individuando)"
-                hint="PNG, JPG ou SVG. Máximo 5MB."
-                currentUrl={partnerLogoUrl || undefined}
-                onUpload={(url) => setPartnerLogoUrl(url)}
-              />
-
               <div className="flex items-center justify-between rounded-lg border p-4">
                 <div>
                   <Label htmlFor="showNameInHeader" className="text-sm font-medium">
@@ -305,22 +325,6 @@ export default function EditClientPage({
                   id="showNameInHeader"
                   checked={brand.showNameInHeader !== false}
                   onCheckedChange={(v) => updateBrand("showNameInHeader", v)}
-                />
-              </div>
-
-              <div className="flex items-center justify-between rounded-lg border p-4">
-                <div>
-                  <Label htmlFor="showPartnerLogo" className="text-sm font-medium">
-                    Mostrar logo parceiro
-                  </Label>
-                  <p className="text-xs text-muted-foreground mt-0.5">
-                    Exibir o logo da Individuando ao lado do logo do cliente.
-                  </p>
-                </div>
-                <Switch
-                  id="showPartnerLogo"
-                  checked={showPartnerLogo}
-                  onCheckedChange={setShowPartnerLogo}
                 />
               </div>
             </CardContent>
@@ -394,7 +398,7 @@ export default function EditClientPage({
               {brand.fontFamily === "Custom" && (
                 <>
                   <div className="space-y-2">
-                    <Label htmlFor="fontUrl">URL da fonte custom</Label>
+                    <Label htmlFor="fontUrl">URL do Google Fonts (alternativa)</Label>
                     <Input
                       id="fontUrl"
                       type="url"
@@ -403,19 +407,68 @@ export default function EditClientPage({
                       onChange={(e) => updateBrand("fontUrl", e.target.value)}
                     />
                     <p className="text-xs text-muted-foreground">
-                      Cole a URL de importação do Google Fonts ou outra fonte.
+                      Cole a URL de importação do Google Fonts, ou faça upload dos arquivos abaixo.
                     </p>
                   </div>
 
-                  <FileUpload
-                    bucket="client-assets"
-                    path={`fonts/${slug}`}
-                    accept=".ttf,.otf,.woff,.woff2"
-                    label="Arquivo da fonte"
-                    hint="TTF, OTF, WOFF ou WOFF2. Máximo 5MB."
-                    currentUrl={brand.fontUrl || undefined}
-                    onUpload={(url) => updateBrand("fontUrl", url)}
-                  />
+                  <div className="space-y-3 rounded-lg border p-4">
+                    <div className="flex items-center justify-between">
+                      <Label className="text-sm font-medium">Arquivos de fonte</Label>
+                      <span className="text-xs text-muted-foreground">
+                        {(brand.customFonts || []).length} peso(s)
+                      </span>
+                    </div>
+
+                    {/* Uploaded fonts list */}
+                    {(brand.customFonts || []).length > 0 && (
+                      <div className="space-y-2">
+                        {(brand.customFonts || []).map((font: CustomFont, idx: number) => (
+                          <div
+                            key={idx}
+                            className="flex items-center gap-3 rounded-md border bg-muted/30 px-3 py-2"
+                          >
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-medium truncate">{font.name}</p>
+                            </div>
+                            <span className="shrink-0 inline-flex items-center rounded-full bg-primary/10 px-2 py-0.5 text-xs font-semibold text-primary">
+                              {font.weight} - {getWeightLabel(font.weight)}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const updated = [...(brand.customFonts || [])];
+                                updated.splice(idx, 1);
+                                updateBrand("customFonts", updated);
+                              }}
+                              className="shrink-0 p-1 rounded-md hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
+                            >
+                              <X className="h-4 w-4" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Add new font file */}
+                    <FileUpload
+                      bucket="client-assets"
+                      path={`fonts/${slug}`}
+                      accept=".ttf,.otf,.woff,.woff2"
+                      label="+ Adicionar peso"
+                      hint="TTF, OTF, WOFF ou WOFF2. Máximo 5MB."
+                      onUpload={(url) => {
+                        // Extract filename from URL
+                        const filename = url.split("/").pop() || "font";
+                        const weight = detectWeightFromFilename(filename);
+                        const newFont: CustomFont = { url, weight, name: decodeURIComponent(filename) };
+                        const updated = [...(brand.customFonts || []), newFont];
+                        updateBrand("customFonts", updated);
+                      }}
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      O peso e detectado automaticamente pelo nome do arquivo (ex: &quot;Montserrat-Bold.woff2&quot; → 700 Bold).
+                    </p>
+                  </div>
                 </>
               )}
 

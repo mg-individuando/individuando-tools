@@ -17,6 +17,7 @@ import {
   LayoutGrid,
   Table,
   ArrowLeft,
+  ChevronRight,
   Sparkles,
   Send,
   Loader2,
@@ -67,7 +68,6 @@ const SUGGESTIONS = [
 
 export default function NovaFerramentaPage() {
   const [mode, setMode] = useState<"choose" | "template" | "ai" | "pdf">("choose");
-  const [step, setStep] = useState<"template" | "details">("template");
   const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -115,27 +115,29 @@ export default function NovaFerramentaPage() {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [chatMessages]);
 
-  async function handleCreate() {
-    if (!selectedTemplate || !title) return;
+  async function handleCreate(templateKey?: string) {
+    const tplKey = templateKey || selectedTemplate;
+    if (!tplKey) return;
     setLoading(true);
 
-    const template = templates[selectedTemplate];
+    const template = templates[tplKey];
+    const tplTitle = title || template.name;
     const {
       data: { user },
     } = await supabase.auth.getUser();
-    if (!user) return;
+    if (!user) { setLoading(false); return; }
 
     const { data: profile } = await supabase
       .from("profiles")
       .select("id")
       .eq("user_id", user.id)
       .single();
-    if (!profile) return;
+    if (!profile) { setLoading(false); return; }
 
-    const slug = generateSlug(title) + "-" + Date.now().toString(36);
+    const slug = generateSlug(tplTitle) + "-" + Date.now().toString(36);
     const schema = {
       ...template.schema,
-      title,
+      title: tplTitle,
       description: description || template.schema.description,
     };
 
@@ -143,7 +145,7 @@ export default function NovaFerramentaPage() {
       .from("tools")
       .insert({
         created_by: profile.id,
-        title,
+        title: tplTitle,
         slug,
         description: description || null,
         template_type: template.type,
@@ -161,7 +163,7 @@ export default function NovaFerramentaPage() {
       return;
     }
 
-    router.push(`/admin/ferramentas/${data.id}`);
+    router.push(`/admin/ferramentas/${data.id}?tab=builder`);
   }
 
   async function handleAiCreate() {
@@ -215,7 +217,7 @@ export default function NovaFerramentaPage() {
     }
 
     toast.success("Ferramenta criada com IA!");
-    router.push(`/admin/ferramentas/${data.id}`);
+    router.push(`/admin/ferramentas/${data.id}?tab=builder`);
   }
 
   function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
@@ -1116,157 +1118,64 @@ export default function NovaFerramentaPage() {
     );
   }
 
-  // ── Template Mode (original) ──────────────────────
-  if (step === "template") {
-    return (
-      <div>
-        <div className="mb-6">
-          <button
-            onClick={() => setMode("choose")}
-            className="text-sm text-gray-500 hover:text-gray-700 flex items-center gap-1 mb-3"
-          >
-            <ArrowLeft className="w-3 h-3" /> Voltar
-          </button>
-          <h1 className="text-2xl font-bold text-gray-900">
-            Escolha um Template
-          </h1>
-          <p className="text-gray-500 mt-1">
-            Selecione o template que melhor se encaixa na sua necessidade
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {Object.entries(templates).map(([key, tpl]) => {
-            const Icon = iconMap[tpl.icon] || Grid2X2;
-            return (
-              <Card
-                key={key}
-                className={`cursor-pointer transition-all hover:shadow-md ${
-                  selectedTemplate === key
-                    ? "ring-2 ring-primary shadow-md"
-                    : ""
-                }`}
-                onClick={() => setSelectedTemplate(key)}
-              >
-                <CardContent className="pt-6 pb-5">
-                  <div className="flex items-start gap-3">
-                    <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
-                      <Icon className="w-6 h-6 text-primary" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold">{tpl.name}</h3>
-                      <p className="text-sm text-gray-500 mt-1">
-                        {tpl.description}
-                      </p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div>
-
-        {selectedTemplate && (
-          <div className="mt-6 flex justify-end">
-            <Button
-              onClick={() => {
-                setTitle(templates[selectedTemplate].name);
-                setDescription(
-                  templates[selectedTemplate].schema.description || ""
-                );
-                setStep("details");
-              }}
-              className="bg-primary hover:bg-primary/90"
-            >
-              Continuar
-            </Button>
-          </div>
-        )}
-      </div>
-    );
-  }
-
-  // ── Details step (template mode) ──────────────────
+  // ── Template Mode ──────────────────────────────────
   return (
     <div>
       <div className="mb-6">
         <button
-          onClick={() => setStep("template")}
+          onClick={() => setMode("choose")}
           className="text-sm text-gray-500 hover:text-gray-700 flex items-center gap-1 mb-3"
         >
-          <ArrowLeft className="w-3 h-3" /> Voltar aos templates
+          <ArrowLeft className="w-3 h-3" /> Voltar
         </button>
         <h1 className="text-2xl font-bold text-gray-900">
-          Configurar Ferramenta
+          Escolha um Template
         </h1>
+        <p className="text-gray-500 mt-1">
+          Selecione o template que melhor se encaixa na sua necessidade
+        </p>
       </div>
 
-      <Card className="max-w-xl">
-        <CardHeader>
-          <CardTitle>Detalhes</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {/* Client selector */}
-          <div className="space-y-2">
-            <Label htmlFor="client">Cliente</Label>
-            <div className="flex items-center gap-3">
-              {selectedClient &&
-                (() => {
-                  const client = clients.find((c) => c.id === selectedClient);
-                  return client?.logo_url ? (
-                    <img
-                      src={client.logo_url}
-                      alt={client.name}
-                      className="w-8 h-8 rounded-md object-contain border border-gray-200 bg-white"
-                    />
-                  ) : null;
-                })()}
-              <select
-                id="client"
-                value={selectedClient}
-                onChange={(e) => setSelectedClient(e.target.value)}
-                className="w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 focus:border-primary focus:ring-2 focus:ring-primary/10 outline-none transition-all"
-              >
-                <option value="">Sem cliente (padrão Individuando)</option>
-                {clients.map((client) => (
-                  <option key={client.id} value={client.id}>
-                    {client.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="title">Título da Ferramenta</Label>
-            <Input
-              id="title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="Ex: SWOT Pessoal — Turma Abril"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="description">Descrição (opcional)</Label>
-            <Textarea
-              id="description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Uma breve descrição para os participantes..."
-              rows={3}
-            />
-          </div>
-          <div className="pt-2 flex gap-3">
-            <Button
-              onClick={handleCreate}
-              disabled={!title || loading}
-              className="bg-primary hover:bg-primary/90"
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pb-8">
+        {Object.entries(templates).map(([key, tpl]) => {
+          const Icon = iconMap[tpl.icon] || Grid2X2;
+          return (
+            <Card
+              key={key}
+              className="cursor-pointer transition-all hover:shadow-lg hover:scale-[1.01] hover:border-primary/30 group relative"
+              onClick={() => handleCreate(key)}
             >
-              {loading ? "Criando..." : "Criar Ferramenta"}
-            </Button>
+              <CardContent className="pt-6 pb-5">
+                <div className="flex items-start gap-3">
+                  <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0 group-hover:bg-primary/20 transition-colors">
+                    <Icon className="w-6 h-6 text-primary" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-semibold">{tpl.name}</h3>
+                    <p className="text-sm text-gray-500 mt-1">
+                      {tpl.description}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex justify-end mt-3">
+                  <span className="inline-flex items-center gap-1 text-xs font-medium text-primary opacity-0 group-hover:opacity-100 transition-opacity bg-primary/5 px-3 py-1.5 rounded-lg">
+                    Usar <ChevronRight className="w-3 h-3" />
+                  </span>
+                </div>
+              </CardContent>
+            </Card>
+          );
+        })}
+      </div>
+
+      {loading && (
+        <div className="fixed inset-0 z-50 bg-black/30 backdrop-blur-sm flex items-center justify-center">
+          <div className="bg-white rounded-2xl shadow-xl p-8 flex flex-col items-center gap-3">
+            <Loader2 className="w-8 h-8 animate-spin text-primary" />
+            <p className="text-sm text-gray-600 font-medium">Criando ferramenta...</p>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      )}
     </div>
   );
 }

@@ -12,11 +12,9 @@ import {
   AlignCenter,
   AlignRight,
   Sparkles,
-  Loader2,
   Maximize2,
   Minimize2,
   RotateCcw,
-  Wand2,
   ChevronDown,
   ChevronUp,
   Layout,
@@ -135,15 +133,6 @@ const DIRECTION_OPTIONS = [
   { value: "to bottom", label: "\u2193 Vertical" },
   { value: "to bottom right", label: "\u2198 Diagonal" },
   { value: "135deg", label: "\u2197 Diagonal" },
-];
-
-const AI_SUGGESTIONS = [
-  "Banner elegante e minimalista com tons escuros",
-  "Banner vibrante e moderno para workshop de inovacao",
-  "Banner sofisticado com gradiente suave para coaching executivo",
-  "Banner acolhedor e quente para mentoria de carreira",
-  "Banner corporativo clean para treinamento empresarial",
-  "Banner criativo e colorido para workshop de design thinking",
 ];
 
 const LAYOUT_OPTIONS = [
@@ -358,10 +347,7 @@ export function BannerEditor({
   clientName,
   onRecoloredLogo,
 }: BannerEditorProps) {
-  const [activeSection, setActiveSection] = useState<string | null>("ai");
-  const [aiPrompt, setAiPrompt] = useState("");
-  const [aiLoading, setAiLoading] = useState(false);
-  const [aiHistory, setAiHistory] = useState<string[]>([]);
+  const [activeSection, setActiveSection] = useState<string | null>("layout");
   const [recoloredClientLogo, setRecoloredClientLogo] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -403,35 +389,6 @@ export function BannerEditor({
     reader.readAsDataURL(file);
   }
 
-  async function handleAiGenerate(prompt?: string) {
-    const text = prompt || aiPrompt;
-    if (!text.trim()) return;
-
-    setAiLoading(true);
-    try {
-      const res = await fetch("/api/ai/generate-banner", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          prompt: text,
-          clientName,
-          hasClientLogo: !!logoUrl,
-          currentConfig: config,
-        }),
-      });
-      const data = await res.json();
-      if (data.config) {
-        onChange({ ...config, ...data.config });
-        setAiHistory((prev) => [...prev, text]);
-        setAiPrompt("");
-      }
-    } catch (err) {
-      console.error("AI banner generation failed:", err);
-    } finally {
-      setAiLoading(false);
-    }
-  }
-
   function handleReset() {
     onChange(migrateConfig({}));
   }
@@ -444,7 +401,7 @@ export function BannerEditor({
     <div className="space-y-1">
       {/* Reset button row */}
       <div className="flex items-center justify-between mb-3">
-        <p className="text-xs text-gray-500">Use a IA ou configure manualmente</p>
+        <p className="text-xs text-gray-500">Configure o banner manualmente</p>
         <button
           onClick={handleReset}
           className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-gray-700 px-2.5 py-1.5 rounded-lg hover:bg-gray-100 transition-colors"
@@ -453,65 +410,6 @@ export function BannerEditor({
           Resetar
         </button>
       </div>
-
-      {/* ===== AI Section ===== */}
-      <SectionAccordion
-        title="Criar com IA"
-        icon={<Sparkles className="h-4 w-4" />}
-        isOpen={activeSection === "ai"}
-        onToggle={() => toggleSection("ai")}
-        highlight
-      >
-        <div className="space-y-3">
-          <p className="text-xs text-gray-500">
-            Descreva o banner que voce quer e a IA cria o design completo — cores, gradientes, layout, texto e escolha automatica das logos.
-          </p>
-
-          <div className="flex flex-wrap gap-1.5">
-            {AI_SUGGESTIONS.map((suggestion) => (
-              <button
-                key={suggestion}
-                onClick={() => handleAiGenerate(suggestion)}
-                disabled={aiLoading}
-                className="text-[11px] px-2.5 py-1.5 rounded-full border border-gray-200 text-gray-600 hover:bg-[#1e2f4c] hover:text-white hover:border-[#1e2f4c] transition-colors disabled:opacity-50"
-              >
-                {suggestion}
-              </button>
-            ))}
-          </div>
-
-          <div className="flex gap-2">
-            <Input
-              placeholder="Descreva o banner que voce imagina..."
-              value={aiPrompt}
-              onChange={(e) => setAiPrompt(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && !aiLoading) handleAiGenerate();
-              }}
-              disabled={aiLoading}
-              className="flex-1 text-sm"
-            />
-            <Button
-              onClick={() => handleAiGenerate()}
-              disabled={aiLoading || !aiPrompt.trim()}
-              className="bg-[#1e2f4c] hover:bg-[#162340] gap-2 shrink-0"
-            >
-              {aiLoading ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <Wand2 className="h-4 w-4" />
-              )}
-              Gerar
-            </Button>
-          </div>
-
-          {aiHistory.length > 0 && (
-            <p className="text-[10px] text-gray-400">
-              Ultimo prompt: &ldquo;{aiHistory[aiHistory.length - 1]}&rdquo;
-            </p>
-          )}
-        </div>
-      </SectionAccordion>
 
       {/* ===== Layout Section ===== */}
       <SectionAccordion
@@ -522,25 +420,38 @@ export function BannerEditor({
       >
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-2">
-            {LAYOUT_OPTIONS.map((opt) => (
-              <button
-                key={opt.value}
-                onClick={() => update("bannerLayout", opt.value)}
-                className={`p-3 rounded-lg border text-left transition-all ${
-                  config.bannerLayout === opt.value
-                    ? "border-[#1e2f4c] bg-[#1e2f4c]/5 ring-1 ring-[#1e2f4c]"
-                    : "border-gray-200 hover:border-gray-300"
-                }`}
-              >
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-gray-800">{opt.label}</span>
-                  {config.bannerLayout === opt.value && (
-                    <Check className="h-4 w-4 text-[#1e2f4c]" />
-                  )}
-                </div>
-                <span className="text-[11px] text-gray-500">{opt.desc}</span>
-              </button>
-            ))}
+            {LAYOUT_OPTIONS.map((opt) => {
+              const isFirst = opt.value === "logo-text-logo";
+              const isDisabled = !isFirst;
+              return (
+                <button
+                  key={opt.value}
+                  onClick={() => { if (!isDisabled) update("bannerLayout", opt.value); }}
+                  disabled={isDisabled}
+                  className={`p-3 rounded-lg border text-left transition-all ${
+                    isDisabled
+                      ? "border-gray-100 bg-gray-50 opacity-60 cursor-not-allowed"
+                      : config.bannerLayout === opt.value
+                        ? "border-[#1e2f4c] bg-[#1e2f4c]/5 ring-1 ring-[#1e2f4c]"
+                        : "border-gray-200 hover:border-gray-300"
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <span className={`text-sm font-medium ${isDisabled ? "text-gray-400" : "text-gray-800"}`}>
+                      {opt.label}
+                    </span>
+                    {isDisabled ? (
+                      <span className="text-[10px] text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded-full">
+                        Em breve
+                      </span>
+                    ) : config.bannerLayout === opt.value ? (
+                      <Check className="h-4 w-4 text-[#1e2f4c]" />
+                    ) : null}
+                  </div>
+                  <span className={`text-[11px] ${isDisabled ? "text-gray-400" : "text-gray-500"}`}>{opt.desc}</span>
+                </button>
+              );
+            })}
           </div>
 
           {(config.bannerLayout === "logo-text-logo") && (

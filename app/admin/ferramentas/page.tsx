@@ -66,10 +66,51 @@ export default function FerramentasPage() {
 
   async function handleDelete(toolId: string, e: React.MouseEvent) {
     e.stopPropagation();
-    if (!window.confirm("Excluir esta ferramenta?")) return;
-    await supabase.from("tools").delete().eq("id", toolId);
+    if (!window.confirm("Tem certeza que deseja excluir esta ferramenta? Esta ação não pode ser desfeita.")) return;
+    const { error } = await supabase.from("tools").delete().eq("id", toolId);
+    if (error) {
+      toast.error("Erro ao excluir ferramenta.");
+      return;
+    }
     toast.success("Ferramenta excluída!");
     setTools(tools.filter(t => t.id !== toolId));
+  }
+
+  async function handleDuplicate(toolId: string, e: React.MouseEvent) {
+    e.stopPropagation();
+    const { data: original, error: fetchError } = await supabase
+      .from("tools")
+      .select("*")
+      .eq("id", toolId)
+      .single();
+    if (fetchError || !original) {
+      toast.error("Erro ao duplicar ferramenta.");
+      return;
+    }
+    const newSlug = `${original.slug}-copia-${Date.now()}`;
+    const { data: created, error: insertError } = await supabase
+      .from("tools")
+      .insert({
+        created_by: original.created_by,
+        title: `${original.title} (Cópia)`,
+        slug: newSlug,
+        description: original.description,
+        template_type: original.template_type,
+        schema: original.schema,
+        style_config: original.style_config,
+        settings: original.settings,
+        status: "draft",
+        published_at: null,
+        client_id: original.client_id,
+      })
+      .select()
+      .single();
+    if (insertError || !created) {
+      toast.error("Erro ao duplicar ferramenta.");
+      return;
+    }
+    toast.success("Ferramenta duplicada com sucesso!");
+    router.push(`/admin/ferramentas/${created.id}`);
   }
 
   if (loading) {
@@ -181,14 +222,23 @@ export default function FerramentasPage() {
               </div>
 
               {/* Actions row */}
-              <div className="flex items-center gap-1 mt-4 pt-4 border-t border-[rgba(0,128,255,0.06)]">
+              <div className="flex items-center gap-1.5 mt-4 pt-4 border-t border-[rgba(0,128,255,0.06)]">
                 <button
-                  className="text-[#475569] hover:text-[#0080ff] h-8 px-2 rounded-lg hover:bg-[rgba(0,128,255,0.05)] transition-all duration-200"
-                  onClick={() => copyLink(tool.slug)}
-                  title="Copiar link"
+                  className="text-[#475569] hover:text-[#0080ff] w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[rgba(0,128,255,0.05)] transition-all duration-200"
+                  onClick={(e) => handleDuplicate(tool.id, e)}
+                  title="Duplicar ferramenta"
                 >
-                  <Copy className="w-3.5 h-3.5" />
+                  <Copy className="w-4 h-4" />
                 </button>
+
+                <Link href={`/admin/ferramentas/${tool.id}`}>
+                  <button
+                    className="text-[#475569] hover:text-[#0080ff] w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[rgba(0,128,255,0.05)] transition-all duration-200"
+                    title="Editar ferramenta"
+                  >
+                    <Pencil className="w-4 h-4" />
+                  </button>
+                </Link>
 
                 <a
                   href={`/f/${tool.slug}`}
@@ -196,21 +246,29 @@ export default function FerramentasPage() {
                   rel="noopener noreferrer"
                 >
                   <button
-                    className="text-[#475569] hover:text-[#0080ff] h-8 px-2 rounded-lg hover:bg-[rgba(0,128,255,0.05)] transition-all duration-200"
+                    className="text-[#475569] hover:text-[#0080ff] w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[rgba(0,128,255,0.05)] transition-all duration-200"
                     title="Abrir ferramenta"
                   >
-                    <ExternalLink className="w-3.5 h-3.5" />
+                    <ExternalLink className="w-4 h-4" />
                   </button>
                 </a>
 
                 <Link href={`/admin/ferramentas/${tool.id}/respostas`}>
                   <button
-                    className="text-[#475569] hover:text-[#0080ff] h-8 px-2 rounded-lg hover:bg-[rgba(0,128,255,0.05)] transition-all duration-200"
+                    className="text-[#475569] hover:text-[#0080ff] w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[rgba(0,128,255,0.05)] transition-all duration-200"
                     title="Ver respostas"
                   >
-                    <Eye className="w-3.5 h-3.5" />
+                    <Eye className="w-4 h-4" />
                   </button>
                 </Link>
+
+                <button
+                  className="text-[#475569] hover:text-red-500 w-8 h-8 flex items-center justify-center rounded-lg hover:bg-red-50 transition-all duration-200"
+                  onClick={(e) => handleDelete(tool.id, e)}
+                  title="Excluir ferramenta"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
 
                 <div className="ml-auto flex items-center gap-1.5">
                   <button
@@ -219,11 +277,6 @@ export default function FerramentasPage() {
                   >
                     {tool.status === "published" ? "Despublicar" : "Publicar"}
                   </button>
-                  <Link href={`/admin/ferramentas/${tool.id}`}>
-                    <button className="btn-primary text-xs !py-1.5 !px-3">
-                      Editar
-                    </button>
-                  </Link>
                 </div>
               </div>
             </div>
@@ -233,7 +286,7 @@ export default function FerramentasPage() {
         /* List view */
         <div className="glass-card overflow-hidden">
           {/* Header row */}
-          <div className="grid grid-cols-[1fr_120px_100px_120px_80px] gap-4 px-5 py-3 text-[11px] font-semibold text-[#475569] uppercase tracking-wider border-b border-[rgba(0,128,255,0.06)]">
+          <div className="grid grid-cols-[1fr_120px_100px_120px_140px] gap-4 px-5 py-3 text-[11px] font-semibold text-[#475569] uppercase tracking-wider border-b border-[rgba(0,128,255,0.06)]">
             <span>Nome</span>
             <span>Tipo</span>
             <span>Status</span>
@@ -244,7 +297,7 @@ export default function FerramentasPage() {
           {tools.map((tool) => (
             <div
               key={tool.id}
-              className="grid grid-cols-[1fr_120px_100px_120px_80px] gap-4 px-5 py-3 items-center border-b border-[rgba(0,128,255,0.03)] hover:bg-[rgba(0,128,255,0.02)] transition-colors duration-150 cursor-pointer"
+              className="grid grid-cols-[1fr_120px_100px_120px_140px] gap-4 px-5 py-3 items-center border-b border-[rgba(0,128,255,0.03)] hover:bg-[rgba(0,128,255,0.02)] transition-colors duration-150 cursor-pointer"
               onClick={() => router.push(`/admin/ferramentas/${tool.id}`)}
             >
               <span className="text-sm font-medium text-[#0f172a] truncate">{tool.title}</span>
@@ -268,21 +321,41 @@ export default function FerramentasPage() {
               <span className="text-xs text-[#94a3b8]">
                 {new Date(tool.created_at).toLocaleDateString("pt-BR")}
               </span>
-              <div className="flex gap-1">
+              <div className="flex items-center gap-1.5">
+                <button
+                  className="text-[#475569] hover:text-[#0080ff] w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[rgba(0,128,255,0.05)] transition-all duration-200"
+                  title="Duplicar"
+                  onClick={(e) => handleDuplicate(tool.id, e)}
+                >
+                  <Copy className="w-4 h-4" />
+                </button>
                 <Link href={`/admin/ferramentas/${tool.id}`} onClick={(e) => e.stopPropagation()}>
                   <button
-                    className="text-[#475569] hover:text-[#0080ff] h-7 w-7 flex items-center justify-center rounded-lg hover:bg-[rgba(0,128,255,0.05)] transition-all duration-200"
+                    className="text-[#475569] hover:text-[#0080ff] w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[rgba(0,128,255,0.05)] transition-all duration-200"
                     title="Editar"
                   >
-                    <Pencil className="w-3.5 h-3.5" />
+                    <Pencil className="w-4 h-4" />
                   </button>
                 </Link>
+                <a
+                  href={`/f/${tool.slug}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <button
+                    className="text-[#475569] hover:text-[#0080ff] w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[rgba(0,128,255,0.05)] transition-all duration-200"
+                    title="Abrir ferramenta"
+                  >
+                    <ExternalLink className="w-4 h-4" />
+                  </button>
+                </a>
                 <button
-                  className="text-[#475569] hover:text-red-500 h-7 w-7 flex items-center justify-center rounded-lg hover:bg-red-50 transition-all duration-200"
+                  className="text-[#475569] hover:text-red-500 w-8 h-8 flex items-center justify-center rounded-lg hover:bg-red-50 transition-all duration-200"
                   title="Excluir"
                   onClick={(e) => handleDelete(tool.id, e)}
                 >
-                  <Trash2 className="w-3.5 h-3.5" />
+                  <Trash2 className="w-4 h-4" />
                 </button>
               </div>
             </div>
