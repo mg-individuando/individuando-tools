@@ -23,11 +23,21 @@ export default function CategoryGrid({
   return (
     <div className="w-full max-w-5xl mx-auto">
       {/* Summary bar */}
-      <div className="mb-6 bg-card border border-border rounded-xl p-5 flex items-center justify-between">
-        <span className="text-sm font-medium text-muted-foreground">
+      <div
+        className="mb-6 p-5 flex items-center justify-between transition-all duration-200"
+        style={{
+          backdropFilter: "blur(12px)",
+          WebkitBackdropFilter: "blur(12px)",
+          background: "rgba(255,255,255,0.8)",
+          border: "1px solid rgba(0,128,255,0.1)",
+          boxShadow: "rgba(0,128,255,0.08) 0px 4px 24px",
+          borderRadius: "16px",
+        }}
+      >
+        <span className="text-[13px] font-medium text-[#475569]">
           Forcas selecionadas
         </span>
-        <span className="text-sm font-bold text-foreground">
+        <span className="text-sm font-bold text-[#0f172a]">
           {totalSelected} de {totalFields}
         </span>
       </div>
@@ -38,39 +48,50 @@ export default function CategoryGrid({
           const selectedInCategory = section.fields.filter(
             (f) => values[f.id]
           ).length;
-          const color = section.color || "var(--brand)";
+          const color = section.color || "#0080ff";
 
           return (
             <div
               key={section.id}
-              className="bg-card border border-border rounded-xl overflow-hidden hover:shadow-md transition-all duration-200"
-              style={{ borderTop: `3px solid ${color}` }}
+              className="overflow-hidden transition-all duration-200"
+              style={{
+                backdropFilter: "blur(12px)",
+                WebkitBackdropFilter: "blur(12px)",
+                background: "rgba(255,255,255,0.8)",
+                border: "1px solid rgba(0,128,255,0.1)",
+                boxShadow: "rgba(0,128,255,0.08) 0px 4px 24px",
+                borderRadius: "16px",
+                borderTop: `3px solid ${color}`,
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.boxShadow = "rgba(0,128,255,0.16) 0px 8px 32px";
+                e.currentTarget.style.borderColor = "rgba(0,128,255,0.2)";
+                e.currentTarget.style.borderTopColor = color;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.boxShadow = "rgba(0,128,255,0.08) 0px 4px 24px";
+                e.currentTarget.style.borderColor = "rgba(0,128,255,0.1)";
+                e.currentTarget.style.borderTopColor = color;
+              }}
             >
               <div className="p-5">
                 {/* Category header */}
                 <div className="flex items-center gap-2.5 mb-1">
                   <div
-                    className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
+                    className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
                     style={{
-                      backgroundColor: section.color
-                        ? `${section.color}14`
-                        : "color-mix(in srgb, var(--brand) 8%, transparent)",
+                      background: `linear-gradient(135deg, ${color}, ${color}cc)`,
                     }}
                   >
-                    <SectionIcon icon={section.icon} size={18} />
+                    <SectionIcon icon={section.icon} size={18} className="text-white" />
                   </div>
-                  <h3
-                    className="font-semibold text-sm flex-1 min-w-0 truncate"
-                    style={{ color }}
-                  >
+                  <h3 className="font-semibold text-[15px] text-[#0f172a] flex-1 min-w-0 truncate">
                     {section.label}
                   </h3>
                   <span
-                    className="rounded-full text-xs px-2 py-0.5 font-semibold shrink-0"
+                    className="rounded-full text-xs px-2.5 py-0.5 font-semibold shrink-0"
                     style={{
-                      backgroundColor: section.color
-                        ? `${section.color}14`
-                        : "color-mix(in srgb, var(--brand) 8%, transparent)",
+                      background: `linear-gradient(135deg, ${color}18, ${color}10)`,
                       color,
                     }}
                   >
@@ -79,7 +100,7 @@ export default function CategoryGrid({
                 </div>
 
                 {section.description && (
-                  <p className="text-xs text-muted-foreground/60 mb-3 leading-relaxed ml-[42px]">
+                  <p className="text-[13px] text-[#475569] mb-3 leading-relaxed ml-[50px]">
                     {section.description}
                   </p>
                 )}
@@ -92,10 +113,10 @@ export default function CategoryGrid({
                     return (
                       <label
                         key={field.id}
-                        className={`flex items-start gap-3 px-3 py-2 rounded-lg cursor-pointer transition-colors duration-150 ${
+                        className={`flex items-start gap-3 px-3 py-2 rounded-xl cursor-pointer transition-colors duration-150 ${
                           isChecked
-                            ? "bg-muted/60"
-                            : "hover:bg-muted/50"
+                            ? "bg-white/60"
+                            : "hover:bg-white/40"
                         }`}
                       >
                         {/* Checkbox */}
@@ -115,7 +136,7 @@ export default function CategoryGrid({
                               backgroundColor: isChecked ? color : "transparent",
                               border: isChecked
                                 ? "none"
-                                : "2px solid var(--border)",
+                                : "2px solid rgba(0,128,255,0.2)",
                             }}
                           >
                             {isChecked && (
@@ -130,8 +151,8 @@ export default function CategoryGrid({
                         <span
                           className={`text-sm leading-snug ${
                             isChecked
-                              ? "text-foreground font-medium"
-                              : "text-muted-foreground"
+                              ? "text-[#0f172a] font-medium"
+                              : "text-[#475569]"
                           }`}
                         >
                           {field.label}
@@ -148,8 +169,18 @@ export default function CategoryGrid({
 
       {/* Selected strengths summary */}
       {totalSelected > 0 && (
-        <div className="mt-6 bg-card border border-border rounded-xl p-5">
-          <h4 className="text-sm font-bold text-foreground mb-3">
+        <div
+          className="mt-6 p-5 transition-all duration-200"
+          style={{
+            backdropFilter: "blur(12px)",
+            WebkitBackdropFilter: "blur(12px)",
+            background: "rgba(255,255,255,0.8)",
+            border: "1px solid rgba(0,128,255,0.1)",
+            boxShadow: "rgba(0,128,255,0.08) 0px 4px 24px",
+            borderRadius: "16px",
+          }}
+        >
+          <h4 className="font-semibold text-[15px] text-[#0f172a] mb-3">
             Suas forcas selecionadas
           </h4>
           <div className="flex flex-wrap gap-2">
@@ -157,12 +188,15 @@ export default function CategoryGrid({
               section.fields
                 .filter((f) => values[f.id])
                 .map((f) => {
-                  const c = section.color || "var(--brand)";
+                  const c = section.color || "#0080ff";
                   return (
                     <span
                       key={f.id}
-                      className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 bg-muted text-xs font-medium"
-                      style={{ color: c }}
+                      className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium"
+                      style={{
+                        background: `linear-gradient(135deg, ${c}14, ${c}08)`,
+                        color: c,
+                      }}
                     >
                       <Check className="w-3 h-3" strokeWidth={2.5} />
                       {f.label?.split("\u2014")[0]?.trim()}

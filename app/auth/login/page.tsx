@@ -176,62 +176,65 @@ export default function LoginPage() {
   }
 
   const inputClass =
-    "w-full rounded-xl border border-border bg-secondary/50 px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/50 focus:border-primary focus:ring-2 focus:ring-primary/10 focus:bg-card outline-none transition-all font-sans";
+    "w-full rounded-xl border border-[rgba(0,128,255,0.1)] bg-white/60 px-4 py-3 text-sm text-[#0f172a] placeholder:text-[#94a3b8] focus:border-[#0080ff] focus:ring-2 focus:ring-[#0080ff]/20 focus:bg-white outline-none transition-all duration-200 font-sans";
 
   // Mostra loading enquanto verifica token de recovery
   if (checkingRecovery) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
+      <div className="min-h-screen flex items-center justify-center bg-[#f8fafc] hero-gradient">
         <div className="flex flex-col items-center gap-3">
-          <div className="w-14 h-14 rounded-2xl bg-primary flex items-center justify-center shadow-lg shadow-primary/20 animate-pulse">
-            <span className="text-primary-foreground font-bold text-2xl font-sans">I</span>
+          <div className="w-12 h-12 rounded-xl gradient-primary flex items-center justify-center shadow-lg animate-pulse">
+            <span className="text-white font-bold text-xl font-sans">I</span>
           </div>
-          <p className="text-sm text-muted-foreground font-sans">Carregando...</p>
+          <p className="text-sm text-[#475569] font-sans">Carregando...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background px-4">
-      <div className="w-full max-w-sm">
-        {/* Logo */}
-        <div className="flex flex-col items-center mb-10">
-          <div className="w-14 h-14 rounded-2xl bg-primary flex items-center justify-center shadow-lg shadow-primary/20">
-            <span className="text-primary-foreground font-bold text-2xl font-sans">I</span>
+    <div className="min-h-screen flex flex-col items-center justify-center bg-[#f8fafc] hero-gradient px-4">
+      <div className="w-full max-w-[400px]">
+        {/* Logo & Branding */}
+        <div className="flex flex-col items-center mb-8">
+          <div className="w-12 h-12 rounded-xl gradient-primary flex items-center justify-center shadow-lg">
+            <span className="text-white font-bold text-xl font-sans">I</span>
           </div>
-          <span className="mt-3 text-lg font-semibold text-primary font-sans tracking-tight">
+          <h1 className="mt-3 text-2xl font-bold gradient-text font-sans tracking-tight">
             Individuando
-          </span>
+          </h1>
+          <p className="mt-1 text-sm text-[#475569] font-sans">
+            Plataforma para facilitadores
+          </p>
         </div>
 
-        {/* Card */}
-        <div className="bg-card rounded-2xl border border-border shadow-soft p-8">
+        {/* Glass Card */}
+        <div className="glass-card rounded-2xl p-8">
           {/* Forgot Password View */}
           {view === "forgot" ? (
             <>
               <div className="text-center mb-6">
-                <div className="w-12 h-12 rounded-full bg-brand-subtle flex items-center justify-center mx-auto mb-3">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                <div className="w-12 h-12 rounded-xl gradient-primary flex items-center justify-center mx-auto mb-3">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
                 </div>
-                <h2 className="text-lg font-semibold text-foreground font-sans">
+                <h2 className="text-lg font-semibold text-[#0f172a] font-sans">
                   Recuperar Senha
                 </h2>
-                <p className="text-sm text-muted-foreground mt-1 font-sans">
+                <p className="text-sm text-[#475569] mt-1 font-sans">
                   {resetSent
                     ? "Verifique sua caixa de entrada"
-                    : "Digite seu email para receber o link de recuperação"}
+                    : "Digite seu email para receber o link"}
                 </p>
               </div>
 
               {resetSent ? (
                 <div className="space-y-4">
-                  <div className="bg-green-50 border border-green-100 rounded-xl p-4 text-center">
+                  <div className="bg-emerald-50/80 border border-emerald-200/60 rounded-xl p-4 text-center backdrop-blur-sm">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#10B981" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mx-auto mb-2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-                    <p className="text-sm text-green-700 font-medium font-sans">
+                    <p className="text-sm text-emerald-700 font-medium font-sans">
                       Email enviado para <strong>{email}</strong>
                     </p>
-                    <p className="text-xs text-green-600 mt-1 font-sans">
+                    <p className="text-xs text-emerald-600 mt-1 font-sans">
                       Clique no link do email para criar uma nova senha.
                     </p>
                   </div>
@@ -242,7 +245,7 @@ export default function LoginPage() {
                       toast.info("Reenviando...");
                       handleForgotPassword(new Event("submit") as unknown as React.FormEvent);
                     }}
-                    className="w-full text-sm text-primary hover:text-primary/80 font-medium font-sans transition-colors"
+                    className="w-full text-sm text-[#0080ff] hover:text-[#0066cc] font-medium font-sans transition-all duration-200"
                   >
                     Reenviar email
                   </button>
@@ -252,7 +255,7 @@ export default function LoginPage() {
                   <div className="space-y-1.5">
                     <label
                       htmlFor="reset-email"
-                      className="block text-sm font-medium text-foreground/80 font-sans"
+                      className="block text-sm font-medium text-[#0f172a]/80 font-sans"
                     >
                       Email
                     </label>
@@ -269,7 +272,7 @@ export default function LoginPage() {
                   <button
                     type="submit"
                     disabled={loading}
-                    className="w-full rounded-xl bg-primary py-3 text-sm font-semibold text-primary-foreground shadow-sm hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-sans"
+                    className="btn-primary w-full py-3 text-sm rounded-xl disabled:opacity-50 disabled:cursor-not-allowed font-sans"
                   >
                     {loading ? "Enviando..." : "Enviar Link de Recuperação"}
                   </button>
@@ -279,7 +282,7 @@ export default function LoginPage() {
               <button
                 type="button"
                 onClick={() => switchView("login")}
-                className="w-full mt-4 text-sm text-muted-foreground hover:text-foreground font-sans transition-colors flex items-center justify-center gap-1"
+                className="w-full mt-5 text-sm text-[#475569] hover:text-[#0f172a] font-sans transition-all duration-200 flex items-center justify-center gap-1.5"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
                 Voltar ao login
@@ -288,14 +291,14 @@ export default function LoginPage() {
           ) : (
             <>
               {/* Toggle Login / Signup */}
-              <div className="flex rounded-xl bg-secondary p-1 mb-8">
+              <div className="flex rounded-xl bg-[#f1f5f9] border border-[rgba(0,128,255,0.08)] p-1 mb-7">
                 <button
                   type="button"
                   onClick={() => switchView("login")}
-                  className={`flex-1 py-2.5 text-sm font-medium rounded-lg transition-all font-sans ${
+                  className={`flex-1 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 font-sans ${
                     view === "login"
-                      ? "bg-card text-primary shadow-sm"
-                      : "text-muted-foreground hover:text-foreground"
+                      ? "bg-white text-[#0f172a] shadow-sm border border-[rgba(0,128,255,0.1)]"
+                      : "text-[#475569] hover:text-[#0f172a]"
                   }`}
                 >
                   Entrar
@@ -303,10 +306,10 @@ export default function LoginPage() {
                 <button
                   type="button"
                   onClick={() => switchView("signup")}
-                  className={`flex-1 py-2.5 text-sm font-medium rounded-lg transition-all font-sans ${
+                  className={`flex-1 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 font-sans ${
                     view === "signup"
-                      ? "bg-card text-primary shadow-sm"
-                      : "text-muted-foreground hover:text-foreground"
+                      ? "bg-white text-[#0f172a] shadow-sm border border-[rgba(0,128,255,0.1)]"
+                      : "text-[#475569] hover:text-[#0f172a]"
                   }`}
                 >
                   Criar Conta
@@ -314,7 +317,7 @@ export default function LoginPage() {
               </div>
 
               {/* Description */}
-              <p className="text-sm text-muted-foreground text-center mb-6 font-sans">
+              <p className="text-sm text-[#475569] text-center mb-6 font-sans">
                 {view === "signup"
                   ? "Crie sua conta de facilitador"
                   : "Acesse o painel de ferramentas"}
@@ -329,7 +332,7 @@ export default function LoginPage() {
                   <div className="space-y-1.5">
                     <label
                       htmlFor="name"
-                      className="block text-sm font-medium text-foreground/80 font-sans"
+                      className="block text-sm font-medium text-[#0f172a]/80 font-sans"
                     >
                       Nome
                     </label>
@@ -348,7 +351,7 @@ export default function LoginPage() {
                 <div className="space-y-1.5">
                   <label
                     htmlFor="email"
-                    className="block text-sm font-medium text-foreground/80 font-sans"
+                    className="block text-sm font-medium text-[#0f172a]/80 font-sans"
                   >
                     Email
                   </label>
@@ -367,7 +370,7 @@ export default function LoginPage() {
                   <div className="flex items-center justify-between">
                     <label
                       htmlFor="password"
-                      className="block text-sm font-medium text-foreground/80 font-sans"
+                      className="block text-sm font-medium text-[#0f172a]/80 font-sans"
                     >
                       Senha
                     </label>
@@ -375,7 +378,7 @@ export default function LoginPage() {
                       <button
                         type="button"
                         onClick={() => switchView("forgot")}
-                        className="text-xs text-primary hover:text-primary/80 font-medium font-sans transition-colors"
+                        className="text-xs text-[#0080ff] hover:text-[#0066cc] font-medium font-sans transition-all duration-200"
                       >
                         Esqueci minha senha
                       </button>
@@ -395,7 +398,7 @@ export default function LoginPage() {
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-[#94a3b8] hover:text-[#475569] transition-all duration-200"
                       tabIndex={-1}
                     >
                       {showPassword ? (
@@ -410,7 +413,7 @@ export default function LoginPage() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full rounded-xl bg-primary py-3 text-sm font-semibold text-primary-foreground shadow-sm hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-sans"
+                  className="btn-primary w-full py-3 text-sm rounded-xl disabled:opacity-50 disabled:cursor-not-allowed font-sans"
                 >
                   {loading
                     ? "Carregando..."
@@ -423,9 +426,9 @@ export default function LoginPage() {
           )}
         </div>
 
-        {/* Footer hint */}
-        <p className="text-center text-xs text-muted-foreground/60 mt-6 font-sans">
-          Plataforma para facilitadores
+        {/* Footer */}
+        <p className="text-center text-xs text-[#94a3b8] mt-6 font-sans">
+          Individuando &middot; Ferramentas para facilitadores
         </p>
       </div>
     </div>

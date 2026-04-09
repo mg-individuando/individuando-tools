@@ -10,12 +10,11 @@
   --font-mono: var(--font-mono);
   --font-heading: var(--font-sans);
 
-  /* Semantic colors mapped from CSS variables */
-  --color-brand: var(--brand);
-  --color-brand-light: var(--brand-light);
-  --color-brand-dark: var(--brand-dark);
-  --color-brand-subtle: var(--brand-subtle);
-  --color-success: var(--success);
+  /* Brand / semantic */
+  --color-brand: var(--primary);
+  --color-brand-light: var(--primary-light);
+  --color-brand-dark: var(--primary-dark);
+  --color-success: var(--cta);
   --color-warning: var(--warning);
   --color-info: var(--info);
 
@@ -59,132 +58,141 @@
 }
 
 /* ================================================================
-   LIGHT MODE — Individuando Design System
+   DataPulse SaaS Theme — LIGHT MODE
    ================================================================ */
 :root {
-  /* Font stacks */
-  --font-sans: 'Montserrat', system-ui, -apple-system, sans-serif;
+  --font-sans: 'Poppins', system-ui, -apple-system, sans-serif;
   --font-mono: 'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
 
-  /* Brand palette */
-  --brand: #2D5A7B;
-  --brand-light: #3B7BA6;
-  --brand-dark: #1E3F56;
-  --brand-subtle: #EEF4F8;
-  --ind-navy: #1e2f4c;
-  --ind-sage: #c0d57e;
+  /* Primary palette — Blue → Purple gradient */
+  --primary: #0080ff;
+  --primary-light: #3399ff;
+  --primary-dark: #0066cc;
+  --secondary: #8b00ff;
+  --cta: #22c55e;
+  --cta-dark: #16a34a;
+  --warning: #f59e0b;
+  --error: #ef4444;
+  --info: #6366f1;
 
-  /* Semantic colors */
-  --success: #10B981;
-  --warning: #F59E0B;
-  --error: #EF4444;
-  --info: #6366F1;
-
-  /* Surface hierarchy */
-  --background: #FAFBFC;
-  --foreground: #1A1A2E;
-  --card: #FFFFFF;
-  --card-foreground: #1A1A2E;
-  --popover: #FFFFFF;
-  --popover-foreground: #1A1A2E;
+  /* Surfaces */
+  --background: #f8fafc;
+  --bg-subtle: #f1f5f9;
+  --foreground: #0f172a;
+  --card: rgba(255, 255, 255, 0.8);
+  --card-solid: #ffffff;
+  --card-foreground: #0f172a;
+  --popover: #ffffff;
+  --popover-foreground: #0f172a;
 
   /* UI tokens */
-  --primary: #2D5A7B;
-  --primary-foreground: #FFFFFF;
-  --secondary: #F4F6F8;
-  --secondary-foreground: #1A1A2E;
-  --muted: #F4F6F8;
-  --muted-foreground: #64748B;
-  --accent: #EEF4F8;
-  --accent-foreground: #1E3F56;
-  --destructive: #EF4444;
+  --primary-foreground: #ffffff;
+  --secondary-foreground: #ffffff;
+  --muted: #f1f5f9;
+  --muted-foreground: #475569;
+  --accent: #f1f5f9;
+  --accent-foreground: #0f172a;
+  --destructive: #ef4444;
 
-  /* Borders & inputs */
-  --border: #E2E8F0;
-  --input: #E2E8F0;
-  --ring: #2D5A7B;
+  /* Borders & Inputs */
+  --border: #e2e8f0;
+  --border-glass: rgba(0, 128, 255, 0.1);
+  --input: #e2e8f0;
+  --ring: #0080ff;
 
-  /* Charts — 5 distinguishable colors */
-  --chart-1: #2D5A7B;
-  --chart-2: #10B981;
-  --chart-3: #F59E0B;
-  --chart-4: #6366F1;
-  --chart-5: #EC4899;
+  /* Charts — 5 distinguishable */
+  --chart-1: #0080ff;
+  --chart-2: #22c55e;
+  --chart-3: #f59e0b;
+  --chart-4: #8b00ff;
+  --chart-5: #ec4899;
 
   /* Radius */
-  --radius: 0.625rem;
+  --radius: 0.75rem;
 
-  /* Shadows */
-  --shadow-xs: 0 1px 2px rgba(0,0,0,0.04);
-  --shadow-sm: 0 2px 8px rgba(0,0,0,0.06);
-  --shadow-md: 0 4px 16px rgba(0,0,0,0.08);
-  --shadow-lg: 0 8px 32px rgba(0,0,0,0.10);
-  --shadow-soft: 0 2px 20px rgba(0,0,0,0.04), 0 1px 4px rgba(0,0,0,0.06);
+  /* Shadows — DataPulse style */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-sm: 0 2px 8px rgba(0, 128, 255, 0.06);
+  --shadow-md: 0 4px 24px rgba(0, 128, 255, 0.08);
+  --shadow-lg: 0 8px 40px rgba(0, 128, 255, 0.12);
+  --shadow-glass: 0 4px 24px rgba(0, 128, 255, 0.08);
 
-  /* Sidebar (admin) */
-  --sidebar: #FAFBFC;
-  --sidebar-foreground: #1A1A2E;
-  --sidebar-primary: #2D5A7B;
-  --sidebar-primary-foreground: #FFFFFF;
-  --sidebar-accent: #EEF4F8;
-  --sidebar-accent-foreground: #1E3F56;
-  --sidebar-border: #E2E8F0;
-  --sidebar-ring: #2D5A7B;
+  /* Gradient */
+  --gradient-primary: linear-gradient(135deg, #0080ff, #8b00ff);
+  --gradient-primary-hover: linear-gradient(135deg, #0066cc, #7700dd);
+  --gradient-cta: linear-gradient(135deg, #22c55e, #16a34a);
+  --gradient-bg: linear-gradient(135deg, rgba(0, 128, 255, 0.03), rgba(139, 0, 255, 0.03));
+
+  /* Sidebar */
+  --sidebar: #ffffff;
+  --sidebar-foreground: #0f172a;
+  --sidebar-primary: #0080ff;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #f1f5f9;
+  --sidebar-accent-foreground: #0f172a;
+  --sidebar-border: #e2e8f0;
+  --sidebar-ring: #0080ff;
 }
 
 /* ================================================================
    DARK MODE
    ================================================================ */
 .dark {
-  --brand: #5B9CC7;
-  --brand-light: #7BB8DC;
-  --brand-dark: #3B7BA6;
-  --brand-subtle: #1A2533;
+  --primary: #3399ff;
+  --primary-light: #66b3ff;
+  --primary-dark: #0080ff;
+  --secondary: #a855f7;
+  --cta: #34d399;
+  --cta-dark: #22c55e;
 
-  --success: #34D399;
-  --warning: #FBBF24;
-  --error: #F87171;
-  --info: #818CF8;
+  --background: #0b0f1a;
+  --bg-subtle: #111827;
+  --foreground: #f0f4f8;
+  --card: rgba(17, 24, 39, 0.8);
+  --card-solid: #111827;
+  --card-foreground: #f0f4f8;
+  --popover: #111827;
+  --popover-foreground: #f0f4f8;
 
-  --background: #0F1117;
-  --foreground: #F0F0F5;
-  --card: #1A1D27;
-  --card-foreground: #F0F0F5;
-  --popover: #1A1D27;
-  --popover-foreground: #F0F0F5;
+  --primary-foreground: #ffffff;
+  --secondary-foreground: #ffffff;
+  --muted: #1e293b;
+  --muted-foreground: #94a3b8;
+  --accent: #1e293b;
+  --accent-foreground: #f0f4f8;
+  --destructive: #f87171;
 
-  --primary: #5B9CC7;
-  --primary-foreground: #0F1117;
-  --secondary: #22252F;
-  --secondary-foreground: #F0F0F5;
-  --muted: #22252F;
-  --muted-foreground: #94A3B8;
-  --accent: #1A2533;
-  --accent-foreground: #7BB8DC;
-  --destructive: #F87171;
+  --border: rgba(255, 255, 255, 0.08);
+  --border-glass: rgba(99, 102, 241, 0.15);
+  --input: rgba(255, 255, 255, 0.1);
+  --ring: #3399ff;
 
-  --border: rgba(255,255,255,0.08);
-  --input: rgba(255,255,255,0.12);
-  --ring: #5B9CC7;
+  --chart-1: #3399ff;
+  --chart-2: #34d399;
+  --chart-3: #fbbf24;
+  --chart-4: #a855f7;
+  --chart-5: #f472b6;
 
-  --chart-1: #5B9CC7;
-  --chart-2: #34D399;
-  --chart-3: #FBBF24;
-  --chart-4: #818CF8;
-  --chart-5: #F472B6;
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 24px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.5);
+  --shadow-glass: 0 4px 24px rgba(0, 0, 0, 0.3);
 
-  --sidebar: #1A1D27;
-  --sidebar-foreground: #F0F0F5;
-  --sidebar-primary: #5B9CC7;
-  --sidebar-primary-foreground: #0F1117;
-  --sidebar-accent: #22252F;
-  --sidebar-accent-foreground: #7BB8DC;
-  --sidebar-border: rgba(255,255,255,0.08);
-  --sidebar-ring: #5B9CC7;
+  --gradient-primary: linear-gradient(135deg, #3399ff, #a855f7);
+  --gradient-bg: linear-gradient(135deg, rgba(51, 153, 255, 0.05), rgba(168, 85, 247, 0.05));
+
+  --sidebar: #0b0f1a;
+  --sidebar-foreground: #f0f4f8;
+  --sidebar-primary: #3399ff;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #1e293b;
+  --sidebar-accent-foreground: #f0f4f8;
+  --sidebar-border: rgba(255, 255, 255, 0.08);
+  --sidebar-ring: #3399ff;
 }
 
 /* ================================================================
-   BASE STYLES
+   BASE
    ================================================================ */
 html {
   scroll-behavior: smooth;
@@ -198,7 +206,7 @@ html {
     @apply bg-background text-foreground;
   }
   html {
-    @apply font-sans;
+    @apply font-sans antialiased;
   }
   :focus-visible {
     @apply outline-2 outline-offset-2 outline-ring;
@@ -206,25 +214,115 @@ html {
 }
 
 /* ================================================================
-   UTILITY CLASSES — Design System
+   DataPulse Component Classes
    ================================================================ */
 @layer utilities {
-  .shadow-soft {
-    box-shadow: var(--shadow-soft);
+  /* Glass Card */
+  .glass-card {
+    background: var(--card);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--border-glass);
+    border-radius: 16px;
+    box-shadow: var(--shadow-glass);
+    transition: all 200ms ease;
   }
-  .text-brand {
-    color: var(--brand);
+  .glass-card:hover {
+    box-shadow: var(--shadow-lg);
+    border-color: rgba(0, 128, 255, 0.2);
   }
-  .bg-brand {
-    background-color: var(--brand);
+
+  /* Gradient Primary (icons, accents) */
+  .gradient-primary {
+    background: var(--gradient-primary);
   }
-  .bg-brand-subtle {
-    background-color: var(--brand-subtle);
+
+  /* Gradient Text */
+  .gradient-text {
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
   }
-  .border-brand {
-    border-color: var(--brand);
+
+  /* Primary Button */
+  .btn-primary {
+    background: var(--gradient-primary);
+    color: white;
+    font-weight: 600;
+    border-radius: 12px;
+    padding: 10px 24px;
+    border: none;
+    cursor: pointer;
+    transition: all 200ms ease;
+    box-shadow: 0 4px 16px rgba(0, 128, 255, 0.25);
   }
-  .ring-brand {
-    --tw-ring-color: var(--brand);
+  .btn-primary:hover {
+    background: var(--gradient-primary-hover);
+    box-shadow: 0 6px 24px rgba(0, 128, 255, 0.35);
+    transform: translateY(-1px);
   }
+  .btn-primary:active {
+    transform: translateY(0);
+  }
+
+  /* Secondary Button */
+  .btn-secondary {
+    background: transparent;
+    color: var(--primary);
+    font-weight: 600;
+    border-radius: 12px;
+    padding: 10px 24px;
+    border: 1px solid var(--border-glass);
+    cursor: pointer;
+    transition: all 200ms ease;
+  }
+  .btn-secondary:hover {
+    background: rgba(0, 128, 255, 0.05);
+    border-color: var(--primary);
+  }
+
+  /* Hero gradient background */
+  .hero-gradient {
+    background: linear-gradient(180deg, rgba(0, 128, 255, 0.04) 0%, transparent 60%);
+  }
+
+  /* Feature icon container */
+  .feature-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: var(--gradient-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    flex-shrink: 0;
+  }
+
+  /* Stat card number */
+  .stat-number {
+    font-size: 2rem;
+    font-weight: 700;
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Float animation */
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+  .animate-float {
+    animation: float 4s ease-in-out infinite;
+  }
+
+  /* Utility aliases */
+  .text-brand { color: var(--primary); }
+  .bg-brand { background-color: var(--primary); }
+  .bg-brand-subtle { background-color: rgba(0, 128, 255, 0.05); }
+  .border-brand { border-color: var(--primary); }
+  .shadow-glass { box-shadow: var(--shadow-glass); }
 }

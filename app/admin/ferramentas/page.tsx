@@ -2,9 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import { Plus, Copy, ExternalLink, Eye, FileText } from "lucide-react";
 import { toast } from "sonner";
@@ -14,18 +11,18 @@ const templateLabels: Record<string, string> = {
   swot: "SWOT Pessoal",
   radar: "Roda da Vida",
   ikigai: "Ikigai",
-  category_grid: "Forças Pessoais",
+  category_grid: "Forcas Pessoais",
   dynamic_table: "Metas",
   free_layout: "Layout Livre",
 };
 
 const templateColors: Record<string, string> = {
-  swot: "bg-blue-50 text-blue-700 border-blue-200",
-  radar: "bg-purple-50 text-purple-700 border-purple-200",
-  ikigai: "bg-amber-50 text-amber-700 border-amber-200",
-  category_grid: "bg-emerald-50 text-emerald-700 border-emerald-200",
-  dynamic_table: "bg-rose-50 text-rose-700 border-rose-200",
-  free_layout: "bg-slate-50 text-slate-700 border-slate-200",
+  swot: "bg-blue-50/80 text-blue-700 border-blue-200/60",
+  radar: "bg-purple-50/80 text-purple-700 border-purple-200/60",
+  ikigai: "bg-amber-50/80 text-amber-700 border-amber-200/60",
+  category_grid: "bg-emerald-50/80 text-emerald-700 border-emerald-200/60",
+  dynamic_table: "bg-rose-50/80 text-rose-700 border-rose-200/60",
+  free_layout: "bg-slate-50/80 text-slate-700 border-slate-200/60",
 };
 
 export default function FerramentasPage() {
@@ -66,7 +63,7 @@ export default function FerramentasPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-24 text-gray-400">
+      <div className="flex items-center justify-center py-24 text-[#475569]">
         Carregando...
       </div>
     );
@@ -77,147 +74,129 @@ export default function FerramentasPage() {
       {/* Page header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-gray-900">
+          <h1 className="text-2xl font-bold tracking-tight text-[#0f172a]">
             Ferramentas
           </h1>
-          <p className="text-sm text-gray-500 mt-1">
+          <p className="text-sm text-[#475569] mt-1">
             Gerencie suas ferramentas interativas de workshop e mentoria
           </p>
         </div>
         <Link href="/admin/ferramentas/nova">
-          <Button
-            className="bg-primary hover:bg-brand-dark text-primary-foreground shadow-sm"
-          >
-            <Plus className="w-4 h-4 mr-2" />
+          <button className="btn-primary inline-flex items-center gap-2 text-sm">
+            <Plus className="w-4 h-4" />
             Nova Ferramenta
-          </Button>
+          </button>
         </Link>
       </div>
 
       {/* Empty state */}
       {tools.length === 0 ? (
-        <Card className="border-dashed">
-          <CardContent className="flex flex-col items-center justify-center py-16">
-            <div className="rounded-full bg-gray-100 p-4 mb-4">
-              <FileText className="w-8 h-8 text-gray-400" />
+        <div className="glass-card border-dashed">
+          <div className="flex flex-col items-center justify-center py-16">
+            <div className="feature-icon mb-4">
+              <FileText className="w-8 h-8" />
             </div>
-            <p className="text-gray-500 font-medium mb-1">
+            <p className="text-[#0f172a] font-medium mb-1">
               Nenhuma ferramenta criada
             </p>
-            <p className="text-sm text-gray-400 mb-6">
+            <p className="text-sm text-[#475569] mb-6">
               Crie sua primeira ferramenta interativa para compartilhar com seus clientes.
             </p>
             <Link href="/admin/ferramentas/nova">
-              <Button className="bg-primary hover:bg-brand-dark text-primary-foreground">
-                <Plus className="w-4 h-4 mr-2" />
+              <button className="btn-primary inline-flex items-center gap-2 text-sm">
+                <Plus className="w-4 h-4" />
                 Criar Primeira Ferramenta
-              </Button>
+              </button>
             </Link>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       ) : (
         /* Tool cards grid */
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {tools.map((tool) => (
-            <Card
+            <div
               key={tool.id}
-              className="group transition-shadow duration-200 hover:shadow-md border border-gray-200"
+              className="glass-card group flex flex-col justify-between h-full p-5"
             >
-              <CardContent className="flex flex-col justify-between h-full p-5">
-                {/* Card top section */}
-                <div>
-                  <div className="flex items-start justify-between gap-2 mb-3">
-                    <h3 className="font-semibold text-gray-900 leading-snug">
-                      {tool.title}
-                    </h3>
-                    <Badge
-                      variant="outline"
-                      className={
-                        tool.status === "published"
-                          ? "bg-green-50 text-green-700 border-green-200 shrink-0"
-                          : "bg-gray-50 text-gray-500 border-gray-200 shrink-0"
-                      }
-                    >
-                      {tool.status === "published" ? "Publicada" : "Rascunho"}
-                    </Badge>
-                  </div>
-
-                  <Badge
-                    variant="outline"
-                    className={`text-xs font-normal ${
-                      templateColors[tool.template_type] ||
-                      "bg-slate-50 text-slate-600 border-slate-200"
+              {/* Card top section */}
+              <div>
+                <div className="flex items-start justify-between gap-2 mb-3">
+                  <h3 className="font-semibold text-[#0f172a] leading-snug">
+                    {tool.title}
+                  </h3>
+                  <span
+                    className={`text-xs font-medium px-2.5 py-1 rounded-full shrink-0 ${
+                      tool.status === "published"
+                        ? "gradient-primary text-white"
+                        : "border border-[rgba(0,128,255,0.2)] text-[#475569] bg-white/60"
                     }`}
                   >
-                    {templateLabels[tool.template_type] || tool.template_type}
-                  </Badge>
-
-                  <p className="text-xs text-gray-400 mt-3">
-                    Criada em{" "}
-                    {new Date(tool.created_at).toLocaleDateString("pt-BR")}
-                  </p>
+                    {tool.status === "published" ? "Publicada" : "Rascunho"}
+                  </span>
                 </div>
 
-                {/* Actions row */}
-                <div className="flex items-center gap-1 mt-4 pt-4 border-t border-gray-100">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-gray-500 hover:text-primary h-8 px-2"
-                    onClick={() => copyLink(tool.slug)}
-                    title="Copiar link"
-                  >
-                    <Copy className="w-3.5 h-3.5" />
-                  </Button>
+                <span
+                  className={`inline-block text-xs font-normal px-2 py-0.5 rounded-md border ${
+                    templateColors[tool.template_type] ||
+                    "bg-slate-50/80 text-slate-600 border-slate-200/60"
+                  }`}
+                >
+                  {templateLabels[tool.template_type] || tool.template_type}
+                </span>
 
-                  <a
-                    href={`/f/${tool.slug}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="text-gray-500 hover:text-primary h-8 px-2"
-                      title="Abrir ferramenta"
-                    >
-                      <ExternalLink className="w-3.5 h-3.5" />
-                    </Button>
-                  </a>
+                <p className="text-xs text-[#475569]/60 mt-3">
+                  Criada em{" "}
+                  {new Date(tool.created_at).toLocaleDateString("pt-BR")}
+                </p>
+              </div>
 
-                  <Link href={`/admin/ferramentas/${tool.id}/respostas`}>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="text-gray-500 hover:text-primary h-8 px-2"
-                      title="Ver respostas"
-                    >
-                      <Eye className="w-3.5 h-3.5" />
-                    </Button>
+              {/* Actions row */}
+              <div className="flex items-center gap-1 mt-4 pt-4 border-t border-[rgba(0,128,255,0.06)]">
+                <button
+                  className="text-[#475569] hover:text-[#0080ff] h-8 px-2 rounded-lg hover:bg-[rgba(0,128,255,0.05)] transition-all duration-200"
+                  onClick={() => copyLink(tool.slug)}
+                  title="Copiar link"
+                >
+                  <Copy className="w-3.5 h-3.5" />
+                </button>
+
+                <a
+                  href={`/f/${tool.slug}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <button
+                    className="text-[#475569] hover:text-[#0080ff] h-8 px-2 rounded-lg hover:bg-[rgba(0,128,255,0.05)] transition-all duration-200"
+                    title="Abrir ferramenta"
+                  >
+                    <ExternalLink className="w-3.5 h-3.5" />
+                  </button>
+                </a>
+
+                <Link href={`/admin/ferramentas/${tool.id}/respostas`}>
+                  <button
+                    className="text-[#475569] hover:text-[#0080ff] h-8 px-2 rounded-lg hover:bg-[rgba(0,128,255,0.05)] transition-all duration-200"
+                    title="Ver respostas"
+                  >
+                    <Eye className="w-3.5 h-3.5" />
+                  </button>
+                </Link>
+
+                <div className="ml-auto flex items-center gap-1.5">
+                  <button
+                    className="btn-secondary text-xs !py-1.5 !px-3"
+                    onClick={() => togglePublish(tool)}
+                  >
+                    {tool.status === "published" ? "Despublicar" : "Publicar"}
+                  </button>
+                  <Link href={`/admin/ferramentas/${tool.id}`}>
+                    <button className="btn-primary text-xs !py-1.5 !px-3">
+                      Editar
+                    </button>
                   </Link>
-
-                  <div className="ml-auto flex items-center gap-1.5">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="h-8 text-xs"
-                      onClick={() => togglePublish(tool)}
-                    >
-                      {tool.status === "published" ? "Despublicar" : "Publicar"}
-                    </Button>
-                    <Link href={`/admin/ferramentas/${tool.id}`}>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="h-8 text-xs border-primary text-primary hover:bg-primary/5"
-                      >
-                        Editar
-                      </Button>
-                    </Link>
-                  </div>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           ))}
         </div>
       )}

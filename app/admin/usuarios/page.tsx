@@ -2,9 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import {
@@ -48,7 +45,7 @@ export default function UsuariosPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-24 text-gray-400">
+      <div className="flex items-center justify-center py-24 text-[#475569]">
         Carregando...
       </div>
     );
@@ -59,65 +56,73 @@ export default function UsuariosPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-gray-900">
-            Usuários
+          <h1 className="text-2xl font-bold tracking-tight text-[#0f172a]">
+            Usuarios
           </h1>
-          <p className="text-sm text-gray-500 mt-1">
+          <p className="text-sm text-[#475569] mt-1">
             Gerencie facilitadores e administradores da plataforma
           </p>
         </div>
         <Link href="/admin/usuarios/convidar">
-          <Button className="bg-primary hover:bg-brand-dark text-primary-foreground shadow-sm">
-            <UserPlus className="w-4 h-4 mr-2" />
-            Convidar Usuário
-          </Button>
+          <button className="btn-primary inline-flex items-center gap-2 text-sm">
+            <UserPlus className="w-4 h-4" />
+            Convidar Usuario
+          </button>
         </Link>
       </div>
 
       {/* Search */}
       <div className="relative mb-6">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#475569]/50" />
         <Input
           placeholder="Buscar por nome, email ou papel..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="pl-10 h-10"
+          className="pl-10 h-10 border-[rgba(0,128,255,0.1)] bg-white/80 backdrop-blur-sm focus:border-[rgba(0,128,255,0.3)] focus:ring-[rgba(0,128,255,0.1)] transition-all duration-200 rounded-xl"
         />
       </div>
 
       {/* Stats */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
-        <div className="bg-white rounded-lg border border-gray-200 p-3">
-          <div className="flex items-center gap-2 text-gray-500 mb-1">
-            <Users className="w-4 h-4" />
+        <div className="glass-card p-3">
+          <div className="flex items-center gap-2 text-[#475569] mb-1">
+            <div className="w-6 h-6 rounded-lg gradient-primary flex items-center justify-center">
+              <Users className="w-3.5 h-3.5 text-white" />
+            </div>
             <span className="text-xs font-medium">Total</span>
           </div>
-          <p className="text-xl font-bold text-gray-900">{profiles.length}</p>
+          <p className="text-xl font-bold gradient-text">{profiles.length}</p>
         </div>
-        <div className="bg-white rounded-lg border border-gray-200 p-3">
-          <div className="flex items-center gap-2 text-blue-600 mb-1">
-            <Shield className="w-4 h-4" />
+        <div className="glass-card p-3">
+          <div className="flex items-center gap-2 text-[#475569] mb-1">
+            <div className="w-6 h-6 rounded-lg gradient-primary flex items-center justify-center">
+              <Shield className="w-3.5 h-3.5 text-white" />
+            </div>
             <span className="text-xs font-medium">Admins</span>
           </div>
-          <p className="text-xl font-bold text-gray-900">
+          <p className="text-xl font-bold gradient-text">
             {profiles.filter((p) => p.role === "admin").length}
           </p>
         </div>
-        <div className="bg-white rounded-lg border border-gray-200 p-3">
-          <div className="flex items-center gap-2 text-gray-500 mb-1">
-            <UserCheck className="w-4 h-4" />
+        <div className="glass-card p-3">
+          <div className="flex items-center gap-2 text-[#475569] mb-1">
+            <div className="w-6 h-6 rounded-lg gradient-primary flex items-center justify-center">
+              <UserCheck className="w-3.5 h-3.5 text-white" />
+            </div>
             <span className="text-xs font-medium">Ativos</span>
           </div>
-          <p className="text-xl font-bold text-gray-900">
+          <p className="text-xl font-bold gradient-text">
             {profiles.filter((p) => p.is_active).length}
           </p>
         </div>
-        <div className="bg-white rounded-lg border border-gray-200 p-3">
-          <div className="flex items-center gap-2 text-red-500 mb-1">
-            <UserX className="w-4 h-4" />
+        <div className="glass-card p-3">
+          <div className="flex items-center gap-2 text-[#475569] mb-1">
+            <div className="w-6 h-6 rounded-lg gradient-primary flex items-center justify-center">
+              <UserX className="w-3.5 h-3.5 text-white" />
+            </div>
             <span className="text-xs font-medium">Inativos</span>
           </div>
-          <p className="text-xl font-bold text-gray-900">
+          <p className="text-xl font-bold gradient-text">
             {profiles.filter((p) => !p.is_active).length}
           </p>
         </div>
@@ -125,56 +130,56 @@ export default function UsuariosPage() {
 
       {/* Users table */}
       {filtered.length === 0 ? (
-        <Card className="border-dashed">
-          <CardContent className="flex flex-col items-center justify-center py-16">
-            <div className="rounded-full bg-gray-100 p-4 mb-4">
-              <Users className="w-8 h-8 text-gray-400" />
+        <div className="glass-card border-dashed">
+          <div className="flex flex-col items-center justify-center py-16">
+            <div className="feature-icon mb-4">
+              <Users className="w-8 h-8" />
             </div>
-            <p className="text-gray-500 font-medium mb-1">
+            <p className="text-[#0f172a] font-medium mb-1">
               {search
-                ? "Nenhum usuário encontrado"
-                : "Nenhum usuário cadastrado"}
+                ? "Nenhum usuario encontrado"
+                : "Nenhum usuario cadastrado"}
             </p>
-            <p className="text-sm text-gray-400">
+            <p className="text-sm text-[#475569]">
               {search
                 ? "Tente ajustar os termos de busca."
-                : "Convide o primeiro usuário para a plataforma."}
+                : "Convide o primeiro usuario para a plataforma."}
             </p>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       ) : (
         <>
           {/* Desktop table */}
-          <div className="hidden md:block bg-white rounded-lg border border-gray-200 overflow-hidden">
+          <div className="hidden md:block glass-card overflow-hidden">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-gray-100 bg-gray-50/50">
-                  <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-4 py-3">
-                    Usuário
+                <tr className="border-b border-[rgba(0,128,255,0.06)] bg-[rgba(0,128,255,0.02)]">
+                  <th className="text-left text-xs font-medium text-[#475569] uppercase tracking-wider px-4 py-3">
+                    Usuario
                   </th>
-                  <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-4 py-3">
+                  <th className="text-left text-xs font-medium text-[#475569] uppercase tracking-wider px-4 py-3">
                     Papel
                   </th>
-                  <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-4 py-3">
+                  <th className="text-left text-xs font-medium text-[#475569] uppercase tracking-wider px-4 py-3">
                     Status
                   </th>
-                  <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-4 py-3">
+                  <th className="text-left text-xs font-medium text-[#475569] uppercase tracking-wider px-4 py-3">
                     Criado em
                   </th>
-                  <th className="text-right text-xs font-medium text-gray-500 uppercase tracking-wider px-4 py-3">
-                    Ações
+                  <th className="text-right text-xs font-medium text-[#475569] uppercase tracking-wider px-4 py-3">
+                    Acoes
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-[rgba(0,128,255,0.06)]">
                 {filtered.map((profile) => (
                   <tr
                     key={profile.id}
-                    className="hover:bg-gray-50/50 transition-colors"
+                    className="hover:bg-[rgba(0,128,255,0.03)] transition-all duration-200"
                   >
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-full bg-brand-subtle flex items-center justify-center shrink-0">
+                        <div className="w-9 h-9 rounded-full gradient-primary flex items-center justify-center shrink-0">
                           {profile.avatar_url ? (
                             <img
                               src={profile.avatar_url}
@@ -182,73 +187,65 @@ export default function UsuariosPage() {
                               className="w-9 h-9 rounded-full object-cover"
                             />
                           ) : (
-                            <span className="text-sm font-semibold text-primary">
+                            <span className="text-sm font-semibold text-white">
                               {profile.name?.charAt(0)?.toUpperCase() || "?"}
                             </span>
                           )}
                         </div>
                         <div className="min-w-0">
-                          <p className="text-sm font-medium text-gray-900 truncate">
+                          <p className="text-sm font-medium text-[#0f172a] truncate">
                             {profile.name}
                           </p>
-                          <p className="text-xs text-gray-500 truncate">
+                          <p className="text-xs text-[#475569] truncate">
                             {profile.email}
                           </p>
                         </div>
                       </div>
                     </td>
                     <td className="px-4 py-3">
-                      <Badge
-                        variant={
-                          profile.role === "admin" ? "default" : "secondary"
-                        }
-                        className={
+                      <span
+                        className={`text-xs font-medium px-2.5 py-1 rounded-full ${
                           profile.role === "admin"
-                            ? "bg-primary text-primary-foreground hover:bg-primary"
-                            : "bg-gray-100 text-gray-600"
-                        }
+                            ? "gradient-primary text-white"
+                            : "border border-[rgba(0,128,255,0.2)] text-[#475569] bg-white/60"
+                        }`}
                       >
                         {profile.role === "admin" ? "Admin" : "Facilitador"}
-                      </Badge>
+                      </span>
                     </td>
                     <td className="px-4 py-3">
-                      <Badge
-                        variant={profile.is_active ? "outline" : "destructive"}
-                        className={
+                      <span
+                        className={`text-xs font-medium px-2.5 py-1 rounded-full ${
                           profile.is_active
-                            ? "bg-green-50 text-green-700 border-green-200"
-                            : ""
-                        }
+                            ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                            : "bg-red-50 text-red-600 border border-red-200"
+                        }`}
                       >
                         {profile.is_active ? "Ativo" : "Inativo"}
-                      </Badge>
+                      </span>
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-500">
+                    <td className="px-4 py-3 text-sm text-[#475569]">
                       {new Date(profile.created_at).toLocaleDateString("pt-BR")}
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center justify-end gap-1">
                         <Link href={`/admin/usuarios/${profile.id}`}>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="text-gray-500 hover:text-primary h-8 px-2"
-                            title="Editar usuário"
+                          <button
+                            className="text-[#475569] hover:text-[#0080ff] h-8 px-2 rounded-lg hover:bg-[rgba(0,128,255,0.05)] transition-all duration-200"
+                            title="Editar usuario"
                           >
                             <Pencil className="w-3.5 h-3.5" />
-                          </Button>
+                          </button>
                         </Link>
                         <Link
                           href={`/admin/usuarios/${profile.id}#ferramentas`}
                         >
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="text-gray-500 hover:text-primary h-8 px-2"
+                          <button
+                            className="text-[#475569] hover:text-[#0080ff] h-8 px-2 rounded-lg hover:bg-[rgba(0,128,255,0.05)] transition-all duration-200"
                             title="Ver ferramentas"
                           >
                             <Wrench className="w-3.5 h-3.5" />
-                          </Button>
+                          </button>
                         </Link>
                       </div>
                     </td>
@@ -261,80 +258,70 @@ export default function UsuariosPage() {
           {/* Mobile cards */}
           <div className="md:hidden space-y-3">
             {filtered.map((profile) => (
-              <Card
+              <div
                 key={profile.id}
-                className="group transition-shadow hover:shadow-md border border-gray-200"
+                className="glass-card group p-4"
               >
-                <CardContent className="p-4">
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="flex items-center gap-3 min-w-0">
-                      <div className="w-10 h-10 rounded-full bg-brand-subtle flex items-center justify-center shrink-0">
-                        {profile.avatar_url ? (
-                          <img
-                            src={profile.avatar_url}
-                            alt=""
-                            className="w-10 h-10 rounded-full object-cover"
-                          />
-                        ) : (
-                          <span className="text-sm font-semibold text-primary">
-                            {profile.name?.charAt(0)?.toUpperCase() || "?"}
-                          </span>
-                        )}
-                      </div>
-                      <div className="min-w-0">
-                        <p className="font-medium text-gray-900 truncate">
-                          {profile.name}
-                        </p>
-                        <p className="text-sm text-gray-500 truncate">
-                          {profile.email}
-                        </p>
-                      </div>
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="w-10 h-10 rounded-full gradient-primary flex items-center justify-center shrink-0">
+                      {profile.avatar_url ? (
+                        <img
+                          src={profile.avatar_url}
+                          alt=""
+                          className="w-10 h-10 rounded-full object-cover"
+                        />
+                      ) : (
+                        <span className="text-sm font-semibold text-white">
+                          {profile.name?.charAt(0)?.toUpperCase() || "?"}
+                        </span>
+                      )}
                     </div>
-                    <div className="flex flex-col items-end gap-1.5 shrink-0">
-                      <Badge
-                        variant={
-                          profile.role === "admin" ? "default" : "secondary"
-                        }
-                        className={
-                          profile.role === "admin"
-                            ? "bg-primary text-primary-foreground hover:bg-primary"
-                            : "bg-gray-100 text-gray-600"
-                        }
-                      >
-                        {profile.role === "admin" ? "Admin" : "Facilitador"}
-                      </Badge>
-                      <Badge
-                        variant={profile.is_active ? "outline" : "destructive"}
-                        className={
-                          profile.is_active
-                            ? "bg-green-50 text-green-700 border-green-200"
-                            : ""
-                        }
-                      >
-                        {profile.is_active ? "Ativo" : "Inativo"}
-                      </Badge>
+                    <div className="min-w-0">
+                      <p className="font-medium text-[#0f172a] truncate">
+                        {profile.name}
+                      </p>
+                      <p className="text-sm text-[#475569] truncate">
+                        {profile.email}
+                      </p>
                     </div>
                   </div>
-                  <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
-                    <span className="text-xs text-gray-400">
-                      Criado em{" "}
-                      {new Date(profile.created_at).toLocaleDateString("pt-BR")}
+                  <div className="flex flex-col items-end gap-1.5 shrink-0">
+                    <span
+                      className={`text-xs font-medium px-2.5 py-1 rounded-full ${
+                        profile.role === "admin"
+                          ? "gradient-primary text-white"
+                          : "border border-[rgba(0,128,255,0.2)] text-[#475569] bg-white/60"
+                      }`}
+                    >
+                      {profile.role === "admin" ? "Admin" : "Facilitador"}
                     </span>
-                    <div className="flex items-center gap-1">
-                      <Link href={`/admin/usuarios/${profile.id}`}>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="h-7 text-xs border-primary text-primary hover:bg-primary/5"
-                        >
-                          <Pencil className="w-3 h-3 mr-1" />
-                          Editar
-                        </Button>
-                      </Link>
-                    </div>
+                    <span
+                      className={`text-xs font-medium px-2.5 py-1 rounded-full ${
+                        profile.is_active
+                          ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                          : "bg-red-50 text-red-600 border border-red-200"
+                      }`}
+                    >
+                      {profile.is_active ? "Ativo" : "Inativo"}
+                    </span>
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+                <div className="flex items-center justify-between mt-3 pt-3 border-t border-[rgba(0,128,255,0.06)]">
+                  <span className="text-xs text-[#475569]/60">
+                    Criado em{" "}
+                    {new Date(profile.created_at).toLocaleDateString("pt-BR")}
+                  </span>
+                  <div className="flex items-center gap-1">
+                    <Link href={`/admin/usuarios/${profile.id}`}>
+                      <button className="btn-primary text-xs !py-1.5 !px-3 inline-flex items-center gap-1">
+                        <Pencil className="w-3 h-3" />
+                        Editar
+                      </button>
+                    </Link>
+                  </div>
+                </div>
+              </div>
             ))}
           </div>
         </>

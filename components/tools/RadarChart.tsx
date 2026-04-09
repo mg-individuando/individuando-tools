@@ -90,17 +90,35 @@ export default function RadarChart({
       let anchor: "start" | "middle" | "end" = "middle";
       if (cos > 0.3) anchor = "start";
       else if (cos < -0.3) anchor = "end";
-      return { x: lx, y: ly, anchor, label: p.section.label, color: p.section.color || "var(--brand)" };
+      return { x: lx, y: ly, anchor, label: p.section.label, color: p.section.color || "#0080ff" };
     });
   }, [points, maxRadius, center, n]);
 
-  const primaryColor = "var(--brand)";
-  const primaryColorHex = "#2D5A7B"; // hex fallback for hexToRgba calls
+  const primaryColor = "#0080ff";
+  const primaryColorHex = "#0080ff";
 
   return (
     <div className="flex flex-col items-center gap-8 w-full">
       {/* Radar SVG Section */}
-      <div className="relative w-full max-w-[460px] mx-auto p-4 bg-card border border-border rounded-xl hover:shadow-md transition-all duration-200">
+      <div
+        className="relative w-full max-w-[460px] mx-auto p-4 transition-all duration-200"
+        style={{
+          backdropFilter: "blur(12px)",
+          WebkitBackdropFilter: "blur(12px)",
+          background: "rgba(255,255,255,0.8)",
+          border: "1px solid rgba(0,128,255,0.1)",
+          boxShadow: "rgba(0,128,255,0.08) 0px 4px 24px",
+          borderRadius: "16px",
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.boxShadow = "rgba(0,128,255,0.16) 0px 8px 32px";
+          e.currentTarget.style.borderColor = "rgba(0,128,255,0.2)";
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.boxShadow = "rgba(0,128,255,0.08) 0px 4px 24px";
+          e.currentTarget.style.borderColor = "rgba(0,128,255,0.1)";
+        }}
+      >
         <svg
           viewBox={`0 0 ${size} ${size}`}
           className="w-full"
@@ -118,8 +136,8 @@ export default function RadarChart({
             <path
               key={level}
               d={path}
-              fill={level % 2 === 0 ? "var(--muted)" : "none"}
-              stroke="var(--border)"
+              fill={level % 2 === 0 ? "rgba(0,128,255,0.03)" : "none"}
+              stroke="rgba(0,128,255,0.1)"
               strokeWidth={level === levels - 1 ? 1.2 : 0.6}
             />
           ))}
@@ -134,7 +152,7 @@ export default function RadarChart({
                 y1={center}
                 x2={center + maxRadius * Math.cos(angle)}
                 y2={center + maxRadius * Math.sin(angle)}
-                stroke="var(--border)"
+                stroke="rgba(0,128,255,0.1)"
                 strokeWidth={0.7}
               />
             );
@@ -175,7 +193,8 @@ export default function RadarChart({
               y={l.y}
               textAnchor={l.anchor}
               dominantBaseline="central"
-              className="text-[11px] font-semibold fill-foreground tracking-tight"
+              className="text-[11px] font-semibold tracking-tight"
+              fill="#0f172a"
             >
               {l.label}
             </text>
@@ -196,26 +215,48 @@ export default function RadarChart({
           return (
             <div
               key={section.id}
-              className="bg-card border border-border rounded-xl overflow-hidden hover:shadow-md transition-all duration-200"
-              style={{ borderLeft: `4px solid ${color}` }}
+              className="overflow-hidden transition-all duration-200"
+              style={{
+                backdropFilter: "blur(12px)",
+                WebkitBackdropFilter: "blur(12px)",
+                background: "rgba(255,255,255,0.8)",
+                border: "1px solid rgba(0,128,255,0.1)",
+                boxShadow: "rgba(0,128,255,0.08) 0px 4px 24px",
+                borderRadius: "16px",
+                borderLeft: `3px solid ${color}`,
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.boxShadow = "rgba(0,128,255,0.16) 0px 8px 32px";
+                e.currentTarget.style.borderColor = "rgba(0,128,255,0.2)";
+                e.currentTarget.style.borderLeftColor = color;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.boxShadow = "rgba(0,128,255,0.08) 0px 4px 24px";
+                e.currentTarget.style.borderColor = "rgba(0,128,255,0.1)";
+                e.currentTarget.style.borderLeftColor = color;
+              }}
             >
               <div className="px-4 py-3.5">
                 {/* Label + value */}
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2.5">
                     <div
-                      className="w-8 h-8 rounded-lg flex items-center justify-center"
-                      style={{ backgroundColor: `${color}14` }}
+                      className="w-10 h-10 rounded-xl flex items-center justify-center"
+                      style={{
+                        background: `linear-gradient(135deg, ${color}, ${color}cc)`,
+                      }}
                     >
-                      <SectionIcon icon={section.icon} size={18} />
+                      <SectionIcon icon={section.icon} size={18} className="text-white" />
                     </div>
-                    <span className="font-semibold text-sm text-foreground leading-tight">
+                    <span className="font-semibold text-[15px] text-[#0f172a] leading-tight">
                       {section.label}
                     </span>
                   </div>
                   <span
-                    className="inline-flex items-center justify-center w-7 h-7 rounded-md text-xs font-bold text-white"
-                    style={{ backgroundColor: color }}
+                    className="inline-flex items-center justify-center min-w-[28px] h-7 rounded-lg text-xs font-bold text-white px-1.5"
+                    style={{
+                      background: `linear-gradient(135deg, ${color}, ${color}cc)`,
+                    }}
                   >
                     {value}
                   </span>
@@ -233,7 +274,7 @@ export default function RadarChart({
                     disabled={readOnly}
                     className="radar-slider w-full h-1.5 appearance-none rounded-full cursor-pointer outline-none disabled:opacity-50 disabled:cursor-not-allowed"
                     style={{
-                      background: `linear-gradient(to right, ${color} 0%, ${color} ${pct}%, var(--border) ${pct}%, var(--border) 100%)`,
+                      background: `linear-gradient(to right, ${color} 0%, ${color} ${pct}%, rgba(0,128,255,0.1) ${pct}%, rgba(0,128,255,0.1) 100%)`,
                       ["--slider-color" as string]: color,
                       ["--slider-shadow" as string]: hexToRgba(color, 0.25),
                     }}
@@ -254,8 +295,8 @@ export default function RadarChart({
           height: 16px;
           border-radius: 50%;
           background: white;
-          border: 2.5px solid var(--slider-color, var(--brand));
-          box-shadow: 0 1px 3px var(--slider-shadow, rgba(45,90,123,0.25));
+          border: 2.5px solid var(--slider-color, #0080ff);
+          box-shadow: 0 1px 3px var(--slider-shadow, rgba(0,128,255,0.25));
           cursor: pointer;
           transition: transform 0.15s ease;
         }
@@ -267,8 +308,8 @@ export default function RadarChart({
           height: 16px;
           border-radius: 50%;
           background: white;
-          border: 2.5px solid var(--slider-color, var(--brand));
-          box-shadow: 0 1px 3px var(--slider-shadow, rgba(45,90,123,0.25));
+          border: 2.5px solid var(--slider-color, #0080ff);
+          box-shadow: 0 1px 3px var(--slider-shadow, rgba(0,128,255,0.25));
           cursor: pointer;
           transition: transform 0.15s ease;
         }

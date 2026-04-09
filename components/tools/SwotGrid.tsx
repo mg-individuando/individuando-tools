@@ -35,36 +35,55 @@ export default function SwotGrid({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {orderedSections.map((section) => {
           const field = section.fields[0];
-          const color = section.color || "var(--brand)";
+          const color = section.color || "#0080ff";
           const charCount = (values[field?.id || ""] || "").length;
           const maxLen = field?.maxLength || 0;
-          const isFocused = focusedField === field?.id;
 
           return (
             <div
               key={section.id}
-              className="group bg-card rounded-xl border border-border overflow-hidden transition-all duration-200 hover:shadow-md"
-              style={{ borderLeftWidth: "4px", borderLeftColor: color }}
+              className="group overflow-hidden transition-all duration-200"
+              style={{
+                backdropFilter: "blur(12px)",
+                WebkitBackdropFilter: "blur(12px)",
+                background: "rgba(255,255,255,0.8)",
+                border: "1px solid rgba(0,128,255,0.1)",
+                boxShadow: "rgba(0,128,255,0.08) 0px 4px 24px",
+                borderRadius: "16px",
+                borderLeft: `3px solid ${color}`,
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.boxShadow = "rgba(0,128,255,0.16) 0px 8px 32px";
+                e.currentTarget.style.borderColor = `rgba(0,128,255,0.2)`;
+                e.currentTarget.style.borderLeftColor = color;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.boxShadow = "rgba(0,128,255,0.08) 0px 4px 24px";
+                e.currentTarget.style.borderColor = `rgba(0,128,255,0.1)`;
+                e.currentTarget.style.borderLeftColor = color;
+              }}
             >
               {/* Header */}
               <div className="px-5 pt-4 pb-3">
                 <div className="flex items-center gap-2.5">
                   <div
-                    className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
-                    style={{ backgroundColor: `${section.color || "#2D5A7B"}14` }}
+                    className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
+                    style={{
+                      background: `linear-gradient(135deg, ${color}, ${color}cc)`,
+                    }}
                   >
                     {section.icon ? (
-                      <SectionIcon icon={section.icon} size={18} />
+                      <SectionIcon icon={section.icon} size={18} className="text-white" />
                     ) : (
-                      <span className="text-xs font-bold" style={{ color }}>{section.label.charAt(0)}</span>
+                      <span className="text-xs font-bold text-white">{section.label.charAt(0)}</span>
                     )}
                   </div>
                   <div className="min-w-0">
-                    <h3 className="font-semibold text-sm leading-tight" style={{ color }}>
+                    <h3 className="font-semibold text-[15px] text-[#0f172a] leading-tight">
                       {section.label}
                     </h3>
                     {section.description && (
-                      <p className="text-xs text-muted-foreground mt-0.5 leading-snug">
+                      <p className="text-[13px] text-[#475569] mt-0.5 leading-snug">
                         {section.description}
                       </p>
                     )}
@@ -83,14 +102,14 @@ export default function SwotGrid({
                     required={field.required}
                     readOnly={readOnly}
                     rows={5}
-                    className="w-full rounded-lg border border-border bg-muted/40 px-3.5 py-2.5 text-sm leading-relaxed text-foreground placeholder:text-muted-foreground/50 outline-none resize-none transition-all duration-200 focus:bg-card focus:border-primary/40 focus:ring-2 focus:ring-primary/10"
+                    className="w-full rounded-xl border border-[rgba(0,128,255,0.1)] bg-white/60 px-4 py-3 text-sm leading-relaxed text-[#0f172a] placeholder:text-[#94a3b8] outline-none resize-none transition-all duration-200 focus:border-[#0080ff]/40 focus:ring-2 focus:ring-[#0080ff]/10 focus:bg-white"
                     onFocus={() => setFocusedField(field.id)}
                     onBlur={() => setFocusedField(null)}
                   />
 
                   {field.maxLength != null && field.maxLength > 0 && (
                     <div className="mt-1.5 text-right">
-                      <span className={`text-[11px] tabular-nums ${maxLen > 0 && charCount / maxLen > 0.9 ? "text-destructive" : "text-muted-foreground/50"}`}>
+                      <span className={`text-[11px] tabular-nums ${maxLen > 0 && charCount / maxLen > 0.9 ? "text-red-500" : "text-[#94a3b8]"}`}>
                         {charCount}/{field.maxLength}
                       </span>
                     </div>

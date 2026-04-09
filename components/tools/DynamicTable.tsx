@@ -25,10 +25,7 @@ export default function DynamicTable({
 }: DynamicTableProps) {
   const section = sections[0];
   const fields = section?.fields || [];
-  const color = section?.color || "var(--brand)";
-  /** Returns color with hex-alpha suffix, or color-mix fallback for CSS variables */
-  const colorAlpha = (alpha: string, pct: number) =>
-    section?.color ? `${section.color}${alpha}` : `color-mix(in srgb, var(--brand) ${pct}%, transparent)`;
+  const color = section?.color || "#0080ff";
 
   function createEmptyRow(): MetaRow {
     const row: MetaRow = { id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6) };
@@ -77,45 +74,81 @@ export default function DynamicTable({
     setExpandedRow(expandedRow === rowId ? null : rowId);
   };
 
+  /** Glass card base style object */
+  const glassCard: React.CSSProperties = {
+    backdropFilter: "blur(12px)",
+    WebkitBackdropFilter: "blur(12px)",
+    background: "rgba(255,255,255,0.8)",
+    border: "1px solid rgba(0,128,255,0.1)",
+    boxShadow: "rgba(0,128,255,0.08) 0px 4px 24px",
+    borderRadius: "16px",
+  };
+
+  const glassHover = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.currentTarget.style.boxShadow = "rgba(0,128,255,0.16) 0px 8px 32px";
+    e.currentTarget.style.borderColor = "rgba(0,128,255,0.2)";
+  };
+
+  const glassLeave = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.currentTarget.style.boxShadow = "rgba(0,128,255,0.08) 0px 4px 24px";
+    e.currentTarget.style.borderColor = "rgba(0,128,255,0.1)";
+  };
+
   return (
     <div className="w-full max-w-4xl mx-auto">
       {/* Header */}
-      <div className="flex items-center justify-between mb-5 px-6 py-4 bg-card border border-border rounded-xl transition-all duration-200">
+      <div
+        className="flex items-center justify-between mb-5 px-6 py-4 transition-all duration-200"
+        style={glassCard}
+      >
         <div className="flex items-center gap-3">
           <div
-            className="w-8 h-8 rounded-lg flex items-center justify-center"
-            style={{ backgroundColor: colorAlpha("14", 8) }}
+            className="w-10 h-10 rounded-xl flex items-center justify-center"
+            style={{
+              background: `linear-gradient(135deg, ${color}, ${color}cc)`,
+            }}
           >
-            <SectionIcon icon={section?.icon} size={20} />
+            <SectionIcon icon={section?.icon} size={20} className="text-white" />
           </div>
           <div>
-            <h3 className="font-bold text-base text-foreground">
+            <h3 className="font-semibold text-[15px] text-[#0f172a]">
               {section?.label}
             </h3>
             {section?.description && (
-              <p className="text-xs text-muted-foreground mt-0.5">{section.description}</p>
+              <p className="text-[13px] text-[#475569] mt-0.5">{section.description}</p>
             )}
           </div>
         </div>
         <span
           className="text-sm font-semibold px-3 py-1 rounded-lg"
-          style={{ backgroundColor: colorAlpha("18", 10), color }}
+          style={{
+            background: `linear-gradient(135deg, ${color}18, ${color}10)`,
+            color,
+          }}
         >
           {rows.length} {rows.length === 1 ? "meta" : "metas"}
         </span>
       </div>
 
       {/* Desktop: table layout */}
-      <div className="hidden md:block bg-card border border-border rounded-xl overflow-hidden transition-all duration-200">
+      <div
+        className="hidden md:block overflow-hidden transition-all duration-200"
+        style={glassCard}
+        onMouseEnter={glassHover}
+        onMouseLeave={glassLeave}
+      >
         {/* Table header */}
-        <div className="flex items-center gap-0 px-5 py-3 bg-muted/50">
-          <div className="w-12 shrink-0 text-xs font-semibold text-foreground uppercase tracking-wider">
+        <div
+          className="flex items-center gap-0 px-5 py-3"
+          style={{ background: "rgba(0,128,255,0.03)" }}
+        >
+          <div className="w-12 shrink-0 text-xs font-semibold text-[#0f172a] uppercase tracking-wider">
             #
           </div>
           {fields.map((field) => (
             <div
               key={field.id}
-              className="flex-1 text-xs font-semibold text-foreground uppercase tracking-wider px-2"
+              className="flex-1 text-xs font-semibold text-[#0f172a] uppercase tracking-wider px-2"
             >
               {field.label}
             </div>
@@ -129,14 +162,16 @@ export default function DynamicTable({
             key={row.id}
             className="flex items-start gap-0 px-5 py-3 transition-all duration-200"
             style={{
-              backgroundColor: index % 2 === 0 ? "transparent" : "hsl(var(--muted) / 0.3)",
+              backgroundColor: index % 2 === 0 ? "transparent" : "rgba(0,128,255,0.02)",
             }}
           >
             {/* Row number */}
             <div className="w-12 shrink-0 pt-2">
               <span
-                className="inline-flex items-center justify-center w-6 h-6 rounded-md text-xs font-bold text-white"
-                style={{ backgroundColor: color }}
+                className="inline-flex items-center justify-center w-6 h-6 rounded-lg text-xs font-bold text-white"
+                style={{
+                  background: `linear-gradient(135deg, ${color}, ${color}cc)`,
+                }}
               >
                 {index + 1}
               </span>
@@ -153,7 +188,7 @@ export default function DynamicTable({
                     maxLength={field.maxLength}
                     readOnly={readOnly}
                     rows={2}
-                    className="w-full border border-border bg-muted/40 rounded-lg px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/50 resize-none outline-none transition-all duration-200 focus:border-primary/50 focus:ring-2 focus:ring-primary/20"
+                    className="w-full bg-white/60 border border-[rgba(0,128,255,0.1)] rounded-xl px-4 py-3 text-sm text-[#0f172a] placeholder:text-[#94a3b8] resize-none outline-none transition-all duration-200 focus:border-[#0080ff]/40 focus:ring-2 focus:ring-[#0080ff]/10 focus:bg-white"
                   />
                 ) : (
                   <input
@@ -163,7 +198,7 @@ export default function DynamicTable({
                     placeholder={field.placeholder}
                     maxLength={field.maxLength}
                     readOnly={readOnly}
-                    className="w-full border border-border bg-muted/40 rounded-lg px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/50 outline-none transition-all duration-200 focus:border-primary/50 focus:ring-2 focus:ring-primary/20"
+                    className="w-full bg-white/60 border border-[rgba(0,128,255,0.1)] rounded-xl px-4 py-3 text-sm text-[#0f172a] placeholder:text-[#94a3b8] outline-none transition-all duration-200 focus:border-[#0080ff]/40 focus:ring-2 focus:ring-[#0080ff]/10 focus:bg-white"
                   />
                 )}
               </div>
@@ -175,7 +210,7 @@ export default function DynamicTable({
                 <button
                   onClick={() => removeRow(row.id)}
                   disabled={rows.length <= 1}
-                  className="w-8 h-8 rounded-lg flex items-center justify-center text-muted-foreground/60 hover:text-destructive hover:bg-destructive/10 disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-200"
+                  className="w-8 h-8 rounded-xl flex items-center justify-center text-[#94a3b8] hover:text-red-500 hover:bg-red-50 disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-200"
                   title="Remover meta"
                 >
                   <Trash2 className="w-4 h-4" />
@@ -195,23 +230,26 @@ export default function DynamicTable({
           return (
             <div
               key={row.id}
-              className="bg-card border border-border rounded-xl overflow-hidden transition-all duration-200"
+              className="overflow-hidden transition-all duration-200"
+              style={glassCard}
             >
               <button
                 onClick={() => toggleExpand(row.id)}
-                className="w-full flex items-center gap-3 px-5 py-4 text-left transition-all duration-200 hover:bg-muted/30"
+                className="w-full flex items-center gap-3 px-5 py-4 text-left transition-all duration-200 hover:bg-white/40"
               >
                 <span
-                  className="inline-flex items-center justify-center w-6 h-6 rounded-md text-xs font-bold text-white shrink-0"
-                  style={{ backgroundColor: color }}
+                  className="inline-flex items-center justify-center w-6 h-6 rounded-lg text-xs font-bold text-white shrink-0"
+                  style={{
+                    background: `linear-gradient(135deg, ${color}, ${color}cc)`,
+                  }}
                 >
                   {index + 1}
                 </span>
-                <span className="flex-1 font-semibold text-sm text-foreground truncate">
+                <span className="flex-1 font-semibold text-sm text-[#0f172a] truncate">
                   {metaName || "Nova meta..."}
                 </span>
                 <ChevronDown
-                  className={`w-4 h-4 text-muted-foreground/60 transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`}
+                  className={`w-4 h-4 text-[#94a3b8] transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`}
                 />
               </button>
 
@@ -219,7 +257,7 @@ export default function DynamicTable({
                 <div className="px-5 pb-5 pt-1 space-y-3">
                   {fields.map((field) => (
                     <div key={field.id}>
-                      <label className="text-xs font-semibold text-foreground uppercase tracking-wider mb-1.5 block">
+                      <label className="text-xs font-semibold text-[#0f172a] uppercase tracking-wider mb-1.5 block">
                         {field.label}
                       </label>
                       {field.type === "text_long" ? (
@@ -230,7 +268,7 @@ export default function DynamicTable({
                           maxLength={field.maxLength}
                           readOnly={readOnly}
                           rows={3}
-                          className="w-full border border-border bg-muted/40 rounded-lg px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/50 resize-none outline-none transition-all duration-200 focus:border-primary/50 focus:ring-2 focus:ring-primary/20"
+                          className="w-full bg-white/60 border border-[rgba(0,128,255,0.1)] rounded-xl px-4 py-3 text-sm text-[#0f172a] placeholder:text-[#94a3b8] resize-none outline-none transition-all duration-200 focus:border-[#0080ff]/40 focus:ring-2 focus:ring-[#0080ff]/10 focus:bg-white"
                         />
                       ) : (
                         <input
@@ -240,7 +278,7 @@ export default function DynamicTable({
                           placeholder={field.placeholder}
                           maxLength={field.maxLength}
                           readOnly={readOnly}
-                          className="w-full border border-border bg-muted/40 rounded-lg px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/50 outline-none transition-all duration-200 focus:border-primary/50 focus:ring-2 focus:ring-primary/20"
+                          className="w-full bg-white/60 border border-[rgba(0,128,255,0.1)] rounded-xl px-4 py-3 text-sm text-[#0f172a] placeholder:text-[#94a3b8] outline-none transition-all duration-200 focus:border-[#0080ff]/40 focus:ring-2 focus:ring-[#0080ff]/10 focus:bg-white"
                         />
                       )}
                     </div>
@@ -249,7 +287,7 @@ export default function DynamicTable({
                     <button
                       onClick={() => removeRow(row.id)}
                       disabled={rows.length <= 1}
-                      className="flex items-center gap-1.5 text-xs text-muted-foreground/60 hover:text-destructive hover:bg-destructive/10 disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-200 px-2 py-1.5 rounded-lg"
+                      className="flex items-center gap-1.5 text-xs text-[#94a3b8] hover:text-red-500 hover:bg-red-50 disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-200 px-2 py-1.5 rounded-xl"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                       Remover esta meta
@@ -266,7 +304,7 @@ export default function DynamicTable({
       {!readOnly && (
         <button
           onClick={addRow}
-          className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-3.5 border-2 border-dashed border-border rounded-xl font-semibold text-sm transition-all duration-200 hover:border-primary/40 hover:shadow-md"
+          className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-3.5 border-2 border-dashed border-[rgba(0,128,255,0.2)] rounded-2xl font-semibold text-sm transition-all duration-200 hover:border-[#0080ff]/40 hover:bg-white/60 hover:shadow-lg"
           style={{ color }}
         >
           <Plus className="w-4 h-4" />
