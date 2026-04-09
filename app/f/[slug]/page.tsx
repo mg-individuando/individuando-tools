@@ -256,10 +256,14 @@ export default function PublicFormPage({
                 <div className="flex-1 min-w-0 flex flex-col justify-center" style={{ order: 2 }}>
                   {bannerConfig.title && (
                     <p
-                      className="font-semibold leading-tight truncate"
+                      className="font-semibold leading-tight"
                       style={{
                         color: bannerConfig.titleColor || "#FFFFFF",
                         fontSize: `${bannerConfig.titleSize || 22}px`,
+                        display: "-webkit-box",
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: "vertical" as const,
+                        overflow: "hidden",
                         textAlign: bannerConfig.titlePosition || "center",
                         fontFamily: fontFamily || undefined,
                       }}
@@ -294,7 +298,7 @@ export default function PublicFormPage({
                 )}
               </div>
             ) : (
-              /* Legacy header layout */
+              /* Legacy header layout — still shows Individuando logo */
               <div className="flex items-center justify-between w-full">
                 <div className="flex items-center gap-3">
                   {client.logo_url && (
@@ -306,9 +310,11 @@ export default function PublicFormPage({
                     </span>
                   )}
                 </div>
-                {client.show_partner_logo && client.partner_logo_url && (
-                  <img src={client.partner_logo_url} alt="Partner" className="h-8 object-contain" />
-                )}
+                <img
+                  src="/logos/individuando/logo-7.svg"
+                  alt="Individuando"
+                  className="h-8 object-contain max-w-[120px]"
+                />
               </div>
             )}
           </div>

@@ -421,83 +421,29 @@ export default function NovoClientePage() {
             </CardContent>
           </Card>
 
-          {/* Section 4: Header */}
+          {/* Section 4: Header / Banner */}
           <Card>
             <CardHeader>
               <CardTitle className="font-sans text-[#2D5A7B]">Header</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-5">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                <ColorField
-                  label="Cor de fundo do header"
-                  value={brand.headerBg!}
-                  onChange={(v) => updateBrand("headerBg", v)}
-                />
-                <ColorField
-                  label="Cor do texto do header"
-                  value={brand.headerTextColor!}
-                  onChange={(v) => updateBrand("headerTextColor", v)}
-                />
-              </div>
-
-              <FileUpload
-                bucket="client-assets"
-                path={`headers/${slugified}`}
-                accept="image/png,image/jpeg,image/svg+xml,image/webp"
-                label="Imagem de fundo do header"
-                hint="PNG, JPG ou SVG. Máximo 5MB. Recomendado: 1200x200px."
-                currentUrl={brand.headerBgImage || undefined}
-                onUpload={(url) => updateBrand("headerBgImage", url)}
-              />
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                <div className="space-y-2">
-                  <Label htmlFor="headerLayout">Layout do header</Label>
-                  <select
-                    id="headerLayout"
-                    value={brand.headerLayout ?? "logo-left"}
-                    onChange={(e) => updateBrand("headerLayout", e.target.value)}
-                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                  >
-                    {HEADER_LAYOUT_OPTIONS.map((opt) => (
-                      <option key={opt.value} value={opt.value}>
-                        {opt.label}
-                      </option>
-                    ))}
-                  </select>
+            <CardContent className="space-y-4">
+              <p className="text-sm text-gray-500">
+                Configure o banner do header com cores, gradientes, texto, logo do cliente e logo Individuando.
+              </p>
+              <Button
+                type="button"
+                onClick={() => setBannerOpen(true)}
+                className="gap-2 bg-[#1e2f4c] hover:bg-[#162340]"
+              >
+                <Paintbrush className="h-4 w-4" />
+                {brand.bannerConfig ? "Editar Header" : "Criar Header"}
+              </Button>
+              {brand.bannerConfig && (
+                <div className="flex items-center gap-2 mt-2">
+                  <div className="w-2 h-2 rounded-full bg-green-500" />
+                  <p className="text-xs text-green-600">Header configurado</p>
                 </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="headerHeight">Altura do header</Label>
-                  <select
-                    id="headerHeight"
-                    value={brand.headerHeight ?? "normal"}
-                    onChange={(e) => updateBrand("headerHeight", e.target.value)}
-                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                  >
-                    {HEADER_HEIGHT_OPTIONS.map((opt) => (
-                      <option key={opt.value} value={opt.value}>
-                        {opt.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              <div className="pt-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setBannerOpen(true)}
-                  className="gap-2"
-                >
-                  <Paintbrush className="h-4 w-4" />
-                  {brand.bannerConfig ? "Editar Banner" : "Criar Banner"}
-                </Button>
-                {brand.bannerConfig && (
-                  <p className="text-xs text-green-600 mt-1">Banner configurado</p>
-                )}
-              </div>
+              )}
             </CardContent>
           </Card>
 
