@@ -8,12 +8,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { Separator } from "@/components/ui/separator";
 import { FileUpload } from "@/components/ui/file-upload";
 import { toast } from "sonner";
-import { ArrowLeft, Save, Eye, Trash2, ExternalLink } from "lucide-react";
+import { ArrowLeft, Save, Eye, Trash2, Paintbrush } from "lucide-react";
 import Link from "next/link";
 import type { Client, BrandConfig } from "@/lib/schemas/types";
+import { BannerCreator, type BannerConfig } from "@/components/ui/banner-creator";
 
 const FONT_OPTIONS = [
   "Montserrat",
@@ -98,6 +98,7 @@ export default function EditClientPage({
   const [logoUrl, setLogoUrl] = useState("");
   const [partnerLogoUrl, setPartnerLogoUrl] = useState("");
   const [showPartnerLogo, setShowPartnerLogo] = useState(false);
+  const [bannerOpen, setBannerOpen] = useState(false);
 
   // Brand config (extra header fields stored as arbitrary keys in the JSONB)
   const [brand, setBrand] = useState<Record<string, any>>({
@@ -546,21 +547,19 @@ export default function EditClientPage({
                 </div>
               </div>
 
-              <Separator />
-
-              <div className="space-y-2">
-                <p className="text-xs text-muted-foreground">
-                  Dica: crie um banner de header personalizado no Canva com tamanho 1200×200px e faça upload acima.
-                </p>
-                <a
-                  href="https://www.canva.com/create/banners/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 rounded-lg bg-[#7B2FBE] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#6a28a6]"
+              <div className="pt-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setBannerOpen(true)}
+                  className="gap-2"
                 >
-                  <ExternalLink className="h-4 w-4" />
-                  Abrir Canva — Criar Banner
-                </a>
+                  <Paintbrush className="h-4 w-4" />
+                  {brand.bannerConfig ? "Editar Banner" : "Criar Banner"}
+                </Button>
+                {brand.bannerConfig && (
+                  <p className="text-xs text-green-600 mt-1">Banner configurado</p>
+                )}
               </div>
             </CardContent>
           </Card>
@@ -640,11 +639,19 @@ export default function EditClientPage({
                       backgroundColor: brand.headerBg,
                       color: brand.headerTextColor,
                       height: headerHeightPx,
-                      backgroundImage: brand.headerBgImage
-                        ? `url(${brand.headerBgImage})`
-                        : undefined,
-                      backgroundSize: "cover",
-                      backgroundPosition: "center",
+                      ...(brand.bannerConfig?.backgroundType === "gradient"
+                        ? {
+                            background: `linear-gradient(${brand.bannerConfig.gradientDirection}, ${brand.bannerConfig.gradientFrom}, ${brand.bannerConfig.gradientTo})`,
+                          }
+                        : brand.bannerConfig?.backgroundType === "solid"
+                          ? { backgroundColor: brand.bannerConfig.backgroundColor }
+                          : brand.headerBgImage
+                            ? {
+                                backgroundImage: `url(${brand.headerBgImage})`,
+                                backgroundSize: "cover",
+                                backgroundPosition: "center",
+                              }
+                            : {}),
                       justifyContent:
                         brand.headerLayout === "logo-center"
                           ? "center"
@@ -755,6 +762,15 @@ export default function EditClientPage({
           </div>
         </div>
       </div>
+
+      <BannerCreator
+        open={bannerOpen}
+        onClose={() => setBannerOpen(false)}
+        onSave={(config: BannerConfig) => updateBrand("bannerConfig", config)}
+        initialConfig={brand.bannerConfig}
+        logoUrl={logoUrl}
+        clientName={name}
+      />
     </div>
   );
 }
