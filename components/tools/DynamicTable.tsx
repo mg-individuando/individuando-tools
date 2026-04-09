@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import type { Section } from "@/lib/schemas/tool-schema";
+import type { Section, Field } from "@/lib/schemas/tool-schema";
 import { Plus, Trash2, ChevronDown } from "lucide-react";
 import SectionIcon from "./SectionIcon";
+import InlineEdit from "./InlineEdit";
 
 interface DynamicTableProps {
   sections: Section[];
@@ -13,7 +14,7 @@ interface DynamicTableProps {
   onSectionClick?: (sectionIndex: number) => void;
   selectedSectionIndex?: number;
   onSectionUpdate?: (sectionIndex: number, updates: Partial<Section>) => void;
-  onFieldUpdate?: (sectionIndex: number, fieldIndex: number, updates: Partial<import("@/lib/schemas/tool-schema").Field>) => void;
+  onFieldUpdate?: (sectionIndex: number, fieldIndex: number, updates: Partial<Field>) => void;
 }
 
 interface MetaRow {
@@ -28,10 +29,13 @@ export default function DynamicTable({
   readOnly = false,
   onSectionClick,
   selectedSectionIndex,
+  onSectionUpdate,
+  onFieldUpdate,
 }: DynamicTableProps) {
   const section = sections[0];
   const fields = section?.fields || [];
   const color = section?.color || "#0080ff";
+  const isBuilder = !!onSectionUpdate;
 
   function createEmptyRow(): MetaRow {
     const row: MetaRow = { id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6) };
@@ -80,7 +84,6 @@ export default function DynamicTable({
     setExpandedRow(expandedRow === rowId ? null : rowId);
   };
 
-  /** Glass card base style object */
   const glassCard: React.CSSProperties = {
     backdropFilter: "blur(12px)",
     WebkitBackdropFilter: "blur(12px)",
@@ -117,11 +120,32 @@ export default function DynamicTable({
             <SectionIcon icon={section?.icon} size={20} className="text-white" />
           </div>
           <div>
-            <h3 className="font-semibold text-[15px] text-[#0f172a]">
-              {section?.label}
-            </h3>
-            {section?.description && (
-              <p className="text-[13px] text-[#475569] mt-0.5">{section.description}</p>
+            {isBuilder ? (
+              <>
+                <InlineEdit
+                  value={section?.label || ""}
+                  onChange={(v) => onSectionUpdate!(0, { label: v })}
+                  tag="h3"
+                  className="font-semibold text-[15px] text-[#0f172a]"
+                  placeholder="Nome da tabela"
+                />
+                <InlineEdit
+                  value={section?.description || ""}
+                  onChange={(v) => onSectionUpdate!(0, { description: v })}
+                  tag="p"
+                  className="text-[13px] text-[#475569] mt-0.5"
+                  placeholder="Descrição"
+                />
+              </>
+            ) : (
+              <>
+                <h3 className="font-semibold text-[15px] text-[#0f172a]">
+                  {section?.label}
+                </h3>
+                {section?.description && (
+                  <p className="text-[13px] text-[#475569] mt-0.5">{section.description}</p>
+                )}
+              </>
             )}
           </div>
         </div>
@@ -151,12 +175,22 @@ export default function DynamicTable({
           <div className="w-12 shrink-0 text-xs font-semibold text-[#0f172a] uppercase tracking-wider">
             #
           </div>
-          {fields.map((field) => (
+          {fields.map((field, fieldIndex) => (
             <div
               key={field.id}
               className="flex-1 text-xs font-semibold text-[#0f172a] uppercase tracking-wider px-2"
             >
-              {field.label}
+              {isBuilder ? (
+                <InlineEdit
+                  value={field.label || ""}
+                  onChange={(v) => onFieldUpdate!(0, fieldIndex, { label: v })}
+                  tag="span"
+                  className="text-xs font-semibold text-[#0f172a] uppercase tracking-wider"
+                  placeholder="Coluna"
+                />
+              ) : (
+                field.label
+              )}
             </div>
           ))}
           {!readOnly && <div className="w-10 shrink-0" />}
@@ -171,7 +205,6 @@ export default function DynamicTable({
               backgroundColor: index % 2 === 0 ? "transparent" : "rgba(0,128,255,0.02)",
             }}
           >
-            {/* Row number */}
             <div className="w-12 shrink-0 pt-2">
               <span
                 className="inline-flex items-center justify-center w-6 h-6 rounded-lg text-xs font-bold text-white"
@@ -183,7 +216,6 @@ export default function DynamicTable({
               </span>
             </div>
 
-            {/* Fields */}
             {fields.map((field) => (
               <div key={field.id} className="flex-1 px-2">
                 {field.type === "text_long" ? (
@@ -210,7 +242,6 @@ export default function DynamicTable({
               </div>
             ))}
 
-            {/* Delete button */}
             {!readOnly && (
               <div className="w-10 shrink-0 pt-1.5">
                 <button

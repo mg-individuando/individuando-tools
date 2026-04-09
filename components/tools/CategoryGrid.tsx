@@ -1,8 +1,9 @@
 "use client";
 
-import type { Section } from "@/lib/schemas/tool-schema";
+import type { Section, Field } from "@/lib/schemas/tool-schema";
 import { Check } from "lucide-react";
 import SectionIcon from "./SectionIcon";
+import InlineEdit from "./InlineEdit";
 
 interface CategoryGridProps {
   sections: Section[];
@@ -12,7 +13,7 @@ interface CategoryGridProps {
   onSectionClick?: (sectionIndex: number) => void;
   selectedSectionIndex?: number;
   onSectionUpdate?: (sectionIndex: number, updates: Partial<Section>) => void;
-  onFieldUpdate?: (sectionIndex: number, fieldIndex: number, updates: Partial<import("@/lib/schemas/tool-schema").Field>) => void;
+  onFieldUpdate?: (sectionIndex: number, fieldIndex: number, updates: Partial<Field>) => void;
 }
 
 export default function CategoryGrid({
@@ -22,9 +23,12 @@ export default function CategoryGrid({
   readOnly = false,
   onSectionClick,
   selectedSectionIndex,
+  onSectionUpdate,
+  onFieldUpdate,
 }: CategoryGridProps) {
   const totalSelected = Object.values(values).filter(Boolean).length;
   const totalFields = sections.reduce((sum, s) => sum + s.fields.length, 0);
+  const isBuilder = !!onSectionUpdate;
 
   return (
     <div className="w-full max-w-5xl mx-auto">
@@ -50,16 +54,18 @@ export default function CategoryGrid({
 
       {/* Category cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-        {sections.map((section) => {
+        {sections.map((section, sectionIndex) => {
           const selectedInCategory = section.fields.filter(
             (f) => values[f.id]
           ).length;
           const color = section.color || "#0080ff";
+          const isSelected = onSectionClick && selectedSectionIndex === sectionIndex;
 
           return (
             <div
               key={section.id}
-              className="overflow-hidden transition-all duration-200"
+              className={`overflow-hidden transition-all duration-200 ${onSectionClick ? "cursor-pointer" : ""} ${isSelected ? "ring-2 ring-[#0080ff] ring-offset-2" : onSectionClick ? "hover:ring-1 hover:ring-[#0080ff]/30 hover:ring-offset-1" : ""}`}
+              onClick={onSectionClick ? (e) => { e.stopPropagation(); onSectionClick(sectionIndex); } : undefined}
               style={{
                 backdropFilter: "blur(12px)",
                 WebkitBackdropFilter: "blur(12px)",
@@ -91,9 +97,19 @@ export default function CategoryGrid({
                   >
                     <SectionIcon icon={section.icon} size={18} className="text-white" />
                   </div>
-                  <h3 className="font-semibold text-[15px] text-[#0f172a] flex-1 min-w-0 truncate">
-                    {section.label}
-                  </h3>
+                  {isBuilder ? (
+                    <InlineEdit
+                      value={section.label}
+                      onChange={(v) => onSectionUpdate!(sectionIndex, { label: v })}
+                      tag="h3"
+                      className="font-semibold text-[15px] text-[#0f172a] flex-1 min-w-0"
+                      placeholder="Nome da categoria"
+                    />
+                  ) : (
+                    <h3 className="font-semibold text-[15px] text-[#0f172a] flex-1 min-w-0 truncate">
+                      {section.label}
+                    </h3>
+                  )}
                   <span
                     className="rounded-full text-xs px-2.5 py-0.5 font-semibold shrink-0"
                     style={{
@@ -105,15 +121,25 @@ export default function CategoryGrid({
                   </span>
                 </div>
 
-                {section.description && (
+                {isBuilder ? (
+                  <div className="ml-[50px]">
+                    <InlineEdit
+                      value={section.description || ""}
+                      onChange={(v) => onSectionUpdate!(sectionIndex, { description: v })}
+                      tag="p"
+                      className="text-[13px] text-[#475569] mb-3 leading-relaxed"
+                      placeholder="Descrição da categoria"
+                    />
+                  </div>
+                ) : section.description ? (
                   <p className="text-[13px] text-[#475569] mb-3 leading-relaxed ml-[50px]">
                     {section.description}
                   </p>
-                )}
+                ) : null}
 
                 {/* Checkbox list */}
                 <div className="space-y-1">
-                  {section.fields.map((field) => {
+                  {section.fields.map((field, fieldIndex) => {
                     const isChecked = !!values[field.id];
 
                     return (
@@ -154,15 +180,25 @@ export default function CategoryGrid({
                           </div>
                         </div>
 
-                        <span
-                          className={`text-sm leading-snug ${
-                            isChecked
-                              ? "text-[#0f172a] font-medium"
-                              : "text-[#475569]"
-                          }`}
-                        >
-                          {field.label}
-                        </span>
+                        {isBuilder ? (
+                          <InlineEdit
+                            value={field.label || ""}
+                            onChange={(v) => onFieldUpdate!(sectionIndex, fieldIndex, { label: v })}
+                            tag="span"
+                            className={`text-sm leading-snug ${isChecked ? "text-[#0f172a] font-medium" : "text-[#475569]"}`}
+                            placeholder="Label do item"
+                          />
+                        ) : (
+                          <span
+                            className={`text-sm leading-snug ${
+                              isChecked
+                                ? "text-[#0f172a] font-medium"
+                                : "text-[#475569]"
+                            }`}
+                          >
+                            {field.label}
+                          </span>
+                        )}
                       </label>
                     );
                   })}

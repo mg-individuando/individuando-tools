@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import type { Section } from "@/lib/schemas/tool-schema";
+import type { Section, Field } from "@/lib/schemas/tool-schema";
 import { ChevronDown } from "lucide-react";
 import SectionIcon from "./SectionIcon";
+import InlineEdit from "./InlineEdit";
 
 const circleColors: Record<string, string> = {
   "circle-top": "#EC4899",
@@ -20,7 +21,7 @@ interface IkigaiDiagramProps {
   onSectionClick?: (sectionIndex: number) => void;
   selectedSectionIndex?: number;
   onSectionUpdate?: (sectionIndex: number, updates: Partial<Section>) => void;
-  onFieldUpdate?: (sectionIndex: number, fieldIndex: number, updates: Partial<import("@/lib/schemas/tool-schema").Field>) => void;
+  onFieldUpdate?: (sectionIndex: number, fieldIndex: number, updates: Partial<Field>) => void;
 }
 
 export default function IkigaiDiagram({
@@ -30,20 +31,121 @@ export default function IkigaiDiagram({
   readOnly = false,
   onSectionClick,
   selectedSectionIndex,
+  onSectionUpdate,
+  onFieldUpdate,
 }: IkigaiDiagramProps) {
   const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({
     circles: true,
     intersections: true,
     center: true,
   });
+  const isBuilder = !!onSectionUpdate;
 
-  const mainCircles = sections.filter((s) => s.position?.startsWith("circle-"));
-  const intersections = sections.filter((s) => s.position?.startsWith("intersect-"));
-  const centerSection = sections.find((s) => s.position === "center");
+  const mainCircles = sections.map((s, i) => ({ section: s, originalIndex: i })).filter(({ section }) => section.position?.startsWith("circle-"));
+  const intersections = sections.map((s, i) => ({ section: s, originalIndex: i })).filter(({ section }) => section.position?.startsWith("intersect-"));
+  const centerEntry = sections.map((s, i) => ({ section: s, originalIndex: i })).find(({ section }) => section.position === "center");
 
   const toggleGroup = (group: string) => {
     setExpandedGroups((prev) => ({ ...prev, [group]: !prev[group] }));
   };
+
+  function renderSectionCard(section: Section, originalIndex: number, opts: { rows?: number; titleSize?: string } = {}) {
+    const field = section.fields[0];
+    const baseColor = section.color || circleColors[section.position || ""] || "#6366f1";
+    const charCount = (values[field?.id || ""] || "").length;
+    const maxLen = field?.maxLength || 0;
+    const isSelected = onSectionClick && selectedSectionIndex === originalIndex;
+    const rows = opts.rows ?? 4;
+
+    return (
+      <div
+        key={section.id}
+        className={`bg-card border border-border rounded-xl overflow-hidden hover:shadow-md transition-all duration-200 ${onSectionClick ? "cursor-pointer" : ""} ${isSelected ? "ring-2 ring-[#0080ff] ring-offset-2" : ""}`}
+        onClick={onSectionClick ? (e) => { e.stopPropagation(); onSectionClick(originalIndex); } : undefined}
+      >
+        <div className="flex items-stretch">
+          <div className="w-1 shrink-0" style={{ backgroundColor: baseColor }} />
+          <div className="flex-1 p-4">
+            {/* Header */}
+            <div className="flex items-center gap-2.5 mb-1">
+              <div
+                className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
+                style={{ backgroundColor: `${baseColor}14` }}
+              >
+                <SectionIcon icon={section.icon} size={18} />
+              </div>
+              {isBuilder ? (
+                <InlineEdit
+                  value={section.label}
+                  onChange={(v) => onSectionUpdate!(originalIndex, { label: v })}
+                  tag="h3"
+                  className={`font-semibold ${opts.titleSize || "text-[15px]"}`}
+                  style={{ color: baseColor }}
+                  placeholder="Nome da seção"
+                />
+              ) : (
+                <h4
+                  className={`font-semibold ${opts.titleSize || "text-[15px]"}`}
+                  style={{ color: baseColor }}
+                >
+                  {section.label}
+                </h4>
+              )}
+            </div>
+
+            {isBuilder ? (
+              <div className="ml-[42px]">
+                <InlineEdit
+                  value={section.description || ""}
+                  onChange={(v) => onSectionUpdate!(originalIndex, { description: v })}
+                  tag="p"
+                  className="text-xs text-muted-foreground mb-3 leading-relaxed"
+                  placeholder="Descrição"
+                />
+              </div>
+            ) : section.description ? (
+              <p className="text-xs text-muted-foreground mb-3 leading-relaxed ml-[42px]">
+                {section.description}
+              </p>
+            ) : null}
+
+            {field && (
+              <div>
+                {isBuilder && (
+                  <div className="mb-1">
+                    <InlineEdit
+                      value={field.placeholder || ""}
+                      onChange={(v) => onFieldUpdate!(originalIndex, 0, { placeholder: v })}
+                      tag="span"
+                      className="text-[11px] text-[#94a3b8] italic"
+                      placeholder="Placeholder"
+                    />
+                  </div>
+                )}
+                <textarea
+                  value={values[field.id] || ""}
+                  onChange={(e) => onChange(field.id, e.target.value)}
+                  placeholder={field.placeholder}
+                  maxLength={field.maxLength}
+                  required={field.required}
+                  readOnly={readOnly}
+                  rows={rows}
+                  className="w-full glass-input resize-none"
+                />
+                {maxLen > 0 && (
+                  <div className="mt-1.5 text-right">
+                    <span className={`text-xs tabular-nums ${charCount > maxLen * 0.9 ? "text-destructive" : "text-muted-foreground"}`}>
+                      {charCount}/{maxLen}
+                    </span>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full max-w-5xl mx-auto">
@@ -87,72 +189,7 @@ export default function IkigaiDiagram({
 
         {expandedGroups.circles && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {mainCircles.map((section) => {
-              const field = section.fields[0];
-              const baseColor = section.color || circleColors[section.position || ""] || "#6366f1";
-              const charCount = (values[field?.id || ""] || "").length;
-              const maxLen = field?.maxLength || 0;
-
-              return (
-                <div
-                  key={section.id}
-                  className="bg-card border border-border rounded-xl overflow-hidden hover:shadow-md transition-all duration-200"
-                >
-                  <div className="flex items-stretch">
-                    {/* Colored left accent */}
-                    <div
-                      className="w-1 shrink-0"
-                      style={{ backgroundColor: baseColor }}
-                    />
-                    <div className="flex-1 p-4">
-                      {/* Header */}
-                      <div className="flex items-center gap-2.5 mb-1">
-                        <div
-                          className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
-                          style={{ backgroundColor: `${baseColor}14` }}
-                        >
-                          <SectionIcon icon={section.icon} size={18} />
-                        </div>
-                        <h4
-                          className="font-semibold text-[15px]"
-                          style={{ color: baseColor }}
-                        >
-                          {section.label}
-                        </h4>
-                      </div>
-
-                      {section.description && (
-                        <p className="text-xs text-muted-foreground mb-3 leading-relaxed ml-[42px]">
-                          {section.description}
-                        </p>
-                      )}
-
-                      {field && (
-                        <div>
-                          <textarea
-                            value={values[field.id] || ""}
-                            onChange={(e) => onChange(field.id, e.target.value)}
-                            placeholder={field.placeholder}
-                            maxLength={field.maxLength}
-                            required={field.required}
-                            readOnly={readOnly}
-                            rows={4}
-                            className="w-full glass-input resize-none"
-                          />
-                          {maxLen > 0 && (
-                            <div className="mt-1.5 text-right">
-                              <span className={`text-xs tabular-nums ${charCount > maxLen * 0.9 ? "text-destructive" : "text-muted-foreground"}`}>
-                                {charCount}/{maxLen}
-                              </span>
-                            </div>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
+            {mainCircles.map(({ section, originalIndex }) => renderSectionCard(section, originalIndex))}
           </div>
         )}
       </div>
@@ -173,75 +210,13 @@ export default function IkigaiDiagram({
 
         {expandedGroups.intersections && (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {intersections.map((section) => {
-              const field = section.fields[0];
-              const baseColor = section.color || "#6366f1";
-              const charCount = (values[field?.id || ""] || "").length;
-              const maxLen = field?.maxLength || 0;
-
-              return (
-                <div
-                  key={section.id}
-                  className="bg-muted/30 border border-border rounded-xl overflow-hidden hover:shadow-md transition-all duration-200"
-                >
-                  <div className="flex items-stretch">
-                    <div
-                      className="w-1 shrink-0"
-                      style={{ backgroundColor: baseColor }}
-                    />
-                    <div className="flex-1 p-4">
-                      <div className="flex items-center gap-2.5 mb-1">
-                        <div
-                          className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
-                          style={{ backgroundColor: `${baseColor}14` }}
-                        >
-                          <SectionIcon icon={section.icon} size={18} />
-                        </div>
-                        <h4
-                          className="font-semibold text-sm"
-                          style={{ color: baseColor }}
-                        >
-                          {section.label}
-                        </h4>
-                      </div>
-
-                      {section.description && (
-                        <p className="text-xs text-muted-foreground mb-2.5 leading-relaxed ml-[42px]">
-                          {section.description}
-                        </p>
-                      )}
-
-                      {field && (
-                        <div>
-                          <textarea
-                            value={values[field.id] || ""}
-                            onChange={(e) => onChange(field.id, e.target.value)}
-                            placeholder={field.placeholder}
-                            maxLength={field.maxLength}
-                            readOnly={readOnly}
-                            rows={2}
-                            className="w-full glass-input resize-none"
-                          />
-                          {maxLen > 0 && (
-                            <div className="mt-1.5 text-right">
-                              <span className={`text-xs tabular-nums ${charCount > maxLen * 0.9 ? "text-destructive" : "text-muted-foreground"}`}>
-                                {charCount}/{maxLen}
-                              </span>
-                            </div>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
+            {intersections.map(({ section, originalIndex }) => renderSectionCard(section, originalIndex, { rows: 2, titleSize: "text-sm" }))}
           </div>
         )}
       </div>
 
       {/* Section Group: Center - IKIGAI */}
-      {centerSection && (
+      {centerEntry && (
         <div>
           <button
             onClick={() => toggleGroup("center")}
@@ -255,71 +230,11 @@ export default function IkigaiDiagram({
             />
           </button>
 
-          {expandedGroups.center &&
-            (() => {
-              const field = centerSection.fields[0];
-              const baseColor = centerSection.color || "#D97706";
-              const charCount = (values[field?.id || ""] || "").length;
-              const maxLen = field?.maxLength || 0;
-
-              return (
-                <div
-                  className="bg-card border border-border rounded-xl overflow-hidden hover:shadow-md transition-all duration-200"
-                  style={{ borderTop: `3px solid ${baseColor}` }}
-                >
-                  <div className="flex items-stretch">
-                    <div
-                      className="w-1 shrink-0"
-                      style={{ backgroundColor: baseColor }}
-                    />
-                    <div className="flex-1 p-5">
-                      <div className="flex items-center gap-2.5 mb-1">
-                        <div
-                          className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
-                          style={{ backgroundColor: `${baseColor}14` }}
-                        >
-                          <SectionIcon icon={centerSection.icon} size={20} />
-                        </div>
-                        <h4
-                          className="font-bold text-lg"
-                          style={{ color: baseColor }}
-                        >
-                          {centerSection.label}
-                        </h4>
-                      </div>
-
-                      {centerSection.description && (
-                        <p className="text-sm text-muted-foreground mb-4 leading-relaxed ml-[42px]">
-                          {centerSection.description}
-                        </p>
-                      )}
-
-                      {field && (
-                        <div className="max-w-2xl">
-                          <textarea
-                            value={values[field.id] || ""}
-                            onChange={(e) => onChange(field.id, e.target.value)}
-                            placeholder={field.placeholder}
-                            maxLength={field.maxLength}
-                            required={field.required}
-                            readOnly={readOnly}
-                            rows={4}
-                            className="w-full glass-input resize-none"
-                          />
-                          {maxLen > 0 && (
-                            <div className="mt-1.5 text-right">
-                              <span className={`text-xs tabular-nums ${charCount > maxLen * 0.9 ? "text-destructive" : "text-muted-foreground"}`}>
-                                {charCount}/{maxLen}
-                              </span>
-                            </div>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              );
-            })()}
+          {expandedGroups.center && (
+            <div style={{ borderTop: `3px solid ${centerEntry.section.color || "#D97706"}` }} className="rounded-xl overflow-hidden">
+              {renderSectionCard(centerEntry.section, centerEntry.originalIndex, { titleSize: "text-lg" })}
+            </div>
+          )}
         </div>
       )}
     </div>

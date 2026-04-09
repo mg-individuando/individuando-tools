@@ -1,8 +1,9 @@
 "use client";
 
 import { useMemo, useId } from "react";
-import type { Section } from "@/lib/schemas/tool-schema";
+import type { Section, Field } from "@/lib/schemas/tool-schema";
 import SectionIcon from "./SectionIcon";
+import InlineEdit from "./InlineEdit";
 
 interface RadarChartProps {
   sections: Section[];
@@ -10,6 +11,10 @@ interface RadarChartProps {
   onChange: (fieldId: string, value: number) => void;
   readOnly?: boolean;
   size?: number;
+  onSectionClick?: (sectionIndex: number) => void;
+  selectedSectionIndex?: number;
+  onSectionUpdate?: (sectionIndex: number, updates: Partial<Section>) => void;
+  onFieldUpdate?: (sectionIndex: number, fieldIndex: number, updates: Partial<Field>) => void;
 }
 
 /**
@@ -36,7 +41,12 @@ export default function RadarChart({
   onChange,
   readOnly = false,
   size = 400,
+  onSectionClick,
+  selectedSectionIndex,
+  onSectionUpdate,
+  onFieldUpdate,
 }: RadarChartProps) {
+  const isBuilder = !!onSectionUpdate;
   const uid = useId().replace(/:/g, "");
   const center = size / 2;
   const maxRadius = size * 0.36;
@@ -204,7 +214,7 @@ export default function RadarChart({
 
       {/* Dimension cards grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full max-w-2xl">
-        {sections.map((section) => {
+        {sections.map((section, sectionIndex) => {
           const field = section.fields[0];
           const value = values[field.id] ?? (field.defaultValue as number) ?? 0;
           const color = section.color || primaryColorHex;
@@ -215,7 +225,8 @@ export default function RadarChart({
           return (
             <div
               key={section.id}
-              className="overflow-hidden transition-all duration-200"
+              className={`overflow-hidden transition-all duration-200 ${onSectionClick ? "cursor-pointer" : ""} ${onSectionClick && selectedSectionIndex === sectionIndex ? "ring-2 ring-[#0080ff] ring-offset-2" : ""}`}
+              onClick={onSectionClick ? (e) => { e.stopPropagation(); onSectionClick(sectionIndex); } : undefined}
               style={{
                 backdropFilter: "blur(12px)",
                 WebkitBackdropFilter: "blur(12px)",
@@ -248,9 +259,19 @@ export default function RadarChart({
                     >
                       <SectionIcon icon={section.icon} size={18} className="text-white" />
                     </div>
-                    <span className="font-semibold text-[15px] text-[#0f172a] leading-tight">
-                      {section.label}
-                    </span>
+                    {isBuilder ? (
+                      <InlineEdit
+                        value={section.label}
+                        onChange={(v) => onSectionUpdate!(sectionIndex, { label: v })}
+                        tag="span"
+                        className="font-semibold text-[15px] text-[#0f172a] leading-tight"
+                        placeholder="Dimensão"
+                      />
+                    ) : (
+                      <span className="font-semibold text-[15px] text-[#0f172a] leading-tight">
+                        {section.label}
+                      </span>
+                    )}
                   </div>
                   <span
                     className="inline-flex items-center justify-center min-w-[28px] h-7 rounded-lg text-xs font-bold text-white px-1.5"
