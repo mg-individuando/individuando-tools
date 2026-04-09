@@ -645,60 +645,69 @@ export default function EditClientPage({
                           }
                         : brand.bannerConfig?.backgroundType === "solid"
                           ? { backgroundColor: brand.bannerConfig.backgroundColor }
-                          : brand.headerBgImage
+                          : brand.bannerConfig?.backgroundType === "image" && brand.bannerConfig.backgroundImage
                             ? {
-                                backgroundImage: `url(${brand.headerBgImage})`,
+                                backgroundImage: `url(${brand.bannerConfig.backgroundImage})`,
                                 backgroundSize: "cover",
                                 backgroundPosition: "center",
                               }
-                            : {}),
-                      justifyContent:
-                        brand.headerLayout === "logo-center"
-                          ? "center"
-                          : brand.headerLayout === "logo-right"
-                            ? "flex-end"
-                            : "flex-start",
+                            : brand.headerBgImage
+                              ? {
+                                  backgroundImage: `url(${brand.headerBgImage})`,
+                                  backgroundSize: "cover",
+                                  backgroundPosition: "center",
+                                }
+                              : {}),
                     }}
                   >
-                    <div
-                      className="flex items-center gap-3"
-                      style={{
-                        flexDirection:
-                          brand.headerLayout === "logo-right"
-                            ? "row-reverse"
-                            : "row",
-                      }}
-                    >
-                      {logoUrl ? (
-                        <img
-                          src={logoUrl}
-                          alt="Logo"
-                          className="h-10 object-contain max-w-[120px]"
-                        />
-                      ) : (
-                        <div
-                          className="h-8 w-8 rounded-lg flex items-center justify-center text-white text-sm font-bold shrink-0"
-                          style={{ backgroundColor: brand.primaryColor }}
-                        >
-                          {name ? name.charAt(0).toUpperCase() : "C"}
+                    <div className="flex items-center w-full h-full gap-2 px-1">
+                      {brand.bannerConfig?.showClientLogo !== false && (
+                        <div className="flex items-center shrink-0" style={{ order: brand.bannerConfig?.clientLogoPosition === "right" ? 3 : 1 }}>
+                          {logoUrl ? (
+                            <img
+                              src={logoUrl}
+                              alt="Logo"
+                              className="object-contain"
+                              style={{ height: `${Math.min(brand.bannerConfig?.clientLogoSize || 40, 40)}px`, maxWidth: "100px" }}
+                            />
+                          ) : (
+                            <div
+                              className="rounded-lg flex items-center justify-center text-white text-sm font-bold shrink-0"
+                              style={{ backgroundColor: brand.primaryColor, width: "32px", height: "32px" }}
+                            >
+                              {name ? name.charAt(0).toUpperCase() : "C"}
+                            </div>
+                          )}
                         </div>
                       )}
-                      {brand.showNameInHeader !== false && (
-                        <span
-                          style={{ fontWeight: Number(brand.headingWeight) }}
-                          className="text-sm"
-                        >
-                          {name || "Nome do Cliente"}
-                        </span>
+                      <div className="flex-1 min-w-0 flex flex-col justify-center" style={{ order: 2 }}>
+                        {brand.bannerConfig?.title && (
+                          <p className="text-xs font-semibold truncate" style={{ color: brand.bannerConfig.titleColor || "#fff", textAlign: brand.bannerConfig.titlePosition || "center" }}>
+                            {brand.bannerConfig.title}
+                          </p>
+                        )}
+                        {brand.bannerConfig?.subtitle && (
+                          <p className="text-[9px] truncate" style={{ color: brand.bannerConfig.subtitleColor || "rgba(255,255,255,0.7)", textAlign: brand.bannerConfig.titlePosition || "center" }}>
+                            {brand.bannerConfig.subtitle}
+                          </p>
+                        )}
+                        {!brand.bannerConfig?.title && brand.showNameInHeader !== false && (
+                          <span style={{ fontWeight: Number(brand.headingWeight), textAlign: "center" }} className="text-sm text-white">
+                            {name || "Nome do Cliente"}
+                          </span>
+                        )}
+                      </div>
+                      {brand.bannerConfig?.individuandoVariant && (
+                        <div className="flex items-center shrink-0" style={{ order: brand.bannerConfig?.clientLogoPosition === "right" ? 1 : 3 }}>
+                          <img
+                            src={`/logos/individuando/logo-${brand.bannerConfig.individuandoVariant}.svg`}
+                            alt="Individuando"
+                            className="object-contain"
+                            style={{ height: `${Math.min(brand.bannerConfig?.individuandoSize || 30, 30)}px`, maxWidth: "90px" }}
+                          />
+                        </div>
                       )}
                     </div>
-                    {showPartnerLogo && partnerLogoUrl && (
-                      <img
-                        src={partnerLogoUrl}
-                        alt="Partner"
-                        className="h-5 object-contain opacity-60 ml-auto"
-                      />
-                    )}
                   </div>
 
                   {/* Preview Body */}
