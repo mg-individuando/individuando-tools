@@ -820,60 +820,14 @@ export default function NovaFerramentaPage() {
 
       setPdfFileName(file.name);
 
-      // Convert PDF to image using canvas (first page)
+      // Convert PDF to base64 — Claude supports PDF documents natively
       const reader = new FileReader();
-      reader.onload = async () => {
-        const arrayBuffer = reader.result as ArrayBuffer;
-
-        // Use pdfjs to render the first page as image
-        try {
-          const pdfjsLib = await import("pdfjs-dist");
-          pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`;
-
-          const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-          const page = await pdf.getPage(1);
-          const viewport = page.getViewport({ scale: 2.0 });
-
-          const canvas = document.createElement("canvas");
-          canvas.width = viewport.width;
-          canvas.height = viewport.height;
-          const ctx = canvas.getContext("2d")!;
-
-          await page.render({ canvasContext: ctx, viewport, canvas } as any).promise;
-          const imageData = canvas.toDataURL("image/png");
-          setPdfImage(imageData);
-
-          // Extract text
-          const textContent = await page.getTextContent();
-          const extractedText = textContent.items
-            .map((item: any) => item.str)
-            .filter((s: string) => s.trim())
-            .join("\n");
-          setPdfText(extractedText);
-
-          // Check for form fields
-          const annotations = await page.getAnnotations();
-          const formFields = annotations
-            .filter((a: any) => a.subtype === "Widget")
-            .map(
-              (a: any) =>
-                `Campo "${a.fieldName || "sem nome"}": tipo=${a.fieldType || "Text"}, rect=[${a.rect.map((r: number) => Math.round(r)).join(",")}]`
-            )
-            .join("\n");
-          if (formFields) setPdfFields(formFields);
-
-          toast.success("PDF carregado com sucesso!");
-        } catch (err) {
-          console.error("PDF rendering error:", err);
-          // Fallback: try to use the file as-is by converting to base64
-          const base64Reader = new FileReader();
-          base64Reader.onload = () => {
-            toast.info("PDF carregado. A IA analisará o conteúdo textual.");
-          };
-          base64Reader.readAsDataURL(file);
-        }
+      reader.onload = () => {
+        const base64 = reader.result as string;
+        setPdfImage(base64); // data:application/pdf;base64,...
+        toast.success("PDF carregado com sucesso!");
       };
-      reader.readAsArrayBuffer(file);
+      reader.readAsDataURL(file);
       e.target.value = "";
     }
 
@@ -993,35 +947,13 @@ export default function NovaFerramentaPage() {
 
                     {/* PDF preview */}
                     <div className="rounded-lg border overflow-hidden bg-gray-50">
-                      <img
+                      <embed
                         src={pdfImage}
-                        alt="Preview do PDF"
-                        className="w-full h-auto"
+                        type="application/pdf"
+                        className="w-full"
+                        style={{ height: "300px" }}
                       />
                     </div>
-
-                    {/* Extracted info */}
-                    {pdfText && (
-                      <details className="text-xs">
-                        <summary className="text-gray-500 cursor-pointer hover:text-gray-700">
-                          Texto extraído ({pdfText.length} caracteres)
-                        </summary>
-                        <pre className="mt-2 p-2 bg-gray-50 rounded text-gray-600 whitespace-pre-wrap max-h-32 overflow-y-auto">
-                          {pdfText}
-                        </pre>
-                      </details>
-                    )}
-
-                    {pdfFields && (
-                      <details className="text-xs">
-                        <summary className="text-emerald-600 cursor-pointer hover:text-emerald-700 font-medium">
-                          {pdfFields.split("\n").length} campos editáveis detectados
-                        </summary>
-                        <pre className="mt-2 p-2 bg-emerald-50 rounded text-emerald-700 whitespace-pre-wrap">
-                          {pdfFields}
-                        </pre>
-                      </details>
-                    )}
                   </div>
                 )}
               </CardContent>

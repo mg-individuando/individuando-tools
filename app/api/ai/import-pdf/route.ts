@@ -114,18 +114,34 @@ export async function POST(request: NextRequest) {
     // Build the message content
     const content: Anthropic.Messages.ContentBlockParam[] = [];
 
-    // Add the PDF image
+    // Add the PDF as a document (Claude supports PDF natively)
     if (pdfImage.startsWith("data:")) {
-      const match = pdfImage.match(/^data:(image\/\w+);base64,(.+)$/);
+      const match = pdfImage.match(/^data:([^;]+);base64,(.+)$/);
       if (match) {
-        content.push({
-          type: "image",
-          source: {
-            type: "base64",
-            media_type: match[1] as "image/png" | "image/jpeg" | "image/webp" | "image/gif",
-            data: match[2],
-          },
-        });
+        const mediaType = match[1];
+        const base64Data = match[2];
+
+        if (mediaType === "application/pdf") {
+          // Send as document type (Claude PDF support)
+          content.push({
+            type: "document",
+            source: {
+              type: "base64",
+              media_type: "application/pdf",
+              data: base64Data,
+            },
+          } as any);
+        } else {
+          // Send as image (PNG, JPEG, etc.)
+          content.push({
+            type: "image",
+            source: {
+              type: "base64",
+              media_type: mediaType as "image/png" | "image/jpeg" | "image/webp" | "image/gif",
+              data: base64Data,
+            },
+          });
+        }
       }
     }
 
