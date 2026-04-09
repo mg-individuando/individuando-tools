@@ -25,8 +25,11 @@ import {
   Wand2,
   Bot,
   User,
+  Maximize2,
+  X as XIcon,
 } from "lucide-react";
 import Link from "next/link";
+import ToolRenderer from "@/components/tools/ToolRenderer";
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   "grid-2x2": Grid2X2,
@@ -79,6 +82,8 @@ export default function NovaFerramentaPage() {
   const [generatedSettings, setGeneratedSettings] = useState<any>(null);
   const [generatedMeta, setGeneratedMeta] = useState<any>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const [showPreview, setShowPreview] = useState(false);
 
   useEffect(() => {
     async function loadClients() {
@@ -456,12 +461,26 @@ export default function NovaFerramentaPage() {
                   }}
                   className="flex gap-2"
                 >
-                  <Input
+                  <textarea
+                    ref={textareaRef}
                     value={inputMessage}
-                    onChange={(e) => setInputMessage(e.target.value)}
+                    onChange={(e) => {
+                      setInputMessage(e.target.value);
+                      // Auto resize
+                      e.target.style.height = "auto";
+                      e.target.style.height = Math.min(e.target.scrollHeight, 150) + "px";
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && !e.shiftKey) {
+                        e.preventDefault();
+                        sendMessage();
+                      }
+                    }}
                     placeholder="Descreva a ferramenta que você precisa..."
                     disabled={aiLoading}
-                    className="flex-1"
+                    rows={1}
+                    className="flex-1 resize-none rounded-xl border border-gray-200 bg-gray-50/50 px-4 py-3 text-sm text-gray-900 placeholder:text-gray-300 focus:ring-2 focus:ring-purple-200 focus:bg-white focus:border-purple-300 outline-none transition-all"
+                    style={{ minHeight: "44px", maxHeight: "150px" }}
                   />
                   <Button
                     type="submit"
@@ -550,6 +569,15 @@ export default function NovaFerramentaPage() {
                       )}
                     </div>
 
+                    {/* Preview button */}
+                    <button
+                      onClick={() => setShowPreview(true)}
+                      className="w-full flex items-center justify-center gap-2 py-2.5 text-sm font-medium rounded-xl border-2 border-purple-200 text-purple-600 hover:bg-purple-50 transition-colors"
+                    >
+                      <Maximize2 className="w-4 h-4" />
+                      Visualizar Ferramenta
+                    </button>
+
                     {/* Client selector */}
                     <div className="pt-3 border-t space-y-2">
                       <Label className="text-xs">Cliente (opcional)</Label>
@@ -617,6 +645,28 @@ export default function NovaFerramentaPage() {
             </Card>
           </div>
         </div>
+
+        {/* Preview Modal */}
+        {showPreview && generatedSchema && (
+          <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-start justify-center overflow-y-auto p-4 pt-8">
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl relative max-h-[90vh] overflow-y-auto">
+              <div className="sticky top-0 z-10 bg-white border-b px-6 py-4 flex items-center justify-between rounded-t-2xl">
+                <h3 className="font-semibold text-gray-800 font-sans">
+                  Preview: {generatedSchema.title}
+                </h3>
+                <button
+                  onClick={() => setShowPreview(false)}
+                  className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                >
+                  <XIcon className="w-5 h-5 text-gray-500" />
+                </button>
+              </div>
+              <div className="p-6">
+                <ToolRenderer schema={generatedSchema} onSubmit={() => {}} />
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     );
   }

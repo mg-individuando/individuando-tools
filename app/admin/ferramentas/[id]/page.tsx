@@ -33,6 +33,10 @@ import {
   Send,
   Plus,
   Trash2,
+  Sparkles,
+  Bot,
+  Loader2,
+  X as XIcon,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -60,6 +64,16 @@ export default function EditToolPage({
   const [emailList, setEmailList] = useState("");
   const qrRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+
+  // AI assistant state
+  const [showAiPanel, setShowAiPanel] = useState(false);
+  const [aiMessages, setAiMessages] = useState<
+    { role: "user" | "assistant"; content: string }[]
+  >([]);
+  const [aiInput, setAiInput] = useState("");
+  const [aiLoading, setAiLoading] = useState(false);
+  const aiTextareaRef = useRef<HTMLTextAreaElement>(null);
+  const aiChatEndRef = useRef<HTMLDivElement>(null);
   const supabase = createClient();
 
   useEffect(() => {
@@ -218,6 +232,63 @@ export default function EditToolPage({
     window.open(`https://wa.me/?text=${text}`, "_blank");
   }
 
+  async function sendAiEdit() {
+    const msg = aiInput.trim();
+    if (!msg || aiLoading || !editableSchema) return;
+
+    const userMsg = { role: "user" as const, content: msg };
+    const allMessages = [...aiMessages, userMsg];
+    setAiMessages(allMessages);
+    setAiInput("");
+    setAiLoading(true);
+
+    // Reset textarea height
+    if (aiTextareaRef.current) aiTextareaRef.current.style.height = "auto";
+
+    try {
+      // Build context: include the current schema so AI knows what to modify
+      const contextMessage = {
+        role: "user" as const,
+        content: `O schema atual da ferramenta é:\n\`\`\`json\n${JSON.stringify(editableSchema, null, 2)}\n\`\`\`\n\nAgora o usuário quer fazer esta alteração: ${msg}`,
+      };
+
+      const response = await fetch("/api/ai/generate-tool", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          messages: [contextMessage],
+        }),
+      });
+
+      if (!response.ok) throw new Error("Erro na API");
+
+      const data = await response.json();
+
+      setAiMessages((prev) => [
+        ...prev,
+        {
+          role: "assistant",
+          content: data.explanation || "Schema atualizado!",
+        },
+      ]);
+
+      if (data.schema) {
+        setEditableSchema(data.schema as ToolSchema);
+        if (data.meta?.title) setTitle(data.meta.title);
+        toast.success("Ferramenta atualizada pela IA! Revise e salve.");
+      }
+    } catch {
+      toast.error("Erro ao se comunicar com a IA.");
+      setAiMessages((prev) => [
+        ...prev,
+        { role: "assistant", content: "Desculpe, houve um erro. Tente novamente." },
+      ]);
+    } finally {
+      setAiLoading(false);
+      setTimeout(() => aiChatEndRef.current?.scrollIntoView({ behavior: "smooth" }), 100);
+    }
+  }
+
   if (!tool) {
     return (
       <div
@@ -310,12 +381,113 @@ export default function EditToolPage({
 
       {/* Tab Content */}
       {activeTab === "builder" && editableSchema ? (
-        <BuilderPanel
-          schema={editableSchema}
-          onChange={setEditableSchema}
-          onSave={handleBuilderSave}
-          saving={saving}
-        />
+        <div className="space-y-4">
+          {/* AI Edit toggle */}
+          <div className="flex items-center justify-between">
+            <p className="text-sm text-gray-500">
+              Edite visualmente ou peça ajustes para a IA.
+            </p>
+            <Button
+              variant={showAiPanel ? "default" : "outline"}
+              size="sm"
+              onClick={() => setShowAiPanel(!showAiPanel)}
+              className={showAiPanel ? "bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700" : ""}
+            >
+              <Sparkles className="w-4 h-4 mr-1.5" />
+              {showAiPanel ? "Fechar IA" : "Editar com IA"}
+            </Button>
+          </div>
+
+          {/* AI Panel */}
+          {showAiPanel && (
+            <Card className="border-purple-200 bg-gradient-to-b from-purple-50/30 to-white">
+              <CardContent className="pt-4 pb-4">
+                {/* Chat messages */}
+                <div className="max-h-[250px] overflow-y-auto space-y-3 mb-3">
+                  {aiMessages.length === 0 && (
+                    <div className="text-center py-4">
+                      <Bot className="w-8 h-8 text-purple-300 mx-auto mb-2" />
+                      <p className="text-sm text-gray-400">
+                        Peça ajustes à IA: &quot;adicione mais 3 dimensões&quot;, &quot;troque as cores&quot;, &quot;mude para radar&quot;...
+                      </p>
+                    </div>
+                  )}
+                  {aiMessages.map((msg, i) => (
+                    <div
+                      key={i}
+                      className={`flex gap-2 ${msg.role === "user" ? "justify-end" : "justify-start"}`}
+                    >
+                      {msg.role === "assistant" && (
+                        <div className="w-6 h-6 rounded-md bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center shrink-0 mt-0.5">
+                          <Bot className="w-3 h-3 text-white" />
+                        </div>
+                      )}
+                      <div
+                        className={`max-w-[80%] rounded-xl px-3 py-2 text-sm ${
+                          msg.role === "user"
+                            ? "bg-[#2D5A7B] text-white"
+                            : "bg-white border text-gray-700"
+                        }`}
+                      >
+                        {msg.content}
+                      </div>
+                    </div>
+                  ))}
+                  {aiLoading && (
+                    <div className="flex gap-2 justify-start">
+                      <div className="w-6 h-6 rounded-md bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center shrink-0">
+                        <Bot className="w-3 h-3 text-white" />
+                      </div>
+                      <div className="bg-white border rounded-xl px-3 py-2 text-sm text-gray-500 flex items-center gap-2">
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        Atualizando...
+                      </div>
+                    </div>
+                  )}
+                  <div ref={aiChatEndRef} />
+                </div>
+                {/* Input */}
+                <div className="flex gap-2">
+                  <textarea
+                    ref={aiTextareaRef}
+                    value={aiInput}
+                    onChange={(e) => {
+                      setAiInput(e.target.value);
+                      e.target.style.height = "auto";
+                      e.target.style.height = Math.min(e.target.scrollHeight, 100) + "px";
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && !e.shiftKey) {
+                        e.preventDefault();
+                        sendAiEdit();
+                      }
+                    }}
+                    placeholder="Ex: Adicione uma dimensão de &quot;Comunicação&quot;..."
+                    disabled={aiLoading}
+                    rows={1}
+                    className="flex-1 resize-none rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm placeholder:text-gray-300 focus:ring-2 focus:ring-purple-200 focus:border-purple-300 outline-none transition-all"
+                    style={{ minHeight: "40px", maxHeight: "100px" }}
+                  />
+                  <Button
+                    onClick={sendAiEdit}
+                    disabled={!aiInput.trim() || aiLoading}
+                    size="sm"
+                    className="bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 shrink-0 self-end"
+                  >
+                    <Send className="w-4 h-4" />
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          <BuilderPanel
+            schema={editableSchema}
+            onChange={setEditableSchema}
+            onSave={handleBuilderSave}
+            saving={saving}
+          />
+        </div>
       ) : activeTab === "preview" ? (
         <Card>
           <CardContent className="pt-6">
