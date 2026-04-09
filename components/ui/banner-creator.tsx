@@ -151,10 +151,7 @@ export function BannerCreator({
       maxWidth: `${config.logoSize * 3}px`,
       objectFit: "contain" as const,
     };
-    if (config.logoColorEnabled && config.logoColor) {
-      // CSS filter approach for recoloring — works well with SVG and monochrome logos
-      style.filter = `brightness(0) saturate(100%) ${hexToFilter(config.logoColor)}`;
-    }
+    // Note: logo recoloring is done via SVG filter overlay, not CSS filter
     return style;
   }
 
@@ -266,11 +263,37 @@ export function BannerCreator({
                     className="flex items-center mb-1"
                     style={{ justifyContent: getLogoJustify() }}
                   >
-                    <img
-                      src={logoUrl}
-                      alt="Logo"
-                      style={getLogoStyle()}
-                    />
+                    {config.logoColorEnabled ? (
+                      <div style={{ height: `${config.logoSize}px`, maxWidth: `${config.logoSize * 3}px`, position: "relative" }}>
+                        {/* SVG with feColorMatrix for precise recoloring */}
+                        <svg width="0" height="0" style={{ position: "absolute" }}>
+                          <defs>
+                            <filter id="logo-recolor">
+                              <feColorMatrix
+                                type="matrix"
+                                values={colorMatrixFromHex(config.logoColor)}
+                              />
+                            </filter>
+                          </defs>
+                        </svg>
+                        <img
+                          src={logoUrl}
+                          alt="Logo"
+                          style={{
+                            height: `${config.logoSize}px`,
+                            maxWidth: `${config.logoSize * 3}px`,
+                            objectFit: "contain",
+                            filter: "url(#logo-recolor)",
+                          }}
+                        />
+                      </div>
+                    ) : (
+                      <img
+                        src={logoUrl}
+                        alt="Logo"
+                        style={getLogoStyle()}
+                      />
+                    )}
                   </div>
                 )}
                 {config.showLogo && !logoUrl && clientName && (
@@ -767,36 +790,40 @@ function SectionAccordion({
   );
 }
 
-/* ===== Hex to CSS filter helper for logo recoloring ===== */
-function hexToFilter(hex: string): string {
-  // Convert hex to RGB
+/**
+ * Generate an SVG feColorMatrix "values" string that recolors any pixel
+ * to the target hex color while preserving the original alpha channel.
+ *
+ * The matrix replaces R/G/B with the target color's channels,
+ * weighted by the original pixel's luminance. This preserves
+ * anti-aliasing, gradients, and transparency beautifully.
+ */
+function colorMatrixFromHex(hex: string): string {
   const h = hex.replace("#", "");
   const r = parseInt(h.substring(0, 2), 16) / 255;
   const g = parseInt(h.substring(2, 4), 16) / 255;
   const b = parseInt(h.substring(4, 6), 16) / 255;
 
-  // Simple approximation using sepia + hue-rotate + saturate
-  // This won't be perfect for all colors but works well for common cases
-  const max = Math.max(r, g, b);
-  const min = Math.min(r, g, b);
-  const l = (max + min) / 2;
+  // Use luminance coefficients to preserve detail/contrast
+  // Each output channel = targetColor * luminance(input)
+  // Luminance weights: R=0.2126, G=0.7152, B=0.0722
+  const lr = 0.2126;
+  const lg = 0.7152;
+  const lb = 0.0722;
 
-  let hue = 0;
-  let sat = 0;
-
-  if (max !== min) {
-    const d = max - min;
-    sat = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-    if (max === r) hue = ((g - b) / d + (g < b ? 6 : 0)) / 6;
-    else if (max === g) hue = ((b - r) / d + 2) / 6;
-    else hue = ((r - g) / d + 4) / 6;
-  }
-
-  const hueRotate = Math.round(hue * 360);
-  const saturate = Math.round(sat * 100);
-  const brightness = Math.round(l * 200);
-
-  return `sepia(1) hue-rotate(${hueRotate}deg) saturate(${saturate}%) brightness(${brightness}%)`;
+  // feColorMatrix values (5x4 matrix, row-major):
+  // | R' |   | lr*r  lg*r  lb*r  0  0 |   | R |
+  // | G' | = | lr*g  lg*g  lb*g  0  0 | × | G |
+  // | B' |   | lr*b  lg*b  lb*b  0  0 |   | B |
+  // | A' |   |  0     0     0    1  0 |   | A |
+  return [
+    lr * r, lg * r, lb * r, 0, 0,
+    lr * g, lg * g, lb * g, 0, 0,
+    lr * b, lg * b, lb * b, 0, 0,
+    0,      0,      0,      1, 0,
+  ]
+    .map((v) => v.toFixed(4))
+    .join(" ");
 }
 
 export default BannerCreator;
