@@ -10,10 +10,10 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { FileUpload } from "@/components/ui/file-upload";
 import { toast } from "sonner";
-import { ArrowLeft, Save, Eye, Trash2, Paintbrush } from "lucide-react";
+import { ArrowLeft, Save, Eye, Trash2 } from "lucide-react";
 import Link from "next/link";
 import type { Client, BrandConfig } from "@/lib/schemas/types";
-import { BannerCreator, type BannerConfig } from "@/components/ui/banner-creator";
+import { BannerEditor, type BannerConfig, migrateConfig } from "@/components/ui/banner-editor";
 
 const FONT_OPTIONS = [
   "Montserrat",
@@ -99,7 +99,7 @@ export default function EditClientPage({
   const [logoUrl, setLogoUrl] = useState("");
   const [partnerLogoUrl, setPartnerLogoUrl] = useState("");
   const [showPartnerLogo, setShowPartnerLogo] = useState(false);
-  const [bannerOpen, setBannerOpen] = useState(false);
+  // bannerConfig is managed inline via BannerEditor
 
   // Brand config (extra header fields stored as arbitrary keys in the JSONB)
   const [brand, setBrand] = useState<Record<string, any>>({
@@ -485,29 +485,18 @@ export default function EditClientPage({
             </CardContent>
           </Card>
 
-          {/* Section 4: Header / Banner */}
+          {/* Section 4: Header / Banner — Inline Editor */}
           <Card>
             <CardHeader>
               <CardTitle className="font-sans text-[#2D5A7B]">Header</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <p className="text-sm text-gray-500">
-                Configure o banner do header com cores, gradientes, texto, logo do cliente e logo Individuando.
-              </p>
-              <Button
-                type="button"
-                onClick={() => setBannerOpen(true)}
-                className="gap-2 bg-[#1e2f4c] hover:bg-[#162340]"
-              >
-                <Paintbrush className="h-4 w-4" />
-                {brand.bannerConfig ? "Editar Header" : "Criar Header"}
-              </Button>
-              {brand.bannerConfig && (
-                <div className="flex items-center gap-2 mt-2">
-                  <div className="w-2 h-2 rounded-full bg-green-500" />
-                  <p className="text-xs text-green-600">Header configurado</p>
-                </div>
-              )}
+            <CardContent>
+              <BannerEditor
+                config={migrateConfig(brand.bannerConfig || {})}
+                onChange={(cfg) => updateBrand("bannerConfig", cfg)}
+                logoUrl={logoUrl}
+                clientName={name}
+              />
             </CardContent>
           </Card>
 
@@ -736,14 +725,6 @@ export default function EditClientPage({
         </div>
       </div>
 
-      <BannerCreator
-        open={bannerOpen}
-        onClose={() => setBannerOpen(false)}
-        onSave={(config: BannerConfig) => updateBrand("bannerConfig", config)}
-        initialConfig={brand.bannerConfig}
-        logoUrl={logoUrl}
-        clientName={name}
-      />
     </div>
   );
 }
