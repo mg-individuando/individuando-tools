@@ -14,6 +14,8 @@ import {
   Save,
   Undo2,
   Pencil,
+  Trash2,
+  Plus,
 } from "lucide-react";
 
 interface BuilderPanelProps {
@@ -53,6 +55,36 @@ export default function BuilderPanel({ schema, onChange, onSave, saving }: Build
     newFields[fieldIndex] = { ...newFields[fieldIndex], ...updates };
     newSections[sectionIndex] = { ...newSections[sectionIndex], fields: newFields };
     onChange({ ...schema, sections: newSections });
+  };
+
+  const addField = (sectionIndex: number) => {
+    const newSections = [...schema.sections];
+    const section = newSections[sectionIndex];
+    const newId = `${section.id}_item_${Date.now().toString(36)}`;
+    const fieldType = section.fields[0]?.type || "checkbox";
+    const newField: Field = {
+      id: newId,
+      type: fieldType,
+      label: "Novo item",
+    };
+    newSections[sectionIndex] = {
+      ...section,
+      fields: [...section.fields, newField],
+    };
+    onChange({ ...schema, sections: newSections });
+  };
+
+  const removeField = (sectionIndex: number, fieldIndex: number) => {
+    const newSections = [...schema.sections];
+    const section = newSections[sectionIndex];
+    if (section.fields.length <= 1) return;
+    const newFields = section.fields.filter((_, i) => i !== fieldIndex);
+    newSections[sectionIndex] = { ...section, fields: newFields };
+    onChange({ ...schema, sections: newSections });
+    // If the deleted field was selected, deselect
+    if (selected?.type === "field" && selected.sectionIndex === sectionIndex && selected.fieldIndex === fieldIndex) {
+      setSelected({ type: "section", sectionIndex });
+    }
   };
 
   const handleReset = () => {
@@ -119,6 +151,8 @@ export default function BuilderPanel({ schema, onChange, onSave, saving }: Build
             selectedSectionIndex={selected?.type === "section" ? selected.sectionIndex : undefined}
             onSectionUpdate={updateSection}
             onFieldUpdate={updateField}
+            onFieldAdd={addField}
+            onFieldRemove={removeField}
           />
         </div>
       </div>
@@ -274,6 +308,16 @@ export default function BuilderPanel({ schema, onChange, onSave, saving }: Build
                     className="text-xs font-mono"
                   />
                 </div>
+                <Separator />
+                <h4 className="text-xs font-semibold text-gray-500 uppercase">Itens</h4>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full text-xs"
+                  onClick={() => addField(selected.sectionIndex)}
+                >
+                  <Plus className="w-3 h-3 mr-1" /> Adicionar Item
+                </Button>
               </>
             );
           })()}
@@ -356,6 +400,17 @@ export default function BuilderPanel({ schema, onChange, onSave, saving }: Build
                       />
                     </div>
                   </>
+                )}
+                <Separator />
+                {section.fields.length > 1 && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full text-xs text-red-500 hover:text-red-600 hover:bg-red-50 border-red-200"
+                    onClick={() => removeField(selected.sectionIndex, selected.fieldIndex)}
+                  >
+                    <Trash2 className="w-3 h-3 mr-1" /> Remover Item
+                  </Button>
                 )}
               </>
             );

@@ -110,25 +110,7 @@ export default function RadarChart({
   return (
     <div className="flex flex-col items-center gap-8 w-full">
       {/* Radar SVG Section */}
-      <div
-        className="relative w-full max-w-[460px] mx-auto p-4 transition-all duration-200"
-        style={{
-          backdropFilter: "blur(12px)",
-          WebkitBackdropFilter: "blur(12px)",
-          background: "rgba(255,255,255,0.8)",
-          border: "1px solid rgba(0,128,255,0.1)",
-          boxShadow: "rgba(0,128,255,0.08) 0px 4px 24px",
-          borderRadius: "16px",
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.boxShadow = "rgba(0,128,255,0.16) 0px 8px 32px";
-          e.currentTarget.style.borderColor = "rgba(0,128,255,0.2)";
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.boxShadow = "rgba(0,128,255,0.08) 0px 4px 24px";
-          e.currentTarget.style.borderColor = "rgba(0,128,255,0.1)";
-        }}
-      >
+      <div className="relative w-full max-w-[460px] mx-auto p-4">
         <svg
           viewBox={`0 0 ${size} ${size}`}
           className="w-full"

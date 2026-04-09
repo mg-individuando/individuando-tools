@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import type { Section, Field } from "@/lib/schemas/tool-schema";
-import { Plus, Trash2, ChevronDown } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
 import SectionIcon from "./SectionIcon";
 import InlineEdit from "./InlineEdit";
 
@@ -54,7 +54,6 @@ export default function DynamicTable({
   };
 
   const [rows, setRows] = useState<MetaRow[]>(getInitialRows);
-  const [expandedRow, setExpandedRow] = useState<string | null>(null);
 
   const updateRows = (newRows: MetaRow[]) => {
     setRows(newRows);
@@ -65,23 +64,17 @@ export default function DynamicTable({
     const newRow = createEmptyRow();
     const newRows = [...rows, newRow];
     updateRows(newRows);
-    setExpandedRow(newRow.id);
   };
 
   const removeRow = (rowId: string) => {
     if (rows.length <= 1) return;
     updateRows(rows.filter((r) => r.id !== rowId));
-    if (expandedRow === rowId) setExpandedRow(null);
   };
 
   const updateField = (rowId: string, fieldId: string, value: string) => {
     updateRows(
       rows.map((r) => (r.id === rowId ? { ...r, [fieldId]: value } : r))
     );
-  };
-
-  const toggleExpand = (rowId: string) => {
-    setExpandedRow(expandedRow === rowId ? null : rowId);
   };
 
   const glassCard: React.CSSProperties = {
@@ -160,90 +153,33 @@ export default function DynamicTable({
         </span>
       </div>
 
-      {/* Desktop: table layout */}
-      <div
-        className="hidden md:block overflow-hidden transition-all duration-200"
-        style={glassCard}
-        onMouseEnter={glassHover}
-        onMouseLeave={glassLeave}
-      >
-        {/* Table header */}
-        <div
-          className="flex items-center gap-0 px-5 py-3"
-          style={{ background: "rgba(0,128,255,0.03)" }}
-        >
-          <div className="w-12 shrink-0 text-xs font-semibold text-[#0f172a] uppercase tracking-wider">
-            #
-          </div>
-          {fields.map((field, fieldIndex) => (
-            <div
-              key={field.id}
-              className="flex-1 text-xs font-semibold text-[#0f172a] uppercase tracking-wider px-2"
-            >
-              {isBuilder ? (
-                <InlineEdit
-                  value={field.label || ""}
-                  onChange={(v) => onFieldUpdate!(0, fieldIndex, { label: v })}
-                  tag="span"
-                  className="text-xs font-semibold text-[#0f172a] uppercase tracking-wider"
-                  placeholder="Coluna"
-                />
-              ) : (
-                field.label
-              )}
-            </div>
-          ))}
-          {!readOnly && <div className="w-10 shrink-0" />}
-        </div>
-
-        {/* Table rows */}
+      {/* Card layout per row */}
+      <div className="space-y-3">
         {rows.map((row, index) => (
           <div
             key={row.id}
-            className="flex items-start gap-0 px-5 py-3 transition-all duration-200"
-            style={{
-              backgroundColor: index % 2 === 0 ? "transparent" : "rgba(0,128,255,0.02)",
-            }}
+            className="overflow-hidden transition-all duration-200"
+            style={glassCard}
+            onMouseEnter={glassHover}
+            onMouseLeave={glassLeave}
           >
-            <div className="w-12 shrink-0 pt-2">
+            {/* Card header */}
+            <div
+              className="flex items-center gap-3 px-5 py-3"
+              style={{ background: "rgba(0,128,255,0.03)" }}
+            >
               <span
-                className="inline-flex items-center justify-center w-6 h-6 rounded-lg text-xs font-bold text-white"
+                className="inline-flex items-center justify-center w-6 h-6 rounded-lg text-xs font-bold text-white shrink-0"
                 style={{
                   background: `linear-gradient(135deg, ${color}, ${color}cc)`,
                 }}
               >
                 {index + 1}
               </span>
-            </div>
-
-            {fields.map((field) => (
-              <div key={field.id} className="flex-1 px-2">
-                {field.type === "text_long" ? (
-                  <textarea
-                    value={row[field.id] || ""}
-                    onChange={(e) => updateField(row.id, field.id, e.target.value)}
-                    placeholder={field.placeholder}
-                    maxLength={field.maxLength}
-                    readOnly={readOnly}
-                    rows={2}
-                    className="w-full glass-input resize-none"
-                  />
-                ) : (
-                  <input
-                    type="text"
-                    value={row[field.id] || ""}
-                    onChange={(e) => updateField(row.id, field.id, e.target.value)}
-                    placeholder={field.placeholder}
-                    maxLength={field.maxLength}
-                    readOnly={readOnly}
-                    className="w-full glass-input"
-                  />
-                )}
-              </div>
-            ))}
-
-            {!readOnly && (
-              <div className="w-10 shrink-0 pt-1.5">
+              <span className="flex-1 font-semibold text-sm text-[#0f172a] truncate">
+                {row[fields[0]?.id] || `Meta ${index + 1}`}
+              </span>
+              {!readOnly && (
                 <button
                   onClick={() => removeRow(row.id)}
                   disabled={rows.length <= 1}
@@ -252,89 +188,52 @@ export default function DynamicTable({
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
-
-      {/* Mobile: card layout per row */}
-      <div className="md:hidden space-y-3">
-        {rows.map((row, index) => {
-          const isExpanded = expandedRow === row.id;
-          const metaName = row[fields[0]?.id] || `Meta ${index + 1}`;
-
-          return (
-            <div
-              key={row.id}
-              className="overflow-hidden transition-all duration-200"
-              style={glassCard}
-            >
-              <button
-                onClick={() => toggleExpand(row.id)}
-                className="w-full flex items-center gap-3 px-5 py-4 text-left transition-all duration-200 hover:bg-white/40"
-              >
-                <span
-                  className="inline-flex items-center justify-center w-6 h-6 rounded-lg text-xs font-bold text-white shrink-0"
-                  style={{
-                    background: `linear-gradient(135deg, ${color}, ${color}cc)`,
-                  }}
-                >
-                  {index + 1}
-                </span>
-                <span className="flex-1 font-semibold text-sm text-[#0f172a] truncate">
-                  {metaName || "Nova meta..."}
-                </span>
-                <ChevronDown
-                  className={`w-4 h-4 text-[#94a3b8] transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`}
-                />
-              </button>
-
-              {isExpanded && (
-                <div className="px-5 pb-5 pt-1 space-y-3">
-                  {fields.map((field) => (
-                    <div key={field.id}>
-                      <label className="text-xs font-semibold text-[#0f172a] uppercase tracking-wider mb-1.5 block">
-                        {field.label}
-                      </label>
-                      {field.type === "text_long" ? (
-                        <textarea
-                          value={row[field.id] || ""}
-                          onChange={(e) => updateField(row.id, field.id, e.target.value)}
-                          placeholder={field.placeholder}
-                          maxLength={field.maxLength}
-                          readOnly={readOnly}
-                          rows={3}
-                          className="w-full glass-input resize-none"
-                        />
-                      ) : (
-                        <input
-                          type="text"
-                          value={row[field.id] || ""}
-                          onChange={(e) => updateField(row.id, field.id, e.target.value)}
-                          placeholder={field.placeholder}
-                          maxLength={field.maxLength}
-                          readOnly={readOnly}
-                          className="w-full glass-input"
-                        />
-                      )}
-                    </div>
-                  ))}
-                  {!readOnly && (
-                    <button
-                      onClick={() => removeRow(row.id)}
-                      disabled={rows.length <= 1}
-                      className="flex items-center gap-1.5 text-xs text-[#94a3b8] hover:text-red-500 hover:bg-red-50 disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-200 px-2 py-1.5 rounded-xl"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                      Remover esta meta
-                    </button>
-                  )}
-                </div>
               )}
             </div>
-          );
-        })}
+
+            {/* Card fields */}
+            <div className="px-5 py-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {fields.map((field, fieldIndex) => (
+                <div key={field.id} className={field.type === "text_long" ? "sm:col-span-2" : ""}>
+                  <label className="text-xs font-semibold text-[#0f172a] uppercase tracking-wider mb-1.5 block">
+                    {isBuilder ? (
+                      <InlineEdit
+                        value={field.label || ""}
+                        onChange={(v) => onFieldUpdate!(0, fieldIndex, { label: v })}
+                        tag="span"
+                        className="text-xs font-semibold text-[#0f172a] uppercase tracking-wider"
+                        placeholder="Coluna"
+                      />
+                    ) : (
+                      field.label
+                    )}
+                  </label>
+                  {field.type === "text_long" ? (
+                    <textarea
+                      value={row[field.id] || ""}
+                      onChange={(e) => updateField(row.id, field.id, e.target.value)}
+                      placeholder={field.placeholder}
+                      maxLength={field.maxLength}
+                      readOnly={readOnly}
+                      rows={3}
+                      className="w-full glass-input resize-none"
+                    />
+                  ) : (
+                    <input
+                      type="text"
+                      value={row[field.id] || ""}
+                      onChange={(e) => updateField(row.id, field.id, e.target.value)}
+                      placeholder={field.placeholder}
+                      maxLength={field.maxLength}
+                      readOnly={readOnly}
+                      className="w-full glass-input"
+                    />
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
       </div>
 
       {/* Add row button */}

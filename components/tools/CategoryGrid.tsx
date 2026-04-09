@@ -1,7 +1,8 @@
 "use client";
 
+import { useMemo } from "react";
 import type { Section, Field } from "@/lib/schemas/tool-schema";
-import { Check } from "lucide-react";
+import { Check, Plus, X } from "lucide-react";
 import SectionIcon from "./SectionIcon";
 import InlineEdit from "./InlineEdit";
 
@@ -14,6 +15,8 @@ interface CategoryGridProps {
   selectedSectionIndex?: number;
   onSectionUpdate?: (sectionIndex: number, updates: Partial<Section>) => void;
   onFieldUpdate?: (sectionIndex: number, fieldIndex: number, updates: Partial<Field>) => void;
+  onFieldAdd?: (sectionIndex: number) => void;
+  onFieldRemove?: (sectionIndex: number, fieldIndex: number) => void;
 }
 
 export default function CategoryGrid({
@@ -25,10 +28,19 @@ export default function CategoryGrid({
   selectedSectionIndex,
   onSectionUpdate,
   onFieldUpdate,
+  onFieldAdd,
+  onFieldRemove,
 }: CategoryGridProps) {
   const totalSelected = Object.values(values).filter(Boolean).length;
   const totalFields = sections.reduce((sum, s) => sum + s.fields.length, 0);
   const isBuilder = !!onSectionUpdate;
+
+  // Detect if any section title has a very long word (>15 chars) — if so, use 2 cols max
+  const hasLongWord = useMemo(() => {
+    return sections.some((s) =>
+      s.label.split(/\s+/).some((word) => word.length > 15)
+    );
+  }, [sections]);
 
   return (
     <div className="w-full max-w-5xl mx-auto">
@@ -53,7 +65,7 @@ export default function CategoryGrid({
       </div>
 
       {/* Category cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+      <div className={`grid grid-cols-1 md:grid-cols-2 ${hasLongWord ? "" : "lg:grid-cols-3"} gap-5`}>
         {sections.map((section, sectionIndex) => {
           const selectedInCategory = section.fields.filter(
             (f) => values[f.id]
@@ -106,7 +118,7 @@ export default function CategoryGrid({
                       placeholder="Nome da categoria"
                     />
                   ) : (
-                    <h3 className="font-semibold text-[15px] text-[#0f172a] flex-1 min-w-0 truncate">
+                    <h3 className="font-semibold text-[15px] text-[#0f172a] flex-1 min-w-0 break-words leading-snug">
                       {section.label}
                     </h3>
                   )}
@@ -143,16 +155,16 @@ export default function CategoryGrid({
                     const isChecked = !!values[field.id];
 
                     return (
-                      <label
+                      <div
                         key={field.id}
-                        className={`flex items-start gap-3 px-3 py-2 rounded-xl cursor-pointer transition-colors duration-150 ${
+                        className={`flex items-start gap-3 px-3 py-2 rounded-xl transition-colors duration-150 ${
                           isChecked
                             ? "bg-white/60"
                             : "hover:bg-white/40"
                         }`}
                       >
                         {/* Checkbox */}
-                        <div className="relative flex-shrink-0 mt-0.5">
+                        <label className="relative flex-shrink-0 mt-0.5 cursor-pointer">
                           <input
                             type="checkbox"
                             checked={isChecked}
@@ -178,30 +190,60 @@ export default function CategoryGrid({
                               />
                             )}
                           </div>
-                        </div>
+                        </label>
 
                         {isBuilder ? (
                           <InlineEdit
                             value={field.label || ""}
                             onChange={(v) => onFieldUpdate!(sectionIndex, fieldIndex, { label: v })}
                             tag="span"
-                            className={`text-sm leading-snug ${isChecked ? "text-[#0f172a] font-medium" : "text-[#475569]"}`}
+                            className={`text-sm leading-snug flex-1 min-w-0 ${isChecked ? "text-[#0f172a] font-medium" : "text-[#475569]"}`}
                             placeholder="Label do item"
                           />
                         ) : (
                           <span
-                            className={`text-sm leading-snug ${
+                            className={`text-sm leading-snug flex-1 min-w-0 cursor-pointer ${
                               isChecked
                                 ? "text-[#0f172a] font-medium"
                                 : "text-[#475569]"
                             }`}
+                            onClick={() => onChange(field.id, !isChecked)}
                           >
                             {field.label}
                           </span>
                         )}
-                      </label>
+
+                        {/* Delete item button — builder only */}
+                        {isBuilder && onFieldRemove && section.fields.length > 1 && (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onFieldRemove(sectionIndex, fieldIndex);
+                            }}
+                            className="shrink-0 mt-0.5 w-5 h-5 rounded flex items-center justify-center text-[#94a3b8] hover:text-red-500 hover:bg-red-50 transition-all duration-200"
+                            title="Remover item"
+                          >
+                            <X className="w-3.5 h-3.5" />
+                          </button>
+                        )}
+                      </div>
                     );
                   })}
+
+                  {/* Add item button — builder only */}
+                  {isBuilder && onFieldAdd && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onFieldAdd(sectionIndex);
+                      }}
+                      className="flex items-center gap-1.5 px-3 py-2 text-xs font-medium rounded-xl transition-all duration-200 hover:bg-white/40 w-full"
+                      style={{ color }}
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                      Adicionar item
+                    </button>
+                  )}
                 </div>
               </div>
             </div>

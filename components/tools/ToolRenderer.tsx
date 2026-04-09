@@ -19,6 +19,8 @@ interface ToolRendererProps {
   /** Builder callbacks for inline editing */
   onSectionUpdate?: (sectionIndex: number, updates: Partial<Section>) => void;
   onFieldUpdate?: (sectionIndex: number, fieldIndex: number, updates: Partial<Field>) => void;
+  onFieldAdd?: (sectionIndex: number) => void;
+  onFieldRemove?: (sectionIndex: number, fieldIndex: number) => void;
 }
 
 export default function ToolRenderer({
@@ -30,6 +32,8 @@ export default function ToolRenderer({
   selectedSectionIndex,
   onSectionUpdate,
   onFieldUpdate,
+  onFieldAdd,
+  onFieldRemove,
 }: ToolRendererProps) {
   const [values, setValues] = useState<Record<string, unknown>>(initialValues);
 
@@ -42,6 +46,8 @@ export default function ToolRenderer({
     selectedSectionIndex,
     onSectionUpdate,
     onFieldUpdate,
+    onFieldAdd,
+    onFieldRemove,
   };
 
   const renderTool = () => {
