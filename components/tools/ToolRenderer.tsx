@@ -115,7 +115,9 @@ export default function ToolRenderer({
               shadow-md hover:shadow-lg transition-all duration-200 active:scale-95"
             style={{
               borderRadius: "var(--card-radius, 16px)",
-              background: `linear-gradient(135deg, ${schema.theme?.primaryColor || "#2D5A7B"}, ${schema.theme?.primaryColor || "#2D5A7B"}dd)`,
+              background: schema.theme?.primaryColor
+                ? `linear-gradient(135deg, ${schema.theme.primaryColor}, ${schema.theme.primaryColor}dd)`
+                : `linear-gradient(135deg, var(--brand), var(--brand-dark))`,
             }}
           >
             Enviar Respostas

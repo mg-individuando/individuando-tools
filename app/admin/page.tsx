@@ -73,10 +73,10 @@ export default function AdminDashboard() {
   }, []);
 
   const statCards = [
-    { label: "Ferramentas", value: stats.totalTools, icon: Wrench, color: "#2D5A7B" },
-    { label: "Publicadas", value: stats.publishedTools, icon: TrendingUp, color: "#10B981" },
-    { label: "Total Respostas", value: stats.totalResponses, icon: FileText, color: "#3B82F6" },
-    { label: "Respostas (7 dias)", value: stats.recentResponses, icon: Users, color: "#F59E0B" },
+    { label: "Ferramentas", value: stats.totalTools, icon: Wrench, color: "var(--brand)" },
+    { label: "Publicadas", value: stats.publishedTools, icon: TrendingUp, color: "var(--success)" },
+    { label: "Total Respostas", value: stats.totalResponses, icon: FileText, color: "var(--info)" },
+    { label: "Respostas (7 dias)", value: stats.recentResponses, icon: Users, color: "var(--warning)" },
   ];
 
   const templateLabels: Record<string, string> = {
@@ -104,11 +104,11 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div className="font-sans max-w-6xl mx-auto">
+    <div className="max-w-6xl mx-auto">
       {/* Header */}
       <div className="flex items-center justify-between mb-10">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight" style={{ color: "#2D5A7B" }}>
+          <h1 className="text-3xl font-bold tracking-tight text-primary">
             Ola, Administrador!
           </h1>
           <p className="text-gray-500 mt-1 text-base">
@@ -117,8 +117,7 @@ export default function AdminDashboard() {
         </div>
         <Link
           href="/admin/ferramentas/nova"
-          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-white text-sm font-semibold shadow-md hover:shadow-lg transition-all duration-200"
-          style={{ backgroundColor: "#2D5A7B" }}
+          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-semibold shadow-md hover:shadow-lg transition-all duration-200"
         >
           <Plus className="w-4 h-4" />
           Criar Ferramenta
@@ -136,7 +135,7 @@ export default function AdminDashboard() {
               <div className="flex flex-col items-start gap-4">
                 <div
                   className="w-12 h-12 rounded-full flex items-center justify-center"
-                  style={{ backgroundColor: `${card.color}14` }}
+                  style={{ backgroundColor: `color-mix(in srgb, ${card.color} 8%, transparent)` }}
                 >
                   <card.icon className="w-5 h-5" style={{ color: card.color }} />
                 </div>
@@ -164,8 +163,7 @@ export default function AdminDashboard() {
           </CardTitle>
           <Link
             href="/admin/ferramentas"
-            className="inline-flex items-center gap-1 text-sm font-medium hover:underline transition-colors"
-            style={{ color: "#2D5A7B" }}
+            className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline transition-colors"
           >
             Ver todas
             <ArrowRight className="w-3.5 h-3.5" />
@@ -181,10 +179,9 @@ export default function AdminDashboard() {
           ) : recentTools.length === 0 ? (
             <div className="text-center py-14">
               <div
-                className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
-                style={{ backgroundColor: "#2D5A7B14" }}
+                className="w-16 h-16 rounded-full bg-brand-subtle flex items-center justify-center mx-auto mb-4"
               >
-                <Wrench className="w-7 h-7" style={{ color: "#2D5A7B" }} />
+                <Wrench className="w-7 h-7 text-primary" />
               </div>
               <p className="text-gray-900 font-medium mb-1">
                 Nenhuma ferramenta criada ainda
@@ -194,8 +191,7 @@ export default function AdminDashboard() {
               </p>
               <Link
                 href="/admin/ferramentas/nova"
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-white text-sm font-semibold shadow-md hover:shadow-lg transition-all duration-200"
-                style={{ backgroundColor: "#2D5A7B" }}
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-semibold shadow-md hover:shadow-lg transition-all duration-200"
               >
                 <Plus className="w-4 h-4" />
                 Criar Ferramenta
@@ -211,13 +207,12 @@ export default function AdminDashboard() {
                 >
                   <div className="flex items-center gap-4 min-w-0">
                     <div
-                      className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0"
-                      style={{ backgroundColor: "#2D5A7B10" }}
+                      className="w-9 h-9 rounded-lg bg-brand-subtle flex items-center justify-center flex-shrink-0"
                     >
-                      <FileText className="w-4 h-4" style={{ color: "#2D5A7B" }} />
+                      <FileText className="w-4 h-4 text-primary" />
                     </div>
                     <div className="min-w-0">
-                      <p className="text-sm font-medium text-gray-900 truncate group-hover:text-[#2D5A7B] transition-colors">
+                      <p className="text-sm font-medium text-gray-900 truncate group-hover:text-primary transition-colors">
                         {tool.title}
                       </p>
                       <div className="flex items-center gap-2 mt-0.5">
@@ -238,7 +233,7 @@ export default function AdminDashboard() {
                     >
                       {statusLabels[tool.status]?.label || tool.status}
                     </span>
-                    <ArrowRight className="w-4 h-4 text-gray-300 group-hover:text-[#2D5A7B] transition-colors" />
+                    <ArrowRight className="w-4 h-4 text-gray-300 group-hover:text-primary transition-colors" />
                   </div>
                 </Link>
               ))}

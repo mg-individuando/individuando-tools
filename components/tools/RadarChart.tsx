@@ -90,21 +90,20 @@ export default function RadarChart({
       let anchor: "start" | "middle" | "end" = "middle";
       if (cos > 0.3) anchor = "start";
       else if (cos < -0.3) anchor = "end";
-      return { x: lx, y: ly, anchor, label: p.section.label, color: p.section.color || "#2D5A7B" };
+      return { x: lx, y: ly, anchor, label: p.section.label, color: p.section.color || "var(--brand)" };
     });
   }, [points, maxRadius, center, n]);
 
-  const primaryColor = "#2D5A7B";
+  const primaryColor = "var(--brand)";
+  const primaryColorHex = "#2D5A7B"; // hex fallback for hexToRgba calls
 
   return (
     <div className="flex flex-col items-center gap-8 w-full">
       {/* Radar SVG Section */}
       <div
-        className="relative w-full max-w-[460px] mx-auto p-4"
+        className="relative w-full max-w-[460px] mx-auto p-4 bg-secondary shadow-soft"
         style={{
-          background: "#f8f9fc",
           borderRadius: "var(--card-radius, 16px)",
-          boxShadow: "0 2px 12px rgba(0,0,0,0.06)",
         }}
       >
         <svg
@@ -124,8 +123,8 @@ export default function RadarChart({
             <path
               key={level}
               d={path}
-              fill={level % 2 === 0 ? "rgba(241,245,249,0.5)" : "none"}
-              stroke="#e2e8f0"
+              fill={level % 2 === 0 ? "var(--muted)" : "none"}
+              stroke="var(--border)"
               strokeWidth={level === levels - 1 ? 1.2 : 0.6}
             />
           ))}
@@ -140,7 +139,7 @@ export default function RadarChart({
                 y1={center}
                 x2={center + maxRadius * Math.cos(angle)}
                 y2={center + maxRadius * Math.sin(angle)}
-                stroke="#cbd5e1"
+                stroke="var(--border)"
                 strokeWidth={0.7}
               />
             );
@@ -184,7 +183,7 @@ export default function RadarChart({
               style={{
                 fontSize: "11px",
                 fontWeight: 600,
-                fill: "#475569",
+                fill: "var(--foreground)",
                 letterSpacing: "0.01em",
               }}
             >
@@ -199,7 +198,7 @@ export default function RadarChart({
         {sections.map((section) => {
           const field = section.fields[0];
           const value = values[field.id] ?? (field.defaultValue as number) ?? 0;
-          const color = section.color || primaryColor;
+          const color = section.color || primaryColorHex;
           const min = field.min ?? 0;
           const max = field.max ?? 10;
           const pct = ((value - min) / (max - min)) * 100;
@@ -207,11 +206,10 @@ export default function RadarChart({
           return (
             <div
               key={section.id}
-              className="overflow-hidden"
+              className="overflow-hidden shadow-soft"
               style={{
                 background: hexToRgba(color, 0.08),
                 borderRadius: "var(--card-radius, 16px)",
-                boxShadow: "0 2px 12px rgba(0,0,0,0.06)",
               }}
             >
               <div className="px-4 py-3.5">
@@ -219,7 +217,7 @@ export default function RadarChart({
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
                     <SectionIcon icon={section.icon} size={18} />
-                    <span className="text-sm font-semibold text-slate-700 leading-tight">
+                    <span className="text-sm font-semibold text-foreground leading-tight">
                       {section.label}
                     </span>
                   </div>
@@ -233,8 +231,7 @@ export default function RadarChart({
 
                 {/* Slider in white container */}
                 <div
-                  className="rounded-xl px-3 py-2"
-                  style={{ background: "#fff" }}
+                  className="rounded-xl px-3 py-2 bg-card"
                 >
                   <input
                     type="range"
@@ -246,7 +243,7 @@ export default function RadarChart({
                     disabled={readOnly}
                     className="radar-slider w-full h-1.5 appearance-none rounded-full cursor-pointer outline-none disabled:opacity-50 disabled:cursor-not-allowed"
                     style={{
-                      background: `linear-gradient(to right, ${color} 0%, ${color} ${pct}%, #e2e8f0 ${pct}%, #e2e8f0 100%)`,
+                      background: `linear-gradient(to right, ${color} 0%, ${color} ${pct}%, var(--border) ${pct}%, var(--border) 100%)`,
                       ["--slider-color" as string]: color,
                       ["--slider-shadow" as string]: hexToRgba(color, 0.25),
                     }}
@@ -267,7 +264,7 @@ export default function RadarChart({
           height: 16px;
           border-radius: 50%;
           background: white;
-          border: 2.5px solid var(--slider-color, #2D5A7B);
+          border: 2.5px solid var(--slider-color, var(--brand));
           box-shadow: 0 1px 3px var(--slider-shadow, rgba(45,90,123,0.25));
           cursor: pointer;
           transition: transform 0.15s ease;
@@ -280,7 +277,7 @@ export default function RadarChart({
           height: 16px;
           border-radius: 50%;
           background: white;
-          border: 2.5px solid var(--slider-color, #2D5A7B);
+          border: 2.5px solid var(--slider-color, var(--brand));
           box-shadow: 0 1px 3px var(--slider-shadow, rgba(45,90,123,0.25));
           cursor: pointer;
           transition: transform 0.15s ease;

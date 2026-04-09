@@ -67,7 +67,7 @@ export default function ConvidarUsuarioPage() {
       {/* Back link */}
       <Link
         href="/admin/usuarios"
-        className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-[#2D5A7B] transition-colors mb-6"
+        className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-primary transition-colors mb-6"
       >
         <ArrowLeft className="w-4 h-4" />
         Voltar para usuários
@@ -143,7 +143,7 @@ export default function ConvidarUsuarioPage() {
               </Link>
               <Button
                 type="submit"
-                className="bg-[#2D5A7B] hover:bg-[#1e4260] text-white"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground"
                 disabled={sending}
               >
                 {sending ? (

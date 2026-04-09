@@ -333,7 +333,7 @@ export default function NovaFerramentaPage() {
           >
             <ArrowLeft className="w-3 h-3" /> Voltar
           </Link>
-          <h1 className="text-2xl font-bold text-gray-900 font-sans">
+          <h1 className="text-2xl font-bold text-gray-900">
             Nova Ferramenta
           </h1>
           <p className="text-gray-500 mt-1">
@@ -351,7 +351,7 @@ export default function NovaFerramentaPage() {
               <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center mx-auto mb-4 shadow-lg group-hover:shadow-xl transition-shadow">
                 <Sparkles className="w-8 h-8 text-white" />
               </div>
-              <h3 className="text-lg font-bold font-sans mb-2">
+              <h3 className="text-lg font-bold mb-2">
                 Criar com IA
               </h3>
               <p className="text-sm text-gray-500 leading-relaxed">
@@ -373,7 +373,7 @@ export default function NovaFerramentaPage() {
               <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center mx-auto mb-4 shadow-lg group-hover:shadow-xl transition-shadow">
                 <FileUp className="w-8 h-8 text-white" />
               </div>
-              <h3 className="text-lg font-bold font-sans mb-2">
+              <h3 className="text-lg font-bold mb-2">
                 Importar PDF
               </h3>
               <p className="text-sm text-gray-500 leading-relaxed">
@@ -388,20 +388,20 @@ export default function NovaFerramentaPage() {
 
           {/* Template option */}
           <Card
-            className="cursor-pointer transition-all hover:shadow-lg hover:scale-[1.02] border-2 border-transparent hover:border-[#2D5A7B]/20 group"
+            className="cursor-pointer transition-all hover:shadow-lg hover:scale-[1.02] border-2 border-transparent hover:border-primary/20 group"
             onClick={() => setMode("template")}
           >
             <CardContent className="pt-8 pb-8 text-center">
-              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#2D5A7B] to-[#1e3f56] flex items-center justify-center mx-auto mb-4 shadow-lg group-hover:shadow-xl transition-shadow">
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-brand-dark flex items-center justify-center mx-auto mb-4 shadow-lg group-hover:shadow-xl transition-shadow">
                 <LayoutGrid className="w-8 h-8 text-white" />
               </div>
-              <h3 className="text-lg font-bold font-sans mb-2">
+              <h3 className="text-lg font-bold mb-2">
                 Usar Template
               </h3>
               <p className="text-sm text-gray-500 leading-relaxed">
                 Escolha entre os templates prontos: SWOT, Roda da Vida, Ikigai e mais.
               </p>
-              <div className="mt-4 inline-flex items-center gap-1.5 text-xs font-medium text-[#2D5A7B] bg-[#2D5A7B]/10 px-3 py-1.5 rounded-full">
+              <div className="mt-4 inline-flex items-center gap-1.5 text-xs font-medium text-primary bg-primary/10 px-3 py-1.5 rounded-full">
                 <Grid2X2 className="w-3 h-3" />
                 5 templates
               </div>
@@ -428,7 +428,7 @@ export default function NovaFerramentaPage() {
               <Sparkles className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900 font-sans">
+              <h1 className="text-2xl font-bold text-gray-900">
                 Criar com IA
               </h1>
               <p className="text-gray-500 text-sm">
@@ -449,7 +449,7 @@ export default function NovaFerramentaPage() {
                     <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-100 to-indigo-100 flex items-center justify-center mb-4">
                       <Bot className="w-7 h-7 text-purple-600" />
                     </div>
-                    <h3 className="text-base font-semibold text-gray-700 mb-1 font-sans">
+                    <h3 className="text-base font-semibold text-gray-700 mb-1">
                       Olá! Como posso ajudar?
                     </h3>
                     <p className="text-sm text-gray-400 mb-6 max-w-md">
@@ -494,7 +494,7 @@ export default function NovaFerramentaPage() {
                     <div
                       className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
                         msg.role === "user"
-                          ? "bg-[#2D5A7B] text-white rounded-br-md"
+                          ? "bg-primary text-primary-foreground rounded-br-md"
                           : "bg-gray-100 text-gray-700 rounded-bl-md"
                       }`}
                     >
@@ -522,8 +522,8 @@ export default function NovaFerramentaPage() {
                       )}
                     </div>
                     {msg.role === "user" && (
-                      <div className="w-8 h-8 rounded-lg bg-[#2D5A7B]/10 flex items-center justify-center shrink-0 mt-0.5">
-                        <User className="w-4 h-4 text-[#2D5A7B]" />
+                      <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
+                        <User className="w-4 h-4 text-primary" />
                       </div>
                     )}
                   </div>
@@ -644,7 +644,7 @@ export default function NovaFerramentaPage() {
             {/* Generated tool preview card */}
             <Card>
               <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-sans text-gray-600 flex items-center gap-2">
+                <CardTitle className="text-sm text-gray-600 flex items-center gap-2">
                   <Wand2 className="w-4 h-4 text-purple-500" />
                   Ferramenta Gerada
                 </CardTitle>
@@ -663,7 +663,7 @@ export default function NovaFerramentaPage() {
                   <div className="space-y-4">
                     {/* Schema summary */}
                     <div>
-                      <h4 className="font-semibold text-sm text-gray-800 font-sans">
+                      <h4 className="font-semibold text-sm text-gray-800">
                         {generatedSchema.title}
                       </h4>
                       <p className="text-xs text-gray-500 mt-1 leading-relaxed">
@@ -789,7 +789,7 @@ export default function NovaFerramentaPage() {
           <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-start justify-center overflow-y-auto p-4 pt-8">
             <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl relative max-h-[90vh] overflow-y-auto">
               <div className="sticky top-0 z-10 bg-white border-b px-6 py-4 flex items-center justify-between rounded-t-2xl">
-                <h3 className="font-semibold text-gray-800 font-sans">
+                <h3 className="font-semibold text-gray-800">
                   Preview: {generatedSchema.title}
                 </h3>
                 <button
@@ -889,7 +889,7 @@ export default function NovaFerramentaPage() {
           >
             <ArrowLeft className="w-3 h-3" /> Voltar
           </button>
-          <h1 className="text-2xl font-bold text-gray-900 font-sans">
+          <h1 className="text-2xl font-bold text-gray-900">
             Importar Ferramenta de PDF
           </h1>
           <p className="text-gray-500 mt-1">
@@ -1041,7 +1041,7 @@ export default function NovaFerramentaPage() {
                 <Button
                   onClick={handleAiCreate}
                   disabled={loading || !title}
-                  className="w-full bg-[#2D5A7B] hover:bg-[#1e3f56] gap-2 py-6 text-base"
+                  className="w-full bg-primary hover:bg-primary/90 gap-2 py-6 text-base"
                 >
                   {loading ? (
                     <>
@@ -1127,7 +1127,7 @@ export default function NovaFerramentaPage() {
           >
             <ArrowLeft className="w-3 h-3" /> Voltar
           </button>
-          <h1 className="text-2xl font-bold text-gray-900 font-sans">
+          <h1 className="text-2xl font-bold text-gray-900">
             Escolha um Template
           </h1>
           <p className="text-gray-500 mt-1">
@@ -1143,15 +1143,15 @@ export default function NovaFerramentaPage() {
                 key={key}
                 className={`cursor-pointer transition-all hover:shadow-md ${
                   selectedTemplate === key
-                    ? "ring-2 ring-[#2D5A7B] shadow-md"
+                    ? "ring-2 ring-primary shadow-md"
                     : ""
                 }`}
                 onClick={() => setSelectedTemplate(key)}
               >
                 <CardContent className="pt-6 pb-5">
                   <div className="flex items-start gap-3">
-                    <div className="w-12 h-12 rounded-xl bg-[#2D5A7B]/10 flex items-center justify-center flex-shrink-0">
-                      <Icon className="w-6 h-6 text-[#2D5A7B]" />
+                    <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+                      <Icon className="w-6 h-6 text-primary" />
                     </div>
                     <div>
                       <h3 className="font-semibold">{tpl.name}</h3>
@@ -1176,7 +1176,7 @@ export default function NovaFerramentaPage() {
                 );
                 setStep("details");
               }}
-              className="bg-[#2D5A7B] hover:bg-[#1e4260]"
+              className="bg-primary hover:bg-primary/90"
             >
               Continuar
             </Button>
@@ -1196,7 +1196,7 @@ export default function NovaFerramentaPage() {
         >
           <ArrowLeft className="w-3 h-3" /> Voltar aos templates
         </button>
-        <h1 className="text-2xl font-bold text-gray-900 font-sans">
+        <h1 className="text-2xl font-bold text-gray-900">
           Configurar Ferramenta
         </h1>
       </div>
@@ -1225,7 +1225,7 @@ export default function NovaFerramentaPage() {
                 id="client"
                 value={selectedClient}
                 onChange={(e) => setSelectedClient(e.target.value)}
-                className="w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 focus:border-[#2D5A7B] focus:ring-2 focus:ring-[#2D5A7B]/10 outline-none transition-all"
+                className="w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 focus:border-primary focus:ring-2 focus:ring-primary/10 outline-none transition-all"
               >
                 <option value="">Sem cliente (padrão Individuando)</option>
                 {clients.map((client) => (
@@ -1260,7 +1260,7 @@ export default function NovaFerramentaPage() {
             <Button
               onClick={handleCreate}
               disabled={!title || loading}
-              className="bg-[#2D5A7B] hover:bg-[#1e4260]"
+              className="bg-primary hover:bg-primary/90"
             >
               {loading ? "Criando..." : "Criar Ferramenta"}
             </Button>

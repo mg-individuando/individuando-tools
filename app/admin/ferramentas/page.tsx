@@ -66,17 +66,14 @@ export default function FerramentasPage() {
 
   if (loading) {
     return (
-      <div
-        className="flex items-center justify-center py-24 text-gray-400"
-        style={{ fontFamily: "'Montserrat', sans-serif" }}
-      >
+      <div className="flex items-center justify-center py-24 text-gray-400">
         Carregando...
       </div>
     );
   }
 
   return (
-    <div style={{ fontFamily: "'Montserrat', sans-serif" }}>
+    <div>
       {/* Page header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
         <div>
@@ -89,7 +86,7 @@ export default function FerramentasPage() {
         </div>
         <Link href="/admin/ferramentas/nova">
           <Button
-            className="bg-[#2D5A7B] hover:bg-[#1e4260] text-white shadow-sm"
+            className="bg-primary hover:bg-brand-dark text-primary-foreground shadow-sm"
           >
             <Plus className="w-4 h-4 mr-2" />
             Nova Ferramenta
@@ -111,7 +108,7 @@ export default function FerramentasPage() {
               Crie sua primeira ferramenta interativa para compartilhar com seus clientes.
             </p>
             <Link href="/admin/ferramentas/nova">
-              <Button className="bg-[#2D5A7B] hover:bg-[#1e4260] text-white">
+              <Button className="bg-primary hover:bg-brand-dark text-primary-foreground">
                 <Plus className="w-4 h-4 mr-2" />
                 Criar Primeira Ferramenta
               </Button>
@@ -166,7 +163,7 @@ export default function FerramentasPage() {
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="text-gray-500 hover:text-[#2D5A7B] h-8 px-2"
+                    className="text-gray-500 hover:text-primary h-8 px-2"
                     onClick={() => copyLink(tool.slug)}
                     title="Copiar link"
                   >
@@ -181,7 +178,7 @@ export default function FerramentasPage() {
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="text-gray-500 hover:text-[#2D5A7B] h-8 px-2"
+                      className="text-gray-500 hover:text-primary h-8 px-2"
                       title="Abrir ferramenta"
                     >
                       <ExternalLink className="w-3.5 h-3.5" />
@@ -192,7 +189,7 @@ export default function FerramentasPage() {
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="text-gray-500 hover:text-[#2D5A7B] h-8 px-2"
+                      className="text-gray-500 hover:text-primary h-8 px-2"
                       title="Ver respostas"
                     >
                       <Eye className="w-3.5 h-3.5" />
@@ -212,7 +209,7 @@ export default function FerramentasPage() {
                       <Button
                         variant="outline"
                         size="sm"
-                        className="h-8 text-xs border-[#2D5A7B] text-[#2D5A7B] hover:bg-[#2D5A7B]/5"
+                        className="h-8 text-xs border-primary text-primary hover:bg-primary/5"
                       >
                         Editar
                       </Button>

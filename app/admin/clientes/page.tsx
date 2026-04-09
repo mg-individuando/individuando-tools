@@ -34,7 +34,7 @@ export default function ClientesPage() {
 
   function getInitialColor(name: string): string {
     const colors = [
-      "#2D5A7B", "#4A90A4", "#6B8E7B", "#8B6F5E",
+      "var(--brand)", "#4A90A4", "#6B8E7B", "#8B6F5E",
       "#7B5EA7", "#A45A6B", "#5A7B9E", "#6E8B74",
     ];
     let hash = 0;
@@ -49,7 +49,7 @@ export default function ClientesPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight font-sans text-[#2D5A7B]">
+          <h1 className="text-3xl font-bold tracking-tight text-primary">
             Clientes
           </h1>
           <p className="text-muted-foreground mt-1">
@@ -57,7 +57,7 @@ export default function ClientesPage() {
           </p>
         </div>
         <Link href="/admin/clientes/novo">
-          <Button className="bg-[#2D5A7B] hover:bg-[#1e3f56]">
+          <Button className="bg-primary hover:bg-brand-dark text-primary-foreground">
             <Plus className="mr-2 h-4 w-4" />
             Novo Cliente
           </Button>
@@ -87,10 +87,10 @@ export default function ClientesPage() {
       {!loading && clients.length === 0 && (
         <Card className="border-dashed">
           <CardContent className="flex flex-col items-center justify-center py-16 text-center">
-            <div className="rounded-full bg-[#2D5A7B]/10 p-4 mb-4">
-              <Building2 className="h-8 w-8 text-[#2D5A7B]" />
+            <div className="rounded-full bg-brand-subtle p-4 mb-4">
+              <Building2 className="h-8 w-8 text-primary" />
             </div>
-            <h3 className="text-lg font-semibold font-sans mb-1">
+            <h3 className="text-lg font-semibold mb-1">
               Nenhum cliente cadastrado
             </h3>
             <p className="text-muted-foreground text-sm mb-6 max-w-sm">
@@ -98,7 +98,7 @@ export default function ClientesPage() {
               a identidade visual dele.
             </p>
             <Link href="/admin/clientes/novo">
-              <Button className="bg-[#2D5A7B] hover:bg-[#1e3f56]">
+              <Button className="bg-primary hover:bg-brand-dark text-primary-foreground">
                 <Plus className="mr-2 h-4 w-4" />
                 Criar Primeiro Cliente
               </Button>
@@ -112,7 +112,7 @@ export default function ClientesPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {clients.map((client) => {
             const primaryColor =
-              client.brand_config?.primaryColor ?? "#2D5A7B";
+              client.brand_config?.primaryColor ?? "var(--brand)";
             return (
               <Card
                 key={client.id}
@@ -129,7 +129,7 @@ export default function ClientesPage() {
                       />
                     ) : (
                       <div
-                        className="h-14 w-14 rounded-xl flex items-center justify-center text-white text-xl font-bold font-sans shrink-0"
+                        className="h-14 w-14 rounded-xl flex items-center justify-center text-white text-xl font-bold shrink-0"
                         style={{
                           backgroundColor: getInitialColor(client.name),
                         }}
@@ -141,7 +141,7 @@ export default function ClientesPage() {
                     {/* Info */}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between gap-2">
-                        <h3 className="font-semibold font-sans text-base truncate">
+                        <h3 className="font-semibold text-base truncate">
                           {client.name}
                         </h3>
                         <Badge
@@ -176,7 +176,7 @@ export default function ClientesPage() {
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="text-muted-foreground hover:text-[#2D5A7B]"
+                        className="text-muted-foreground hover:text-primary"
                       >
                         <Pencil className="mr-2 h-3.5 w-3.5" />
                         Editar

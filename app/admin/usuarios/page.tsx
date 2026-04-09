@@ -67,7 +67,7 @@ export default function UsuariosPage() {
           </p>
         </div>
         <Link href="/admin/usuarios/convidar">
-          <Button className="bg-[#2D5A7B] hover:bg-[#1e4260] text-white shadow-sm">
+          <Button className="bg-primary hover:bg-brand-dark text-primary-foreground shadow-sm">
             <UserPlus className="w-4 h-4 mr-2" />
             Convidar Usuário
           </Button>
@@ -174,7 +174,7 @@ export default function UsuariosPage() {
                   >
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-full bg-[#2D5A7B]/10 flex items-center justify-center shrink-0">
+                        <div className="w-9 h-9 rounded-full bg-brand-subtle flex items-center justify-center shrink-0">
                           {profile.avatar_url ? (
                             <img
                               src={profile.avatar_url}
@@ -182,7 +182,7 @@ export default function UsuariosPage() {
                               className="w-9 h-9 rounded-full object-cover"
                             />
                           ) : (
-                            <span className="text-sm font-semibold text-[#2D5A7B]">
+                            <span className="text-sm font-semibold text-primary">
                               {profile.name?.charAt(0)?.toUpperCase() || "?"}
                             </span>
                           )}
@@ -204,7 +204,7 @@ export default function UsuariosPage() {
                         }
                         className={
                           profile.role === "admin"
-                            ? "bg-[#2D5A7B] text-white hover:bg-[#2D5A7B]"
+                            ? "bg-primary text-primary-foreground hover:bg-primary"
                             : "bg-gray-100 text-gray-600"
                         }
                       >
@@ -232,7 +232,7 @@ export default function UsuariosPage() {
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="text-gray-500 hover:text-[#2D5A7B] h-8 px-2"
+                            className="text-gray-500 hover:text-primary h-8 px-2"
                             title="Editar usuário"
                           >
                             <Pencil className="w-3.5 h-3.5" />
@@ -244,7 +244,7 @@ export default function UsuariosPage() {
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="text-gray-500 hover:text-[#2D5A7B] h-8 px-2"
+                            className="text-gray-500 hover:text-primary h-8 px-2"
                             title="Ver ferramentas"
                           >
                             <Wrench className="w-3.5 h-3.5" />
@@ -268,7 +268,7 @@ export default function UsuariosPage() {
                 <CardContent className="p-4">
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex items-center gap-3 min-w-0">
-                      <div className="w-10 h-10 rounded-full bg-[#2D5A7B]/10 flex items-center justify-center shrink-0">
+                      <div className="w-10 h-10 rounded-full bg-brand-subtle flex items-center justify-center shrink-0">
                         {profile.avatar_url ? (
                           <img
                             src={profile.avatar_url}
@@ -276,7 +276,7 @@ export default function UsuariosPage() {
                             className="w-10 h-10 rounded-full object-cover"
                           />
                         ) : (
-                          <span className="text-sm font-semibold text-[#2D5A7B]">
+                          <span className="text-sm font-semibold text-primary">
                             {profile.name?.charAt(0)?.toUpperCase() || "?"}
                           </span>
                         )}
@@ -297,7 +297,7 @@ export default function UsuariosPage() {
                         }
                         className={
                           profile.role === "admin"
-                            ? "bg-[#2D5A7B] text-white hover:bg-[#2D5A7B]"
+                            ? "bg-primary text-primary-foreground hover:bg-primary"
                             : "bg-gray-100 text-gray-600"
                         }
                       >
@@ -325,7 +325,7 @@ export default function UsuariosPage() {
                         <Button
                           variant="outline"
                           size="sm"
-                          className="h-7 text-xs border-[#2D5A7B] text-[#2D5A7B] hover:bg-[#2D5A7B]/5"
+                          className="h-7 text-xs border-primary text-primary hover:bg-primary/5"
                         >
                           <Pencil className="w-3 h-3 mr-1" />
                           Editar

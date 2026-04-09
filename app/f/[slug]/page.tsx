@@ -132,8 +132,8 @@ export default function PublicFormPage({
   /* ── Loading ── */
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-slate-50 to-white">
-        <Loader2 className="w-8 h-8 animate-spin text-[#2D5A7B]/40" />
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-background to-white">
+        <Loader2 className="w-8 h-8 animate-spin text-brand/40" />
       </div>
     );
   }
@@ -141,14 +141,14 @@ export default function PublicFormPage({
   /* ── Not found ── */
   if (notFound || !tool) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-slate-50 to-white px-4">
-        <div className="w-14 h-14 rounded-2xl bg-gray-100 flex items-center justify-center mb-6">
-          <span className="text-gray-300 font-bold text-2xl font-sans">?</span>
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-background to-white px-4">
+        <div className="w-14 h-14 rounded-2xl bg-muted flex items-center justify-center mb-6">
+          <span className="text-muted-foreground/50 font-bold text-2xl">?</span>
         </div>
-        <h1 className="text-xl font-semibold text-gray-700 mb-2 font-sans">
+        <h1 className="text-xl font-semibold text-foreground/70 mb-2">
           Ferramenta não encontrada
         </h1>
-        <p className="text-sm text-gray-400 text-center max-w-xs font-sans">
+        <p className="text-sm text-muted-foreground text-center max-w-xs">
           Este link pode estar incorreto ou a ferramenta não está mais
           disponível.
         </p>
@@ -164,10 +164,10 @@ export default function PublicFormPage({
   const primaryColor =
     brand.primaryColor || schema.theme?.primaryColor || "#2D5A7B";
   const backgroundColor =
-    brand.backgroundColor || schema.theme?.backgroundColor || "#FAFBFC";
+    brand.backgroundColor || schema.theme?.backgroundColor || "var(--background)";
   const textColor = brand.textColor || undefined;
   const buttonColor = brand.buttonColor || primaryColor;
-  const buttonTextColor = brand.buttonTextColor || "#FFFFFF";
+  const buttonTextColor = brand.buttonTextColor || "var(--primary-foreground)";
   const buttonRadius = brand.buttonRadius || "0.75rem";
   const cardRadius = brand.cardRadius || "16px";
   const fontFamily = brand.fontFamily || undefined;
@@ -203,10 +203,10 @@ export default function PublicFormPage({
           headerStyle.backgroundSize = "cover";
           headerStyle.backgroundPosition = "center";
         } else {
-          headerStyle.backgroundColor = headerBg || "#FFFFFF";
+          headerStyle.backgroundColor = headerBg || "var(--card)";
         }
       } else {
-        headerStyle.backgroundColor = headerBg || "#FFFFFF";
+        headerStyle.backgroundColor = headerBg || "var(--card)";
         if (brand.headerBgImage) {
           headerStyle.backgroundImage = `url(${brand.headerBgImage})`;
           headerStyle.backgroundSize = "cover";
@@ -326,7 +326,7 @@ export default function PublicFormPage({
 
     /* Default Individuando header (no client) */
     return (
-      <header className="w-full border-b border-gray-100 bg-white/80 backdrop-blur-sm sticky top-0 z-10">
+      <header className="w-full border-b border-border bg-white/80 backdrop-blur-sm sticky top-0 z-10">
         <div className="max-w-4xl mx-auto px-4 py-3 flex items-center gap-3">
           <img
             src="/logos/individuando/logo-1.svg"
@@ -334,7 +334,7 @@ export default function PublicFormPage({
             className="h-8 object-contain"
           />
           {!compact && (
-            <span className="text-base font-semibold tracking-tight" style={{ color: primaryColor }}>
+            <span className="text-base font-semibold tracking-tight text-brand">
               Individuando
             </span>
           )}
@@ -366,7 +366,7 @@ export default function PublicFormPage({
             />
           </div>
           <h1
-            className="text-2xl font-semibold text-gray-800 mb-2 font-sans"
+            className="text-2xl font-semibold text-foreground mb-2"
             style={{
               fontWeight: headingWeight,
               fontFamily: fontFamily || undefined,
@@ -374,13 +374,13 @@ export default function PublicFormPage({
           >
             Respostas Enviadas!
           </h1>
-          <p className="text-sm text-gray-400 text-center max-w-sm font-sans">
+          <p className="text-sm text-muted-foreground text-center max-w-sm">
             {settings.confirmationMessage ||
               "Obrigado por preencher! Suas respostas foram salvas."}
           </p>
         </div>
         <footer className="w-full py-6 text-center">
-          <span className="text-[11px] text-gray-300 font-sans">
+          <span className="text-[11px] text-muted-foreground/50">
             {footerText}
           </span>
         </footer>
@@ -408,7 +408,7 @@ export default function PublicFormPage({
               <h1
                 className="text-2xl sm:text-3xl tracking-tight mb-3"
                 style={{
-                  color: textColor || "#1a1a1a",
+                  color: textColor || "var(--foreground)",
                   fontWeight: Number(headingWeight),
                   fontFamily: fontFamily || undefined,
                 }}
@@ -419,7 +419,7 @@ export default function PublicFormPage({
                 <p
                   className="text-sm leading-relaxed max-w-md mx-auto"
                   style={{
-                    color: textColor ? `${textColor}99` : "#6b7280",
+                    color: textColor ? `${textColor}99` : "var(--muted-foreground)",
                     fontWeight: Number(bodyWeight),
                   }}
                 >
@@ -429,7 +429,7 @@ export default function PublicFormPage({
               {schema.instructions && (
                 <p
                   className="text-xs mt-2 italic max-w-md mx-auto"
-                  style={{ color: textColor ? `${textColor}66` : "#9ca3af" }}
+                  style={{ color: textColor ? `${textColor}66` : "var(--muted-foreground)" }}
                 >
                   {schema.instructions}
                 </p>
@@ -438,7 +438,7 @@ export default function PublicFormPage({
                 <p
                   className="text-sm mt-4 max-w-md mx-auto"
                   style={{
-                    color: textColor ? `${textColor}88` : "#6b7280",
+                    color: textColor ? `${textColor}88` : "var(--muted-foreground)",
                     fontWeight: Number(bodyWeight),
                   }}
                 >
@@ -448,7 +448,7 @@ export default function PublicFormPage({
             </div>
 
             {/* Identification form */}
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 sm:p-8 space-y-5">
+            <div className="bg-card rounded-2xl border border-border shadow-sm p-6 sm:p-8 space-y-5">
               <p
                 className="text-xs font-medium uppercase tracking-wider"
                 style={{
@@ -466,7 +466,7 @@ export default function PublicFormPage({
                     htmlFor="p-name"
                     className="block text-sm font-medium"
                     style={{
-                      color: textColor || "#374151",
+                      color: textColor || "var(--foreground)",
                       fontWeight: Number(labelWeight),
                     }}
                   >
@@ -477,7 +477,7 @@ export default function PublicFormPage({
                     value={participantName}
                     onChange={(e) => setParticipantName(e.target.value)}
                     placeholder="Como você quer ser identificado"
-                    className="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-4 py-3 text-sm text-gray-900 placeholder:text-gray-300 focus:ring-2 focus:bg-white outline-none transition-all"
+                    className="w-full rounded-xl border border-input bg-muted/50 px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/40 focus:ring-2 focus:bg-card outline-none transition-all"
                     style={
                       {
                         "--tw-ring-color": `${primaryColor}22`,
@@ -494,7 +494,7 @@ export default function PublicFormPage({
                     htmlFor="p-email"
                     className="block text-sm font-medium"
                     style={{
-                      color: textColor || "#374151",
+                      color: textColor || "var(--foreground)",
                       fontWeight: Number(labelWeight),
                     }}
                   >
@@ -506,7 +506,7 @@ export default function PublicFormPage({
                     value={participantEmail}
                     onChange={(e) => setParticipantEmail(e.target.value)}
                     placeholder="seu@email.com"
-                    className="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-4 py-3 text-sm text-gray-900 placeholder:text-gray-300 focus:ring-2 focus:bg-white outline-none transition-all"
+                    className="w-full rounded-xl border border-input bg-muted/50 px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/40 focus:ring-2 focus:bg-card outline-none transition-all"
                     style={
                       {
                         "--tw-ring-color": `${primaryColor}22`,
@@ -523,7 +523,7 @@ export default function PublicFormPage({
                     htmlFor={`custom-${field.id}`}
                     className="block text-sm font-medium"
                     style={{
-                      color: textColor || "#374151",
+                      color: textColor || "var(--foreground)",
                       fontWeight: Number(labelWeight),
                     }}
                   >
@@ -543,7 +543,7 @@ export default function PublicFormPage({
                           [field.id]: e.target.value,
                         }))
                       }
-                      className="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-4 py-3 text-sm text-gray-900 focus:ring-2 focus:bg-white outline-none transition-all"
+                      className="w-full rounded-xl border border-input bg-muted/50 px-4 py-3 text-sm text-foreground focus:ring-2 focus:bg-card outline-none transition-all"
                       style={
                         {
                           "--tw-ring-color": `${primaryColor}22`,
@@ -568,7 +568,7 @@ export default function PublicFormPage({
                         }))
                       }
                       placeholder={field.placeholder || ""}
-                      className="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-4 py-3 text-sm text-gray-900 placeholder:text-gray-300 focus:ring-2 focus:bg-white outline-none transition-all"
+                      className="w-full rounded-xl border border-input bg-muted/50 px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/40 focus:ring-2 focus:bg-card outline-none transition-all"
                       style={
                         {
                           "--tw-ring-color": `${primaryColor}22`,
@@ -598,7 +598,7 @@ export default function PublicFormPage({
         </div>
 
         <footer className="w-full py-6 text-center">
-          <span className="text-[11px] text-gray-300 font-sans">
+          <span className="text-[11px] text-muted-foreground/50">
             {footerText}
           </span>
         </footer>
@@ -623,7 +623,7 @@ export default function PublicFormPage({
       {/* Tool title */}
       <div
         className="w-full"
-        style={{ backgroundColor: headerBg || "#FFFFFF" }}
+        style={{ backgroundColor: headerBg || "var(--card)" }}
       >
         <div className="max-w-4xl mx-auto px-4 pb-5 pt-3">
           <h1
@@ -640,7 +640,7 @@ export default function PublicFormPage({
             <p
               className="text-sm mt-2 max-w-2xl leading-relaxed"
               style={{
-                color: textColor ? `${textColor}99` : "#6b7280",
+                color: textColor ? `${textColor}99` : "var(--muted-foreground)",
                 fontWeight: Number(bodyWeight),
               }}
             >
@@ -650,7 +650,7 @@ export default function PublicFormPage({
           {schema.instructions && (
             <p
               className="text-xs mt-1.5 italic max-w-2xl"
-              style={{ color: textColor ? `${textColor}77` : "#9ca3af" }}
+              style={{ color: textColor ? `${textColor}77` : "var(--muted-foreground)" }}
             >
               {schema.instructions}
             </p>
@@ -663,13 +663,13 @@ export default function PublicFormPage({
         <ToolRenderer schema={schema} onSubmit={handleSubmit} />
 
         {submitting && (
-          <div className="fixed inset-0 bg-white/60 backdrop-blur-sm flex items-center justify-center z-50">
-            <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 flex items-center gap-3">
+          <div className="fixed inset-0 bg-card/60 backdrop-blur-sm flex items-center justify-center z-50">
+            <div className="bg-card rounded-2xl p-6 shadow-lg border border-border flex items-center gap-3">
               <Loader2
                 className="w-5 h-5 animate-spin"
                 style={{ color: primaryColor }}
               />
-              <span className="text-sm text-gray-600 font-medium">
+              <span className="text-sm text-muted-foreground font-medium">
                 Enviando...
               </span>
             </div>
@@ -678,7 +678,7 @@ export default function PublicFormPage({
       </main>
 
       <footer className="w-full py-6 text-center">
-        <span className="text-[11px] text-gray-300 font-sans">
+        <span className="text-[11px] text-muted-foreground/50">
           {footerText}
         </span>
       </footer>

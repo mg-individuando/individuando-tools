@@ -236,7 +236,7 @@ export default function UsuarioDetalhePage() {
       <div className="mb-6">
         <Link
           href="/admin/usuarios"
-          className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-[#2D5A7B] transition-colors mb-4"
+          className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-primary transition-colors mb-4"
         >
           <ArrowLeft className="w-4 h-4" />
           Voltar para usuários
@@ -244,7 +244,7 @@ export default function UsuarioDetalhePage() {
 
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-full bg-[#2D5A7B]/10 flex items-center justify-center shrink-0">
+            <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
               {profile.avatar_url ? (
                 <img
                   src={profile.avatar_url}
@@ -252,7 +252,7 @@ export default function UsuarioDetalhePage() {
                   className="w-14 h-14 rounded-full object-cover"
                 />
               ) : (
-                <span className="text-xl font-bold text-[#2D5A7B]">
+                <span className="text-xl font-bold text-primary">
                   {profile.name?.charAt(0)?.toUpperCase() || "?"}
                 </span>
               )}
@@ -269,7 +269,7 @@ export default function UsuarioDetalhePage() {
               variant={profile.role === "admin" ? "default" : "secondary"}
               className={
                 profile.role === "admin"
-                  ? "bg-[#2D5A7B] text-white hover:bg-[#2D5A7B]"
+                  ? "bg-primary text-primary-foreground hover:bg-primary"
                   : "bg-gray-100 text-gray-600"
               }
             >
@@ -331,7 +331,7 @@ export default function UsuarioDetalhePage() {
       <Card className="mb-6">
         <CardContent className="p-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
-            <User className="w-5 h-5 text-[#2D5A7B]" />
+            <User className="w-5 h-5 text-primary" />
             Dados do Perfil
           </h2>
 
@@ -428,7 +428,7 @@ export default function UsuarioDetalhePage() {
             </div>
 
             <Button
-              className="bg-[#2D5A7B] hover:bg-[#1e4260] text-white"
+              className="bg-primary hover:bg-primary/90 text-primary-foreground"
               onClick={handleSave}
               disabled={saving || !hasChanges}
             >
@@ -448,7 +448,7 @@ export default function UsuarioDetalhePage() {
         <Card>
           <CardContent className="p-6">
             <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-              <Wrench className="w-5 h-5 text-[#2D5A7B]" />
+              <Wrench className="w-5 h-5 text-primary" />
               Ferramentas ({tools.length})
             </h2>
 
@@ -502,7 +502,7 @@ export default function UsuarioDetalhePage() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="h-7 px-2 text-gray-500 hover:text-[#2D5A7B]"
+                          className="h-7 px-2 text-gray-500 hover:text-primary"
                           title="Editar ferramenta"
                         >
                           <ExternalLink className="w-3.5 h-3.5" />
@@ -512,7 +512,7 @@ export default function UsuarioDetalhePage() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="h-7 px-2 text-gray-500 hover:text-[#2D5A7B]"
+                          className="h-7 px-2 text-gray-500 hover:text-primary"
                           title="Ver respostas"
                         >
                           <Eye className="w-3.5 h-3.5" />

@@ -7,8 +7,19 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-mono: var(--font-mono);
   --font-heading: var(--font-sans);
+
+  /* Semantic colors mapped from CSS variables */
+  --color-brand: var(--brand);
+  --color-brand-light: var(--brand-light);
+  --color-brand-dark: var(--brand-dark);
+  --color-brand-subtle: var(--brand-subtle);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-info: var(--info);
+
+  /* shadcn tokens */
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -47,76 +58,134 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
+/* ================================================================
+   LIGHT MODE — Individuando Design System
+   ================================================================ */
 :root {
-  --font-sans: 'Montserrat', sans-serif;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
+  /* Font stacks */
+  --font-sans: 'Montserrat', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
+
+  /* Brand palette */
+  --brand: #2D5A7B;
+  --brand-light: #3B7BA6;
+  --brand-dark: #1E3F56;
+  --brand-subtle: #EEF4F8;
+  --ind-navy: #1e2f4c;
+  --ind-sage: #c0d57e;
+
+  /* Semantic colors */
+  --success: #10B981;
+  --warning: #F59E0B;
+  --error: #EF4444;
+  --info: #6366F1;
+
+  /* Surface hierarchy */
+  --background: #FAFBFC;
+  --foreground: #1A1A2E;
+  --card: #FFFFFF;
+  --card-foreground: #1A1A2E;
+  --popover: #FFFFFF;
+  --popover-foreground: #1A1A2E;
+
+  /* UI tokens */
+  --primary: #2D5A7B;
+  --primary-foreground: #FFFFFF;
+  --secondary: #F4F6F8;
+  --secondary-foreground: #1A1A2E;
+  --muted: #F4F6F8;
+  --muted-foreground: #64748B;
+  --accent: #EEF4F8;
+  --accent-foreground: #1E3F56;
+  --destructive: #EF4444;
+
+  /* Borders & inputs */
+  --border: #E2E8F0;
+  --input: #E2E8F0;
+  --ring: #2D5A7B;
+
+  /* Charts — 5 distinguishable colors */
+  --chart-1: #2D5A7B;
+  --chart-2: #10B981;
+  --chart-3: #F59E0B;
+  --chart-4: #6366F1;
+  --chart-5: #EC4899;
+
+  /* Radius */
   --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+
+  /* Shadows */
+  --shadow-xs: 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.06);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.08);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,0.10);
+  --shadow-soft: 0 2px 20px rgba(0,0,0,0.04), 0 1px 4px rgba(0,0,0,0.06);
+
+  /* Sidebar (admin) */
+  --sidebar: #FAFBFC;
+  --sidebar-foreground: #1A1A2E;
+  --sidebar-primary: #2D5A7B;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #EEF4F8;
+  --sidebar-accent-foreground: #1E3F56;
+  --sidebar-border: #E2E8F0;
+  --sidebar-ring: #2D5A7B;
 }
 
+/* ================================================================
+   DARK MODE
+   ================================================================ */
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --brand: #5B9CC7;
+  --brand-light: #7BB8DC;
+  --brand-dark: #3B7BA6;
+  --brand-subtle: #1A2533;
+
+  --success: #34D399;
+  --warning: #FBBF24;
+  --error: #F87171;
+  --info: #818CF8;
+
+  --background: #0F1117;
+  --foreground: #F0F0F5;
+  --card: #1A1D27;
+  --card-foreground: #F0F0F5;
+  --popover: #1A1D27;
+  --popover-foreground: #F0F0F5;
+
+  --primary: #5B9CC7;
+  --primary-foreground: #0F1117;
+  --secondary: #22252F;
+  --secondary-foreground: #F0F0F5;
+  --muted: #22252F;
+  --muted-foreground: #94A3B8;
+  --accent: #1A2533;
+  --accent-foreground: #7BB8DC;
+  --destructive: #F87171;
+
+  --border: rgba(255,255,255,0.08);
+  --input: rgba(255,255,255,0.12);
+  --ring: #5B9CC7;
+
+  --chart-1: #5B9CC7;
+  --chart-2: #34D399;
+  --chart-3: #FBBF24;
+  --chart-4: #818CF8;
+  --chart-5: #F472B6;
+
+  --sidebar: #1A1D27;
+  --sidebar-foreground: #F0F0F5;
+  --sidebar-primary: #5B9CC7;
+  --sidebar-primary-foreground: #0F1117;
+  --sidebar-accent: #22252F;
+  --sidebar-accent-foreground: #7BB8DC;
+  --sidebar-border: rgba(255,255,255,0.08);
+  --sidebar-ring: #5B9CC7;
 }
 
+/* ================================================================
+   BASE STYLES
+   ================================================================ */
 html {
   scroll-behavior: smooth;
 }
@@ -133,5 +202,29 @@ html {
   }
   :focus-visible {
     @apply outline-2 outline-offset-2 outline-ring;
+  }
+}
+
+/* ================================================================
+   UTILITY CLASSES — Design System
+   ================================================================ */
+@layer utilities {
+  .shadow-soft {
+    box-shadow: var(--shadow-soft);
+  }
+  .text-brand {
+    color: var(--brand);
+  }
+  .bg-brand {
+    background-color: var(--brand);
+  }
+  .bg-brand-subtle {
+    background-color: var(--brand-subtle);
+  }
+  .border-brand {
+    border-color: var(--brand);
+  }
+  .ring-brand {
+    --tw-ring-color: var(--brand);
   }
 }

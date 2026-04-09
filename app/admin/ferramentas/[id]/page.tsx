@@ -305,10 +305,7 @@ export default function EditToolPage({
 
   if (!tool) {
     return (
-      <div
-        className="text-center py-12 text-gray-500"
-        style={{ fontFamily: "Montserrat, sans-serif" }}
-      >
+      <div className="text-center py-12 text-gray-500">
         Carregando...
       </div>
     );
@@ -324,13 +321,13 @@ export default function EditToolPage({
   ];
 
   return (
-    <div style={{ fontFamily: "Montserrat, sans-serif" }}>
+    <div>
       {/* Header */}
       <div className="flex items-start justify-between mb-6">
         <div>
           <Link
             href="/admin/ferramentas"
-            className="text-sm text-gray-500 hover:text-[#2D5A7B] flex items-center gap-1 mb-3 transition-colors"
+            className="text-sm text-gray-500 hover:text-primary flex items-center gap-1 mb-3 transition-colors"
           >
             <ArrowLeft className="w-3 h-3" /> Ferramentas
           </Link>
@@ -384,7 +381,7 @@ export default function EditToolPage({
             onClick={() => setActiveTab(tab.key)}
             className={`pb-2 px-1 text-sm font-medium transition-colors ${
               activeTab === tab.key
-                ? "border-b-2 border-[#2D5A7B] text-[#2D5A7B]"
+                ? "border-b-2 border-primary text-primary"
                 : "text-gray-500 hover:text-gray-700"
             }`}
           >
@@ -439,7 +436,7 @@ export default function EditToolPage({
                       <div
                         className={`max-w-[80%] rounded-xl px-3 py-2 text-sm ${
                           msg.role === "user"
-                            ? "bg-[#2D5A7B] text-white"
+                            ? "bg-primary text-primary-foreground"
                             : "bg-white border text-gray-700"
                         }`}
                       >
@@ -537,7 +534,7 @@ export default function EditToolPage({
           <Card>
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
-                <ExternalLink className="w-5 h-5 text-[#2D5A7B]" />
+                <ExternalLink className="w-5 h-5 text-primary" />
                 Link Público
               </CardTitle>
             </CardHeader>
@@ -550,7 +547,7 @@ export default function EditToolPage({
                 />
                 <Button
                   onClick={copyLink}
-                  className="bg-[#2D5A7B] hover:bg-[#1e4260] shrink-0"
+                  className="bg-primary hover:bg-primary/90 shrink-0"
                 >
                   <Copy className="w-4 h-4 mr-2" />
                   Copiar Link
@@ -569,7 +566,7 @@ export default function EditToolPage({
           <Card>
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
-                <QrCode className="w-5 h-5 text-[#2D5A7B]" />
+                <QrCode className="w-5 h-5 text-primary" />
                 QR Code
               </CardTitle>
             </CardHeader>
@@ -590,7 +587,7 @@ export default function EditToolPage({
                 <Button
                   variant="outline"
                   onClick={downloadQrCode}
-                  className="border-[#2D5A7B] text-[#2D5A7B] hover:bg-[#2D5A7B] hover:text-white"
+                  className="border-primary text-primary hover:bg-primary hover:text-primary-foreground"
                 >
                   <Download className="w-4 h-4 mr-2" />
                   Download QR Code
@@ -603,7 +600,7 @@ export default function EditToolPage({
           <Card>
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
-                <Mail className="w-5 h-5 text-[#2D5A7B]" />
+                <Mail className="w-5 h-5 text-primary" />
                 Enviar por Email
               </CardTitle>
             </CardHeader>
@@ -625,7 +622,7 @@ export default function EditToolPage({
               </div>
               <Button
                 onClick={handleSendInvites}
-                className="bg-[#2D5A7B] hover:bg-[#1e4260]"
+                className="bg-primary hover:bg-primary/90"
               >
                 <Send className="w-4 h-4 mr-2" />
                 Enviar Convites
@@ -641,7 +638,7 @@ export default function EditToolPage({
           <Card>
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
-                <Share2 className="w-5 h-5 text-[#2D5A7B]" />
+                <Share2 className="w-5 h-5 text-primary" />
                 Compartilhamento Rápido
               </CardTitle>
             </CardHeader>
@@ -674,7 +671,7 @@ export default function EditToolPage({
                 <select
                   value={selectedClient}
                   onChange={(e) => setSelectedClient(e.target.value)}
-                  className="w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 focus:border-[#2D5A7B] focus:ring-2 focus:ring-[#2D5A7B]/10 outline-none transition-all"
+                  className="w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 focus:border-primary focus:ring-2 focus:ring-primary/10 outline-none transition-all"
                 >
                   <option value="">Sem cliente (padrão Individuando)</option>
                   {clients.map((c) => (
@@ -687,7 +684,7 @@ export default function EditToolPage({
                   {clients.find(c => c.id === selectedClient)?.logo_url ? (
                     <img src={clients.find(c => c.id === selectedClient)!.logo_url!} alt="" className="h-8 object-contain" />
                   ) : (
-                    <div className="w-8 h-8 rounded-lg bg-[#2D5A7B] flex items-center justify-center text-white text-sm font-bold">
+                    <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-primary-foreground text-sm font-bold">
                       {clients.find(c => c.id === selectedClient)?.name?.charAt(0) || "C"}
                     </div>
                   )}
@@ -1006,7 +1003,7 @@ export default function EditToolPage({
           <Button
             onClick={handleSave}
             disabled={saving}
-            className="bg-[#2D5A7B] hover:bg-[#1e4260]"
+            className="bg-primary hover:bg-primary/90"
           >
             <Save className="w-4 h-4 mr-2" />
             {saving ? "Salvando..." : "Salvar Alterações"}

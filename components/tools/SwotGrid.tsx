@@ -37,7 +37,8 @@ export default function SwotGrid({
         {orderedSections.map((section) => {
           const hasIcon = !!section.icon;
           const field = section.fields[0];
-          const baseColor = section.color || "#6366f1";
+          const baseColor = section.color || "var(--brand)";
+          const baseColorBg = section.color ? `${section.color}0C` : "color-mix(in srgb, var(--brand) 5%, transparent)";
           const charCount = (values[field?.id || ""] || "").length;
           const maxLen = field?.maxLength || 0;
           const isFocused = focusedField === field?.id;
@@ -45,12 +46,10 @@ export default function SwotGrid({
           return (
             <div
               key={section.id}
-              className="flex flex-col overflow-hidden"
+              className="flex flex-col overflow-hidden shadow-soft"
               style={{
-                backgroundColor: `${baseColor}0C`,
+                backgroundColor: baseColorBg,
                 borderRadius: "var(--card-radius, 16px)",
-                boxShadow:
-                  "0 2px 20px rgba(0,0,0,0.04), 0 1px 4px rgba(0,0,0,0.06)",
               }}
             >
               {/* Top accent bar */}
@@ -74,7 +73,7 @@ export default function SwotGrid({
                 </div>
 
                 {section.description && (
-                  <p className="text-sm text-slate-500 leading-relaxed mt-1 ml-[30px]">
+                  <p className="text-sm text-muted-foreground leading-relaxed mt-1 ml-[30px]">
                     {section.description}
                   </p>
                 )}
@@ -92,8 +91,8 @@ export default function SwotGrid({
                     readOnly={readOnly}
                     rows={5}
                     className="
-                      w-full bg-white border-0 text-sm leading-relaxed
-                      text-slate-700 placeholder:text-slate-400
+                      w-full bg-card border-0 text-sm leading-relaxed
+                      text-foreground placeholder:text-muted-foreground/60
                       outline-none resize-none
                       transition-shadow duration-150
                     "
@@ -101,7 +100,7 @@ export default function SwotGrid({
                       borderRadius: "var(--card-radius, 12px)",
                       padding: "10px 14px",
                       boxShadow: isFocused
-                        ? `0 0 0 2px ${baseColor}30`
+                        ? section.color ? `0 0 0 2px ${section.color}30` : `0 0 0 2px color-mix(in srgb, var(--brand) 20%, transparent)`
                         : "none",
                     }}
                     onFocus={() => setFocusedField(field.id)}
@@ -116,8 +115,8 @@ export default function SwotGrid({
                         style={{
                           color:
                             maxLen > 0 && charCount / maxLen > 0.9
-                              ? "#ef4444"
-                              : "#94a3b8",
+                              ? "var(--error)"
+                              : "var(--muted-foreground)",
                         }}
                       >
                         {charCount} / {field.maxLength}

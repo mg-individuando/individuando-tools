@@ -24,18 +24,16 @@ export default function CategoryGrid({
     <div className="w-full max-w-5xl mx-auto">
       {/* Summary bar */}
       <div
-        className="mb-6 px-5 py-4 flex items-center justify-between"
+        className="mb-6 px-5 py-4 flex items-center justify-between shadow-soft"
         style={{
-          backgroundColor: "#6366f10C",
+          backgroundColor: "color-mix(in srgb, var(--brand) 5%, transparent)",
           borderRadius: "var(--card-radius, 16px)",
-          boxShadow:
-            "0 2px 20px rgba(0,0,0,0.04), 0 1px 4px rgba(0,0,0,0.06)",
         }}
       >
-        <span className="text-sm font-medium text-gray-600">
+        <span className="text-sm font-medium text-muted-foreground">
           Forças selecionadas
         </span>
-        <span className="text-sm font-bold text-gray-800">
+        <span className="text-sm font-bold text-foreground">
           {totalSelected} de {totalFields}
         </span>
       </div>
@@ -46,17 +44,16 @@ export default function CategoryGrid({
           const selectedInCategory = section.fields.filter(
             (f) => values[f.id]
           ).length;
-          const color = section.color || "#2D5A7B";
+          const color = section.color || "var(--brand)";
+          const colorBg = section.color ? `${section.color}0C` : "color-mix(in srgb, var(--brand) 5%, transparent)";
 
           return (
             <div
               key={section.id}
-              className="overflow-hidden"
+              className="overflow-hidden shadow-soft"
               style={{
-                backgroundColor: `${color}0C`,
+                backgroundColor: colorBg,
                 borderRadius: "var(--card-radius, 16px)",
-                boxShadow:
-                  "0 2px 20px rgba(0,0,0,0.04), 0 1px 4px rgba(0,0,0,0.06)",
               }}
             >
               {/* Top accent bar */}
@@ -78,7 +75,7 @@ export default function CategoryGrid({
                   <span
                     className="text-xs font-semibold px-2.5 py-0.5 rounded-full shrink-0"
                     style={{
-                      backgroundColor: `${color}14`,
+                      backgroundColor: section.color ? `${section.color}14` : "color-mix(in srgb, var(--brand) 8%, transparent)",
                       color,
                     }}
                   >
@@ -87,7 +84,7 @@ export default function CategoryGrid({
                 </div>
 
                 {section.description && (
-                  <p className="text-xs text-gray-400 mb-3 leading-relaxed">
+                  <p className="text-xs text-muted-foreground/60 mb-3 leading-relaxed">
                     {section.description}
                   </p>
                 )}
@@ -102,14 +99,14 @@ export default function CategoryGrid({
                         key={field.id}
                         className="flex items-start gap-3 px-3 py-2 rounded-full cursor-pointer transition-all duration-150"
                         style={{
-                          backgroundColor: isChecked ? "white" : "transparent",
+                          backgroundColor: isChecked ? "var(--card)" : "transparent",
                           boxShadow: isChecked
-                            ? "0 1px 6px rgba(0,0,0,0.06)"
+                            ? "var(--shadow-xs)"
                             : "none",
                         }}
                         onMouseEnter={(e) => {
                           if (!isChecked) {
-                            (e.currentTarget as HTMLElement).style.backgroundColor = "rgba(255,255,255,0.6)";
+                            (e.currentTarget as HTMLElement).style.backgroundColor = "color-mix(in srgb, var(--card) 60%, transparent)";
                           }
                         }}
                         onMouseLeave={(e) => {
@@ -132,10 +129,10 @@ export default function CategoryGrid({
                           <div
                             className="w-[18px] h-[18px] rounded-full flex items-center justify-center transition-colors"
                             style={{
-                              backgroundColor: isChecked ? color : "white",
+                              backgroundColor: isChecked ? color : "var(--card)",
                               border: isChecked
                                 ? "none"
-                                : "2px solid #d1d5db",
+                                : "2px solid var(--border)",
                             }}
                           >
                             {isChecked && (
@@ -150,8 +147,8 @@ export default function CategoryGrid({
                         <span
                           className={`text-sm leading-snug ${
                             isChecked
-                              ? "text-gray-800 font-medium"
-                              : "text-gray-600"
+                              ? "text-foreground font-medium"
+                              : "text-muted-foreground"
                           }`}
                         >
                           {field.label}
@@ -169,15 +166,13 @@ export default function CategoryGrid({
       {/* Selected strengths summary */}
       {totalSelected > 0 && (
         <div
-          className="mt-6 p-5"
+          className="mt-6 p-5 shadow-soft"
           style={{
-            backgroundColor: "#6366f10C",
+            backgroundColor: "color-mix(in srgb, var(--brand) 5%, transparent)",
             borderRadius: "var(--card-radius, 16px)",
-            boxShadow:
-              "0 2px 20px rgba(0,0,0,0.04), 0 1px 4px rgba(0,0,0,0.06)",
           }}
         >
-          <h4 className="text-sm font-bold text-gray-700 mb-3">
+          <h4 className="text-sm font-bold text-foreground mb-3">
             Suas forças selecionadas
           </h4>
           <div className="flex flex-wrap gap-2">
@@ -185,14 +180,14 @@ export default function CategoryGrid({
               section.fields
                 .filter((f) => values[f.id])
                 .map((f) => {
-                  const c = section.color || "#2D5A7B";
+                  const c = section.color || "var(--brand)";
                   return (
                     <span
                       key={f.id}
                       className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full font-medium"
                       style={{
-                        backgroundColor: "white",
-                        boxShadow: "0 1px 4px rgba(0,0,0,0.06)",
+                        backgroundColor: "var(--card)",
+                        boxShadow: "var(--shadow-xs)",
                         color: c,
                       }}
                     >

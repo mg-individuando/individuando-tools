@@ -50,45 +50,45 @@ export default function UpdatePasswordPage() {
   }
 
   const inputClass =
-    "w-full rounded-xl border border-gray-200 bg-gray-50/50 px-4 py-3 text-sm text-gray-900 placeholder:text-gray-300 focus:border-[#2D5A7B] focus:ring-2 focus:ring-[#2D5A7B]/10 focus:bg-white outline-none transition-all font-sans";
+    "w-full rounded-xl border border-border bg-secondary/50 px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/50 focus:border-primary focus:ring-2 focus:ring-primary/10 focus:bg-card outline-none transition-all font-sans";
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-slate-50 to-white px-4">
+    <div className="min-h-screen flex items-center justify-center bg-background px-4">
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="flex flex-col items-center mb-10">
-          <div className="w-14 h-14 rounded-2xl bg-[#2D5A7B] flex items-center justify-center shadow-lg shadow-[#2D5A7B]/20">
-            <span className="text-white font-bold text-2xl font-sans">I</span>
+          <div className="w-14 h-14 rounded-2xl bg-primary flex items-center justify-center shadow-lg shadow-primary/20">
+            <span className="text-primary-foreground font-bold text-2xl font-sans">I</span>
           </div>
-          <span className="mt-3 text-lg font-semibold text-[#2D5A7B] font-sans tracking-tight">
+          <span className="mt-3 text-lg font-semibold text-primary font-sans tracking-tight">
             Individuando
           </span>
         </div>
 
         {/* Card */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8">
+        <div className="bg-card rounded-2xl border border-border shadow-soft p-8">
           {success ? (
             <div className="text-center py-4">
               <div className="w-14 h-14 rounded-full bg-green-50 flex items-center justify-center mx-auto mb-4">
                 <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#10B981" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
               </div>
-              <h2 className="text-lg font-semibold text-gray-900 font-sans mb-1">
+              <h2 className="text-lg font-semibold text-foreground font-sans mb-1">
                 Senha Atualizada!
               </h2>
-              <p className="text-sm text-gray-400 font-sans">
+              <p className="text-sm text-muted-foreground font-sans">
                 Redirecionando para o painel...
               </p>
             </div>
           ) : (
             <>
               <div className="text-center mb-6">
-                <div className="w-12 h-12 rounded-full bg-[#2D5A7B]/10 flex items-center justify-center mx-auto mb-3">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2D5A7B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                <div className="w-12 h-12 rounded-full bg-brand-subtle flex items-center justify-center mx-auto mb-3">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
                 </div>
-                <h2 className="text-lg font-semibold text-gray-900 font-sans">
+                <h2 className="text-lg font-semibold text-foreground font-sans">
                   Nova Senha
                 </h2>
-                <p className="text-sm text-gray-400 mt-1 font-sans">
+                <p className="text-sm text-muted-foreground mt-1 font-sans">
                   Escolha uma nova senha para sua conta
                 </p>
               </div>
@@ -97,7 +97,7 @@ export default function UpdatePasswordPage() {
                 <div className="space-y-1.5">
                   <label
                     htmlFor="new-password"
-                    className="block text-sm font-medium text-gray-700 font-sans"
+                    className="block text-sm font-medium text-foreground/80 font-sans"
                   >
                     Nova Senha
                   </label>
@@ -115,7 +115,7 @@ export default function UpdatePasswordPage() {
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                       tabIndex={-1}
                     >
                       {showPassword ? (
@@ -130,7 +130,7 @@ export default function UpdatePasswordPage() {
                 <div className="space-y-1.5">
                   <label
                     htmlFor="confirm-password"
-                    className="block text-sm font-medium text-gray-700 font-sans"
+                    className="block text-sm font-medium text-foreground/80 font-sans"
                   >
                     Confirmar Senha
                   </label>
@@ -154,7 +154,7 @@ export default function UpdatePasswordPage() {
                 <button
                   type="submit"
                   disabled={loading || password !== confirmPassword}
-                  className="w-full rounded-xl bg-[#2D5A7B] py-3 text-sm font-semibold text-white shadow-sm hover:bg-[#24496A] disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-sans"
+                  className="w-full rounded-xl bg-primary py-3 text-sm font-semibold text-primary-foreground shadow-sm hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-sans"
                 >
                   {loading ? "Atualizando..." : "Atualizar Senha"}
                 </button>

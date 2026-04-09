@@ -129,7 +129,7 @@ export default function RespostasPage({
               <Card
                 key={r.id}
                 className={`cursor-pointer transition-all hover:shadow-sm ${
-                  selectedResponse?.id === r.id ? "ring-2 ring-[#2D5A7B]" : ""
+                  selectedResponse?.id === r.id ? "ring-2 ring-primary" : ""
                 }`}
                 onClick={() => setSelectedResponse(r)}
               >
