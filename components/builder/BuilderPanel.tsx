@@ -3,6 +3,7 @@
 import { useState } from "react";
 import type { ToolSchema, Section, Field } from "@/lib/schemas/tool-schema";
 import ToolRenderer from "@/components/tools/ToolRenderer";
+import IconPicker from "@/components/ui/icon-picker";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -31,6 +32,8 @@ type SelectedItem =
 
 export default function BuilderPanel({ schema, onChange, onSave, saving }: BuilderPanelProps) {
   const [selected, setSelected] = useState<SelectedItem>({ type: "tool" });
+  const [showIconPicker, setShowIconPicker] = useState(false);
+  const [iconPickerTarget, setIconPickerTarget] = useState<number | null>(null);
   const [originalSchema] = useState<ToolSchema>(JSON.parse(JSON.stringify(schema)));
 
   const defaultTheme = { primaryColor: "#2D5A7B", backgroundColor: "#FFFFFF", fontFamily: "Inter" };
@@ -269,11 +272,35 @@ export default function BuilderPanel({ schema, onChange, onSave, saving }: Build
                 </div>
                 <div className="space-y-2">
                   <Label className="text-xs">Ícone</Label>
+                  <div className="flex items-center gap-2">
+                    {section.icon && section.icon.startsWith("http") ? (
+                      <img
+                        src={section.icon}
+                        alt="Ícone"
+                        className="w-8 h-8 rounded-lg border bg-white p-0.5 object-contain"
+                      />
+                    ) : (
+                      <div className="w-8 h-8 rounded-lg border bg-gray-50 flex items-center justify-center text-[10px] text-gray-400">
+                        {section.icon || "—"}
+                      </div>
+                    )}
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="flex-1 text-xs"
+                      onClick={() => {
+                        setIconPickerTarget(selected.sectionIndex);
+                        setShowIconPicker(true);
+                      }}
+                    >
+                      Buscar Ícone
+                    </Button>
+                  </div>
                   <Input
                     value={section.icon || ""}
                     onChange={(e) => updateSection(selected.sectionIndex, { icon: e.target.value })}
-                    placeholder="Ex: heart, star, shield"
-                    className="text-sm"
+                    placeholder="URL ou nome do ícone"
+                    className="text-xs font-mono"
                   />
                 </div>
               </>
@@ -370,6 +397,28 @@ export default function BuilderPanel({ schema, onChange, onSave, saving }: Build
           )}
         </div>
       </div>
+
+      {/* Icon Picker Modal */}
+      {showIconPicker && (
+        <IconPicker
+          value={
+            iconPickerTarget !== null
+              ? schema.sections[iconPickerTarget]?.icon
+              : undefined
+          }
+          onSelect={(url, name) => {
+            if (iconPickerTarget !== null) {
+              updateSection(iconPickerTarget, { icon: url });
+            }
+            setShowIconPicker(false);
+            setIconPickerTarget(null);
+          }}
+          onClose={() => {
+            setShowIconPicker(false);
+            setIconPickerTarget(null);
+          }}
+        />
+      )}
     </div>
   );
 }
