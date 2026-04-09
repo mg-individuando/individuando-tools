@@ -3,7 +3,8 @@
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
-import { Plus, Copy, ExternalLink, Eye, FileText } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Plus, Copy, ExternalLink, Eye, FileText, LayoutGrid, List, Trash2, Pencil } from "lucide-react";
 import { toast } from "sonner";
 import type { Tool } from "@/lib/schemas/types";
 
@@ -28,7 +29,9 @@ const templateColors: Record<string, string> = {
 export default function FerramentasPage() {
   const [tools, setTools] = useState<Tool[]>([]);
   const [loading, setLoading] = useState(true);
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const supabase = createClient();
+  const router = useRouter();
 
   useEffect(() => {
     loadTools();
@@ -61,6 +64,14 @@ export default function FerramentasPage() {
     loadTools();
   }
 
+  async function handleDelete(toolId: string, e: React.MouseEvent) {
+    e.stopPropagation();
+    if (!window.confirm("Excluir esta ferramenta?")) return;
+    await supabase.from("tools").delete().eq("id", toolId);
+    toast.success("Ferramenta excluída!");
+    setTools(tools.filter(t => t.id !== toolId));
+  }
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-24 text-[#475569]">
@@ -81,12 +92,30 @@ export default function FerramentasPage() {
             Gerencie suas ferramentas interativas de workshop e mentoria
           </p>
         </div>
-        <Link href="/admin/ferramentas/nova">
-          <button className="btn-primary inline-flex items-center gap-2 text-sm">
-            <Plus className="w-4 h-4" />
-            Nova Ferramenta
-          </button>
-        </Link>
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1 mr-3">
+            <button
+              onClick={() => setViewMode("grid")}
+              className={`p-2 rounded-lg transition-all duration-200 ${viewMode === "grid" ? "gradient-primary text-white" : "text-[#475569] hover:bg-white/60"}`}
+              title="Visualização em grade"
+            >
+              <LayoutGrid className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => setViewMode("list")}
+              className={`p-2 rounded-lg transition-all duration-200 ${viewMode === "list" ? "gradient-primary text-white" : "text-[#475569] hover:bg-white/60"}`}
+              title="Visualização em lista"
+            >
+              <List className="w-4 h-4" />
+            </button>
+          </div>
+          <Link href="/admin/ferramentas/nova">
+            <button className="btn-primary inline-flex items-center gap-2 text-sm">
+              <Plus className="w-4 h-4" />
+              Nova Ferramenta
+            </button>
+          </Link>
+        </div>
       </div>
 
       {/* Empty state */}
@@ -111,7 +140,8 @@ export default function FerramentasPage() {
           </div>
         </div>
       ) : (
-        /* Tool cards grid */
+        /* Tool cards — grid or list */
+        viewMode === "grid" ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {tools.map((tool) => (
             <div
@@ -199,6 +229,66 @@ export default function FerramentasPage() {
             </div>
           ))}
         </div>
+        ) : (
+        /* List view */
+        <div className="glass-card overflow-hidden">
+          {/* Header row */}
+          <div className="grid grid-cols-[1fr_120px_100px_120px_80px] gap-4 px-5 py-3 text-[11px] font-semibold text-[#475569] uppercase tracking-wider border-b border-[rgba(0,128,255,0.06)]">
+            <span>Nome</span>
+            <span>Tipo</span>
+            <span>Status</span>
+            <span>Criada em</span>
+            <span>Ações</span>
+          </div>
+          {/* Rows */}
+          {tools.map((tool) => (
+            <div
+              key={tool.id}
+              className="grid grid-cols-[1fr_120px_100px_120px_80px] gap-4 px-5 py-3 items-center border-b border-[rgba(0,128,255,0.03)] hover:bg-[rgba(0,128,255,0.02)] transition-colors duration-150 cursor-pointer"
+              onClick={() => router.push(`/admin/ferramentas/${tool.id}`)}
+            >
+              <span className="text-sm font-medium text-[#0f172a] truncate">{tool.title}</span>
+              <span className={`inline-block text-xs font-normal px-2 py-0.5 rounded-md border w-fit ${
+                templateColors[tool.template_type] ||
+                "bg-slate-50/80 text-slate-600 border-slate-200/60"
+              }`}>
+                {templateLabels[tool.template_type] || tool.template_type}
+              </span>
+              <span>
+                <span
+                  className={`text-xs font-medium px-2.5 py-1 rounded-full ${
+                    tool.status === "published"
+                      ? "gradient-primary text-white"
+                      : "border border-[rgba(0,128,255,0.2)] text-[#475569] bg-white/60"
+                  }`}
+                >
+                  {tool.status === "published" ? "Publicada" : "Rascunho"}
+                </span>
+              </span>
+              <span className="text-xs text-[#94a3b8]">
+                {new Date(tool.created_at).toLocaleDateString("pt-BR")}
+              </span>
+              <div className="flex gap-1">
+                <Link href={`/admin/ferramentas/${tool.id}`} onClick={(e) => e.stopPropagation()}>
+                  <button
+                    className="text-[#475569] hover:text-[#0080ff] h-7 w-7 flex items-center justify-center rounded-lg hover:bg-[rgba(0,128,255,0.05)] transition-all duration-200"
+                    title="Editar"
+                  >
+                    <Pencil className="w-3.5 h-3.5" />
+                  </button>
+                </Link>
+                <button
+                  className="text-[#475569] hover:text-red-500 h-7 w-7 flex items-center justify-center rounded-lg hover:bg-red-50 transition-all duration-200"
+                  title="Excluir"
+                  onClick={(e) => handleDelete(tool.id, e)}
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+        )
       )}
     </div>
   );

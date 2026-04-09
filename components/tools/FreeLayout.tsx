@@ -40,7 +40,7 @@ export default function FreeLayout({
               maxLength={field.maxLength}
               required={field.required}
               readOnly={readOnly}
-              className="w-full bg-white/60 border border-[rgba(0,128,255,0.1)] rounded-xl px-4 py-3 text-sm text-[#0f172a] placeholder:text-[#94a3b8] outline-none transition-all duration-200 focus:border-[#0080ff]/40 focus:ring-2 focus:ring-[#0080ff]/10 focus:bg-white"
+              className="w-full glass-input"
               onFocus={() => setFocusedField(field.id)}
               onBlur={() => setFocusedField(null)}
             />
@@ -71,7 +71,7 @@ export default function FreeLayout({
               required={field.required}
               readOnly={readOnly}
               rows={4}
-              className="w-full bg-white/60 border border-[rgba(0,128,255,0.1)] rounded-xl px-4 py-3 text-sm leading-relaxed text-[#0f172a] placeholder:text-[#94a3b8] outline-none resize-none transition-all duration-200 focus:border-[#0080ff]/40 focus:ring-2 focus:ring-[#0080ff]/10 focus:bg-white"
+              className="w-full glass-input resize-none"
               onFocus={() => setFocusedField(field.id)}
               onBlur={() => setFocusedField(null)}
             />
@@ -190,7 +190,7 @@ export default function FreeLayout({
               value={(fieldValue as string) || ""}
               onChange={(e) => onChange(field.id, e.target.value)}
               disabled={readOnly}
-              className="w-full bg-white/60 border border-[rgba(0,128,255,0.1)] rounded-xl px-4 py-3 text-sm text-[#0f172a] outline-none transition-all duration-200 focus:border-[#0080ff]/40 focus:ring-2 focus:ring-[#0080ff]/10 focus:bg-white"
+              className="w-full glass-input"
               onFocus={() => setFocusedField(field.id)}
               onBlur={() => setFocusedField(null)}
             >
@@ -215,7 +215,7 @@ export default function FreeLayout({
               value={(fieldValue as string) || ""}
               onChange={(e) => onChange(field.id, e.target.value)}
               readOnly={readOnly}
-              className="w-full bg-white/60 border border-[rgba(0,128,255,0.1)] rounded-xl px-4 py-3 text-sm text-[#0f172a] outline-none transition-all duration-200 focus:border-[#0080ff]/40 focus:ring-2 focus:ring-[#0080ff]/10 focus:bg-white"
+              className="w-full glass-input"
               onFocus={() => setFocusedField(field.id)}
               onBlur={() => setFocusedField(null)}
             />

@@ -190,6 +190,22 @@ export default function EditToolPage({
     );
   }
 
+  async function handleDelete() {
+    if (!tool) return;
+    const confirmed = window.confirm(
+      `Tem certeza que deseja excluir "${tool.title}"? Esta acao e irreversivel e todas as respostas associadas serao perdidas.`
+    );
+    if (!confirmed) return;
+
+    const { error } = await supabase.from("tools").delete().eq("id", tool.id);
+    if (error) {
+      toast.error("Erro ao excluir ferramenta.");
+      return;
+    }
+    toast.success("Ferramenta excluida com sucesso!");
+    router.push("/admin/ferramentas");
+  }
+
   async function copyLink() {
     if (!tool) return;
     await navigator.clipboard.writeText(publicUrl);
@@ -369,6 +385,15 @@ export default function EditToolPage({
           </Link>
           <Button variant="outline" size="sm" onClick={handlePublish}>
             {tool.status === "published" ? "Despublicar" : "Publicar"}
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            className="text-red-500 hover:text-red-700 hover:bg-red-50 border-red-200"
+            onClick={handleDelete}
+            title="Excluir ferramenta"
+          >
+            <Trash2 className="w-4 h-4" />
           </Button>
         </div>
       </div>
@@ -1008,6 +1033,24 @@ export default function EditToolPage({
             <Save className="w-4 h-4 mr-2" />
             {saving ? "Salvando..." : "Salvar Alterações"}
           </Button>
+
+          <div className="glass-card p-6 border-red-200/50 mt-8">
+            <h3 className="text-base font-semibold text-red-600 mb-2">Zona de Perigo</h3>
+            <p className="text-[13px] text-[#475569] mb-4">
+              Excluir esta ferramenta permanentemente. Todas as respostas associadas também serão removidas.
+            </p>
+            <button
+              onClick={async () => {
+                if (!window.confirm("Tem certeza? Esta ação é irreversível e excluirá todas as respostas.")) return;
+                await supabase.from("tools").delete().eq("id", tool.id);
+                toast.success("Ferramenta excluída com sucesso!");
+                router.push("/admin/ferramentas");
+              }}
+              className="px-4 py-2 rounded-xl bg-red-500 text-white font-medium text-sm hover:bg-red-600 transition-all duration-200"
+            >
+              Excluir Ferramenta
+            </button>
+          </div>
         </div>
       )}
     </div>

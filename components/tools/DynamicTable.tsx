@@ -188,7 +188,7 @@ export default function DynamicTable({
                     maxLength={field.maxLength}
                     readOnly={readOnly}
                     rows={2}
-                    className="w-full bg-white/60 border border-[rgba(0,128,255,0.1)] rounded-xl px-4 py-3 text-sm text-[#0f172a] placeholder:text-[#94a3b8] resize-none outline-none transition-all duration-200 focus:border-[#0080ff]/40 focus:ring-2 focus:ring-[#0080ff]/10 focus:bg-white"
+                    className="w-full glass-input resize-none"
                   />
                 ) : (
                   <input
@@ -198,7 +198,7 @@ export default function DynamicTable({
                     placeholder={field.placeholder}
                     maxLength={field.maxLength}
                     readOnly={readOnly}
-                    className="w-full bg-white/60 border border-[rgba(0,128,255,0.1)] rounded-xl px-4 py-3 text-sm text-[#0f172a] placeholder:text-[#94a3b8] outline-none transition-all duration-200 focus:border-[#0080ff]/40 focus:ring-2 focus:ring-[#0080ff]/10 focus:bg-white"
+                    className="w-full glass-input"
                   />
                 )}
               </div>
@@ -268,7 +268,7 @@ export default function DynamicTable({
                           maxLength={field.maxLength}
                           readOnly={readOnly}
                           rows={3}
-                          className="w-full bg-white/60 border border-[rgba(0,128,255,0.1)] rounded-xl px-4 py-3 text-sm text-[#0f172a] placeholder:text-[#94a3b8] resize-none outline-none transition-all duration-200 focus:border-[#0080ff]/40 focus:ring-2 focus:ring-[#0080ff]/10 focus:bg-white"
+                          className="w-full glass-input resize-none"
                         />
                       ) : (
                         <input
@@ -278,7 +278,7 @@ export default function DynamicTable({
                           placeholder={field.placeholder}
                           maxLength={field.maxLength}
                           readOnly={readOnly}
-                          className="w-full bg-white/60 border border-[rgba(0,128,255,0.1)] rounded-xl px-4 py-3 text-sm text-[#0f172a] placeholder:text-[#94a3b8] outline-none transition-all duration-200 focus:border-[#0080ff]/40 focus:ring-2 focus:ring-[#0080ff]/10 focus:bg-white"
+                          className="w-full glass-input"
                         />
                       )}
                     </div>

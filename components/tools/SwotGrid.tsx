@@ -102,7 +102,7 @@ export default function SwotGrid({
                     required={field.required}
                     readOnly={readOnly}
                     rows={5}
-                    className="w-full rounded-xl border border-[rgba(0,128,255,0.1)] bg-white/60 px-4 py-3 text-sm leading-relaxed text-[#0f172a] placeholder:text-[#94a3b8] outline-none resize-none transition-all duration-200 focus:border-[#0080ff]/40 focus:ring-2 focus:ring-[#0080ff]/10 focus:bg-white"
+                    className="w-full glass-input resize-none"
                     onFocus={() => setFocusedField(field.id)}
                     onBlur={() => setFocusedField(null)}
                   />

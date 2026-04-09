@@ -480,7 +480,7 @@ export default function PublicFormPage({
                     value={participantName}
                     onChange={(e) => setParticipantName(e.target.value)}
                     placeholder="Como você quer ser identificado"
-                    className="w-full rounded-xl border border-[rgba(0,128,255,0.1)] bg-white/60 px-4 py-3 text-sm text-[#0f172a] placeholder:text-[#94a3b8] focus:border-[#0080ff]/40 focus:ring-2 focus:ring-[#0080ff]/10 focus:bg-white outline-none transition-all duration-200"
+                    className="w-full glass-input"
                   />
                 </div>
               )}
@@ -504,7 +504,7 @@ export default function PublicFormPage({
                     value={participantEmail}
                     onChange={(e) => setParticipantEmail(e.target.value)}
                     placeholder="seu@email.com"
-                    className="w-full rounded-xl border border-[rgba(0,128,255,0.1)] bg-white/60 px-4 py-3 text-sm text-[#0f172a] placeholder:text-[#94a3b8] focus:border-[#0080ff]/40 focus:ring-2 focus:ring-[#0080ff]/10 focus:bg-white outline-none transition-all duration-200"
+                    className="w-full glass-input"
                   />
                 </div>
               )}
@@ -561,7 +561,7 @@ export default function PublicFormPage({
                         }))
                       }
                       placeholder={field.placeholder || ""}
-                      className="w-full rounded-xl border border-[rgba(0,128,255,0.1)] bg-white/60 px-4 py-3 text-sm text-[#0f172a] placeholder:text-[#94a3b8] focus:border-[#0080ff]/40 focus:ring-2 focus:ring-[#0080ff]/10 focus:bg-white outline-none transition-all duration-200"
+                      className="w-full glass-input"
                       style={
                         {
                           "--tw-ring-color": `${primaryColor}22`,

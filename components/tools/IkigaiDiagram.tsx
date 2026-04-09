@@ -131,7 +131,7 @@ export default function IkigaiDiagram({
                             required={field.required}
                             readOnly={readOnly}
                             rows={4}
-                            className="w-full border border-border bg-muted/40 rounded-lg px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/50 resize-none transition-all duration-200 focus:outline-none focus:border-ring focus:ring-2 focus:ring-ring/20"
+                            className="w-full glass-input resize-none"
                           />
                           {maxLen > 0 && (
                             <div className="mt-1.5 text-right">
@@ -214,7 +214,7 @@ export default function IkigaiDiagram({
                             maxLength={field.maxLength}
                             readOnly={readOnly}
                             rows={2}
-                            className="w-full border border-border bg-muted/40 rounded-lg px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/50 resize-none transition-all duration-200 focus:outline-none focus:border-ring focus:ring-2 focus:ring-ring/20"
+                            className="w-full glass-input resize-none"
                           />
                           {maxLen > 0 && (
                             <div className="mt-1.5 text-right">
@@ -298,7 +298,7 @@ export default function IkigaiDiagram({
                             required={field.required}
                             readOnly={readOnly}
                             rows={4}
-                            className="w-full border border-border bg-muted/40 rounded-lg px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/50 resize-none transition-all duration-200 focus:outline-none focus:border-ring focus:ring-2 focus:ring-ring/20"
+                            className="w-full glass-input resize-none"
                           />
                           {maxLen > 0 && (
                             <div className="mt-1.5 text-right">
