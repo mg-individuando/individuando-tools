@@ -7,6 +7,7 @@ import RadarChart from "./RadarChart";
 import IkigaiDiagram from "./IkigaiDiagram";
 import CategoryGrid from "./CategoryGrid";
 import DynamicTable from "./DynamicTable";
+import FreeLayout from "./FreeLayout";
 
 interface ToolRendererProps {
   schema: ToolSchema;
@@ -79,11 +80,25 @@ export default function ToolRenderer({
           />
         );
 
+      case "free_layout":
+      case "blank":
+        return (
+          <FreeLayout
+            sections={schema.sections}
+            values={values}
+            onChange={(id, val) => handleChange(id, val)}
+            readOnly={readOnly}
+          />
+        );
+
       default:
         return (
-          <div className="text-center text-gray-500 py-10">
-            Template &quot;{schema.layout}&quot; ainda n&atilde;o implementado.
-          </div>
+          <FreeLayout
+            sections={schema.sections}
+            values={values}
+            onChange={(id, val) => handleChange(id, val)}
+            readOnly={readOnly}
+          />
         );
     }
   };
