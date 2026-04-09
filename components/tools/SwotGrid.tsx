@@ -2,22 +2,7 @@
 
 import { useState, useMemo } from "react";
 import type { Section } from "@/lib/schemas/tool-schema";
-import {
-  ShieldCheck,
-  AlertTriangle,
-  Lightbulb,
-  ShieldAlert,
-} from "lucide-react";
-
-const iconMap: Record<
-  string,
-  React.ComponentType<{ className?: string; style?: React.CSSProperties }>
-> = {
-  "shield-check": ShieldCheck,
-  "alert-triangle": AlertTriangle,
-  lightbulb: Lightbulb,
-  "shield-alert": ShieldAlert,
-};
+import SectionIcon from "./SectionIcon";
 
 interface SwotGridProps {
   sections: Section[];
@@ -50,7 +35,7 @@ export default function SwotGrid({
     <div className="w-full max-w-4xl mx-auto">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {orderedSections.map((section) => {
-          const Icon = section.icon ? iconMap[section.icon] : null;
+          const hasIcon = !!section.icon;
           const field = section.fields[0];
           const baseColor = section.color || "#6366f1";
           const charCount = (values[field?.id || ""] || "").length;
@@ -74,11 +59,8 @@ export default function SwotGrid({
                 {/* Header */}
                 <div className="px-5 pt-4 pb-2">
                   <div className="flex items-center gap-2.5 mb-1">
-                    {Icon && (
-                      <Icon
-                        className="w-5 h-5 shrink-0"
-                        style={{ color: baseColor }}
-                      />
+                    {hasIcon && (
+                      <SectionIcon icon={section.icon} size={22} />
                     )}
                     <h3
                       className="font-semibold text-base leading-tight"

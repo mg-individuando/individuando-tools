@@ -17,19 +17,12 @@ interface IconPickerProps {
   onClose: () => void;
 }
 
-const STYLE_FILTERS = [
-  { value: "", label: "Todos" },
-  { value: "lineal-color", label: "Lineal Color" },
-  { value: "flat", label: "Flat" },
-  { value: "lineal", label: "Lineal" },
-  { value: "hand-drawn", label: "Hand Drawn" },
-  { value: "gradient", label: "Gradient" },
-];
+// Only use "special-lineal" style (same as sua_alma project)
+const FIXED_STYLE = "special-lineal";
 
 export default function IconPicker({ value, onSelect, onClose }: IconPickerProps) {
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("business");
-  const [style, setStyle] = useState("");
   const [icons, setIcons] = useState<FreepikIcon[]>([]);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
@@ -55,8 +48,8 @@ export default function IconPicker({ value, onSelect, onClose }: IconPickerProps
         const params = new URLSearchParams({
           term: debouncedSearch,
           page: String(page),
+          style: FIXED_STYLE,
         });
-        if (style) params.set("style", style);
 
         const res = await fetch(`/api/icons/search?${params}`);
         const data = await res.json();
@@ -73,7 +66,7 @@ export default function IconPicker({ value, onSelect, onClose }: IconPickerProps
     }
 
     fetchIcons();
-  }, [debouncedSearch, style, page]);
+  }, [debouncedSearch, page]);
 
   // Focus input on mount
   useEffect(() => {
@@ -110,24 +103,12 @@ export default function IconPicker({ value, onSelect, onClose }: IconPickerProps
             />
           </div>
 
-          {/* Style filters */}
-          <div className="flex gap-1.5 flex-wrap">
-            {STYLE_FILTERS.map((f) => (
-              <button
-                key={f.value}
-                onClick={() => {
-                  setStyle(f.value);
-                  setPage(1);
-                }}
-                className={`text-xs px-2.5 py-1.5 rounded-lg transition-colors ${
-                  style === f.value
-                    ? "bg-purple-100 text-purple-700 font-medium"
-                    : "bg-gray-100 text-gray-500 hover:bg-gray-200"
-                }`}
-              >
-                {f.label}
-              </button>
-            ))}
+          {/* Style badge */}
+          <div className="flex items-center gap-1.5">
+            <span className="text-xs px-2.5 py-1.5 rounded-lg bg-purple-100 text-purple-700 font-medium">
+              Special Lineal
+            </span>
+            <span className="text-xs text-gray-400">Freepik Icons</span>
           </div>
         </div>
 

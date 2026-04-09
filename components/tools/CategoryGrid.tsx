@@ -1,18 +1,8 @@
 "use client";
 
 import type { Section } from "@/lib/schemas/tool-schema";
-import {
-  BookOpen, Flame, Users, Scale, Shield, Sparkles, Check,
-} from "lucide-react";
-
-const iconMap: Record<string, React.ComponentType<{ className?: string; style?: React.CSSProperties }>> = {
-  "book-open": BookOpen,
-  flame: Flame,
-  users: Users,
-  scale: Scale,
-  shield: Shield,
-  sparkles: Sparkles,
-};
+import { Check } from "lucide-react";
+import SectionIcon from "./SectionIcon";
 
 interface CategoryGridProps {
   sections: Section[];
@@ -45,7 +35,6 @@ export default function CategoryGrid({
       {/* Category cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         {sections.map((section) => {
-          const Icon = section.icon ? iconMap[section.icon] : null;
           const selectedInCategory = section.fields.filter((f) => values[f.id]).length;
           const color = section.color || "#2D5A7B";
 
@@ -63,9 +52,7 @@ export default function CategoryGrid({
               <div className="p-4">
                 {/* Category header */}
                 <div className="flex items-center gap-2.5 mb-1">
-                  {Icon && (
-                    <Icon className="w-4.5 h-4.5 shrink-0" style={{ color }} />
-                  )}
+                  <SectionIcon icon={section.icon} size={20} />
                   <h3 className="font-semibold text-sm text-gray-800 flex-1 min-w-0 truncate">
                     {section.label}
                   </h3>

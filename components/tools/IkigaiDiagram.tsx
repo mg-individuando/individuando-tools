@@ -2,15 +2,8 @@
 
 import { useState } from "react";
 import type { Section } from "@/lib/schemas/tool-schema";
-import { Heart, Star, Globe, Banknote, Compass, ChevronDown } from "lucide-react";
-
-const iconMap: Record<string, React.ComponentType<{ className?: string; style?: React.CSSProperties }>> = {
-  heart: Heart,
-  star: Star,
-  globe: Globe,
-  banknote: Banknote,
-  compass: Compass,
-};
+import { ChevronDown } from "lucide-react";
+import SectionIcon from "./SectionIcon";
 
 const circleColors: Record<string, string> = {
   "circle-top": "#EC4899",
@@ -89,7 +82,6 @@ export default function IkigaiDiagram({
         {expandedGroups.circles && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {mainCircles.map((section) => {
-              const Icon = section.icon ? iconMap[section.icon] : null;
               const field = section.fields[0];
               const baseColor = section.color || circleColors[section.position || ""] || "#6366f1";
               const charCount = (values[field?.id || ""] || "").length;
@@ -109,9 +101,7 @@ export default function IkigaiDiagram({
                     <div className="flex-1 p-4">
                       {/* Header */}
                       <div className="flex items-center gap-2.5 mb-1">
-                        {Icon && (
-                          <Icon className="w-4.5 h-4.5 shrink-0" style={{ color: baseColor }} />
-                        )}
+                        <SectionIcon icon={section.icon} size={20} />
                         <h4 className="font-semibold text-[15px] text-gray-800">
                           {section.label}
                         </h4>
@@ -245,7 +235,6 @@ export default function IkigaiDiagram({
 
           {expandedGroups.center &&
             (() => {
-              const CenterIcon = centerSection.icon ? iconMap[centerSection.icon] : null;
               const field = centerSection.fields[0];
               const baseColor = centerSection.color || "#D97706";
               const charCount = (values[field?.id || ""] || "").length;
@@ -260,9 +249,7 @@ export default function IkigaiDiagram({
                     />
                     <div className="flex-1 p-5">
                       <div className="flex items-center gap-2.5 mb-1">
-                        {CenterIcon && (
-                          <CenterIcon className="w-5 h-5 shrink-0" style={{ color: baseColor }} />
-                        )}
+                        <SectionIcon icon={centerSection.icon} size={22} />
                         <h4 className="font-bold text-lg text-gray-800">
                           {centerSection.label}
                         </h4>
