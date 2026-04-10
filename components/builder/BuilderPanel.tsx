@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import type { ToolSchema, Section, Field } from "@/lib/schemas/tool-schema";
+import { generateSectionId, generateFieldId, pickNextColor } from "@/lib/schemas/tool-schema";
 import ToolRenderer from "@/components/tools/ToolRenderer";
 import IconPicker from "@/components/ui/icon-picker";
 import { Input } from "@/components/ui/input";
@@ -16,6 +17,9 @@ import {
   Pencil,
   Trash2,
   Plus,
+  Copy,
+  ChevronUp,
+  ChevronDown,
 } from "lucide-react";
 
 interface BuilderPanelProps {
@@ -87,6 +91,86 @@ export default function BuilderPanel({ schema, onChange, onSave, saving }: Build
     }
   };
 
+  // ── Section management ──────────────────────────────
+
+  const sectionMgmtEnabled = schema.layout !== "ikigai" && schema.layout !== "dynamic_table";
+
+  const minSections = (schema.layout === "swot" || schema.layout === "radar") ? 2 : 1;
+
+  const addSection = () => {
+    if (!sectionMgmtEnabled) return;
+    const lastSection = schema.sections[schema.sections.length - 1];
+    const newSectionId = generateSectionId();
+    const newFields: Field[] = (lastSection?.fields || []).map((f) => ({
+      ...f,
+      id: generateFieldId(newSectionId),
+      label: f.label ? "Novo item" : undefined,
+      placeholder: f.placeholder,
+    }));
+    if (newFields.length === 0) {
+      newFields.push({ id: generateFieldId(newSectionId), type: "text_long", label: "Conteúdo" });
+    }
+    const newSection: Section = {
+      id: newSectionId,
+      label: "Nova Seção",
+      description: "",
+      color: pickNextColor(schema.sections),
+      icon: lastSection?.icon || "layers",
+      fields: newFields,
+    };
+    onChange({ ...schema, sections: [...schema.sections, newSection] });
+    setSelected({ type: "section", sectionIndex: schema.sections.length });
+  };
+
+  const removeSection = (index: number) => {
+    if (!sectionMgmtEnabled) return;
+    if (schema.sections.length <= minSections) return;
+    const newSections = schema.sections.filter((_, i) => i !== index);
+    onChange({ ...schema, sections: newSections });
+    if (selected?.type === "section" && selected.sectionIndex === index) {
+      setSelected({ type: "tool" });
+    } else if (selected?.type === "section" && selected.sectionIndex > index) {
+      setSelected({ type: "section", sectionIndex: selected.sectionIndex - 1 });
+    }
+  };
+
+  const duplicateSection = (index: number) => {
+    if (!sectionMgmtEnabled) return;
+    const source = schema.sections[index];
+    const newSectionId = generateSectionId();
+    const clone: Section = {
+      ...JSON.parse(JSON.stringify(source)),
+      id: newSectionId,
+      label: `${source.label} (cópia)`,
+      color: pickNextColor(schema.sections),
+      fields: source.fields.map((f) => ({
+        ...JSON.parse(JSON.stringify(f)),
+        id: generateFieldId(newSectionId),
+      })),
+    };
+    // Remove position so it doesn't conflict in swot layout
+    delete (clone as any).position;
+    const newSections = [...schema.sections];
+    newSections.splice(index + 1, 0, clone);
+    onChange({ ...schema, sections: newSections });
+    setSelected({ type: "section", sectionIndex: index + 1 });
+  };
+
+  const reorderSection = (index: number, direction: "up" | "down") => {
+    const targetIndex = direction === "up" ? index - 1 : index + 1;
+    if (targetIndex < 0 || targetIndex >= schema.sections.length) return;
+    const newSections = [...schema.sections];
+    // For swot layout, swap positions too
+    if (schema.layout === "swot" && newSections[index].position && newSections[targetIndex].position) {
+      const tempPos = newSections[index].position;
+      newSections[index] = { ...newSections[index], position: newSections[targetIndex].position };
+      newSections[targetIndex] = { ...newSections[targetIndex], position: tempPos };
+    }
+    [newSections[index], newSections[targetIndex]] = [newSections[targetIndex], newSections[index]];
+    onChange({ ...schema, sections: newSections });
+    setSelected({ type: "section", sectionIndex: targetIndex });
+  };
+
   const handleReset = () => {
     onChange(JSON.parse(JSON.stringify(originalSchema)));
     setSelected({ type: "tool" });
@@ -154,6 +238,15 @@ export default function BuilderPanel({ schema, onChange, onSave, saving }: Build
             onFieldAdd={addField}
             onFieldRemove={removeField}
           />
+
+          {/* Add Section button */}
+          {sectionMgmtEnabled && (
+            <div className="mt-6 flex justify-center">
+              <Button variant="outline" size="sm" onClick={addSection} className="text-xs">
+                <Plus className="w-3 h-3 mr-1" /> Adicionar Seção
+              </Button>
+            </div>
+          )}
         </div>
       </div>
 
@@ -229,6 +322,29 @@ export default function BuilderPanel({ schema, onChange, onSave, saving }: Build
                   />
                 </div>
               </div>
+              {/* Grid columns selector — only for grid-based layouts */}
+              {["swot", "category_grid", "free_layout"].includes(schema.layout) && (
+                <>
+                  <Separator />
+                  <h4 className="text-xs font-semibold text-gray-500 uppercase">Layout</h4>
+                  <div className="space-y-2">
+                    <Label className="text-xs">Colunas do Grid</Label>
+                    <select
+                      value={schema.gridColumns ?? ""}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        onChange({ ...schema, gridColumns: val ? parseInt(val) : undefined });
+                      }}
+                      className="w-full border rounded-md px-3 py-2 text-sm bg-white"
+                    >
+                      <option value="">Automático</option>
+                      <option value="2">2 colunas</option>
+                      <option value="3">3 colunas</option>
+                      <option value="4">4 colunas</option>
+                    </select>
+                  </div>
+                </>
+              )}
             </>
           )}
 
@@ -236,12 +352,30 @@ export default function BuilderPanel({ schema, onChange, onSave, saving }: Build
           {selected?.type === "section" && (() => {
             const section = schema.sections[selected.sectionIndex];
             if (!section) return null;
+            const si = selected.sectionIndex;
             return (
               <>
                 <div className="flex items-center gap-2 mb-2">
                   <div className="w-4 h-4 rounded-full" style={{ backgroundColor: section.color }} />
-                  <span className="text-sm font-semibold">{section.label}</span>
+                  <span className="text-sm font-semibold flex-1 truncate">{section.label}</span>
                 </div>
+                {/* Section action buttons */}
+                {sectionMgmtEnabled && (
+                  <div className="flex gap-1 mb-3">
+                    <Button variant="ghost" size="sm" className="flex-1 h-7 text-[10px] px-1" onClick={() => reorderSection(si, "up")} disabled={si === 0} title="Mover para cima">
+                      <ChevronUp className="w-3.5 h-3.5" />
+                    </Button>
+                    <Button variant="ghost" size="sm" className="flex-1 h-7 text-[10px] px-1" onClick={() => reorderSection(si, "down")} disabled={si === schema.sections.length - 1} title="Mover para baixo">
+                      <ChevronDown className="w-3.5 h-3.5" />
+                    </Button>
+                    <Button variant="ghost" size="sm" className="flex-1 h-7 text-[10px] px-1" onClick={() => duplicateSection(si)} title="Duplicar seção">
+                      <Copy className="w-3.5 h-3.5" />
+                    </Button>
+                    <Button variant="ghost" size="sm" className="flex-1 h-7 text-[10px] px-1 text-red-500 hover:text-red-600 hover:bg-red-50" onClick={() => removeSection(si)} disabled={schema.sections.length <= minSections} title="Remover seção">
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </Button>
+                  </div>
+                )}
                 <div className="space-y-2">
                   <Label className="text-xs">Label</Label>
                   <Input

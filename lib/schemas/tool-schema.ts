@@ -62,6 +62,7 @@ export const ToolSchemaDefinition = z.object({
   title: z.string(),
   description: z.string().optional(),
   instructions: z.string().optional(),
+  gridColumns: z.number().min(1).max(6).optional(),
   theme: ThemeSchema.optional(),
   sections: z.array(SectionSchema),
 });
@@ -109,3 +110,27 @@ export type ToolSchema = z.infer<typeof ToolSchemaDefinition>;
 export type TemplateType = z.infer<typeof TemplateType>;
 export type IdentificationField = z.infer<typeof IdentificationFieldSchema>;
 export type ToolSettings = z.infer<typeof ToolSettingsSchema>;
+
+// ── Helpers para o Builder ──────────────────────────────
+
+export const SECTION_COLORS = [
+  "#10B981", "#F59E0B", "#3B82F6", "#EC4899",
+  "#8B5CF6", "#06B6D4", "#F97316", "#14B8A6",
+  "#EF4444", "#6366F1", "#0EA5E9", "#A855F7",
+];
+
+export function generateSectionId(): string {
+  return `section_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 6)}`;
+}
+
+export function generateFieldId(sectionId: string): string {
+  return `${sectionId}_f_${Date.now().toString(36)}${Math.random().toString(36).slice(2, 5)}`;
+}
+
+export function pickNextColor(existingSections: Section[]): string {
+  const usedColors = new Set(existingSections.map((s) => s.color));
+  const available = SECTION_COLORS.filter((c) => !usedColors.has(c));
+  return available.length > 0
+    ? available[0]
+    : SECTION_COLORS[existingSections.length % SECTION_COLORS.length];
+}

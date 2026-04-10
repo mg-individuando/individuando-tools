@@ -5,11 +5,18 @@ import type { Section, Field } from "@/lib/schemas/tool-schema";
 import SectionIcon from "./SectionIcon";
 import InlineEdit from "./InlineEdit";
 
+const GRID_COLS_MAP: Record<number, string> = {
+  2: "grid grid-cols-1 md:grid-cols-2 gap-4",
+  3: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4",
+  4: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4",
+};
+
 interface FreeLayoutProps {
   sections: Section[];
   values: Record<string, unknown>;
   onChange: (fieldId: string, value: unknown) => void;
   readOnly?: boolean;
+  gridColumns?: number;
   onSectionClick?: (sectionIndex: number) => void;
   selectedSectionIndex?: number;
   onSectionUpdate?: (sectionIndex: number, updates: Partial<Section>) => void;
@@ -21,6 +28,7 @@ export default function FreeLayout({
   values,
   onChange,
   readOnly = false,
+  gridColumns,
   onSectionClick,
   selectedSectionIndex,
   onSectionUpdate,
@@ -275,8 +283,13 @@ export default function FreeLayout({
     }
   }
 
+  const useGrid = gridColumns && gridColumns > 1;
+  const containerClass = useGrid
+    ? `w-full max-w-5xl mx-auto ${GRID_COLS_MAP[gridColumns] || GRID_COLS_MAP[2]}`
+    : "w-full max-w-3xl mx-auto space-y-4";
+
   return (
-    <div className="w-full max-w-3xl mx-auto space-y-4">
+    <div className={containerClass}>
       {sections.map((section, sectionIndex) => {
         const color = section.color || "#0080ff";
         const isSelected = onSectionClick && selectedSectionIndex === sectionIndex;

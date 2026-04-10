@@ -6,11 +6,19 @@ import { Check, Plus, X } from "lucide-react";
 import SectionIcon from "./SectionIcon";
 import InlineEdit from "./InlineEdit";
 
+const GRID_COLS_MAP: Record<number, string> = {
+  1: "grid grid-cols-1 gap-5",
+  2: "grid grid-cols-1 md:grid-cols-2 gap-5",
+  3: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5",
+  4: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5",
+};
+
 interface CategoryGridProps {
   sections: Section[];
   values: Record<string, boolean>;
   onChange: (fieldId: string, value: boolean) => void;
   readOnly?: boolean;
+  gridColumns?: number;
   onSectionClick?: (sectionIndex: number) => void;
   selectedSectionIndex?: number;
   onSectionUpdate?: (sectionIndex: number, updates: Partial<Section>) => void;
@@ -24,6 +32,7 @@ export default function CategoryGrid({
   values,
   onChange,
   readOnly = false,
+  gridColumns,
   onSectionClick,
   selectedSectionIndex,
   onSectionUpdate,
@@ -41,6 +50,10 @@ export default function CategoryGrid({
       s.label.split(/\s+/).some((word) => word.length > 15)
     );
   }, [sections]);
+
+  const defaultCols = hasLongWord ? 2 : 3;
+  const effectiveCols = gridColumns ?? defaultCols;
+  const gridClass = GRID_COLS_MAP[effectiveCols] || GRID_COLS_MAP[3];
 
   return (
     <div className="w-full max-w-5xl mx-auto">
@@ -65,7 +78,7 @@ export default function CategoryGrid({
       </div>
 
       {/* Category cards */}
-      <div className={`grid grid-cols-1 md:grid-cols-2 ${hasLongWord ? "" : "lg:grid-cols-3"} gap-5`}>
+      <div className={gridClass}>
         {sections.map((section, sectionIndex) => {
           const selectedInCategory = section.fields.filter(
             (f) => values[f.id]

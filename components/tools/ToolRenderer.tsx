@@ -59,6 +59,7 @@ export default function ToolRenderer({
             values={values as Record<string, string>}
             onChange={(id, val) => handleChange(id, val)}
             readOnly={readOnly}
+            gridColumns={schema.gridColumns}
             {...builderProps}
           />
         );
@@ -92,6 +93,7 @@ export default function ToolRenderer({
             values={values as Record<string, boolean>}
             onChange={(id, val) => handleChange(id, val)}
             readOnly={readOnly}
+            gridColumns={schema.gridColumns}
             {...builderProps}
           />
         );
@@ -115,6 +117,7 @@ export default function ToolRenderer({
             values={values}
             onChange={(id, val) => handleChange(id, val)}
             readOnly={readOnly}
+            gridColumns={schema.gridColumns}
             {...builderProps}
           />
         );
@@ -126,6 +129,7 @@ export default function ToolRenderer({
             values={values}
             onChange={(id, val) => handleChange(id, val)}
             readOnly={readOnly}
+            gridColumns={schema.gridColumns}
             {...builderProps}
           />
         );

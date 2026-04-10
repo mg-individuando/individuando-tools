@@ -10,17 +10,26 @@ interface SwotGridProps {
   values: Record<string, string>;
   onChange: (fieldId: string, value: string) => void;
   readOnly?: boolean;
+  gridColumns?: number;
   onSectionClick?: (sectionIndex: number) => void;
   selectedSectionIndex?: number;
   onSectionUpdate?: (sectionIndex: number, updates: Partial<Section>) => void;
   onFieldUpdate?: (sectionIndex: number, fieldIndex: number, updates: Partial<Field>) => void;
 }
 
+const GRID_COLS_MAP: Record<number, string> = {
+  1: "grid grid-cols-1 gap-4",
+  2: "grid grid-cols-1 md:grid-cols-2 gap-4",
+  3: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4",
+  4: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4",
+};
+
 export default function SwotGrid({
   sections,
   values,
   onChange,
   readOnly = false,
+  gridColumns,
   onSectionClick,
   selectedSectionIndex,
   onSectionUpdate,
@@ -35,14 +44,19 @@ export default function SwotGrid({
     indexed.sort((a, b) => {
       const ai = positionOrder.indexOf(a.section.position || "");
       const bi = positionOrder.indexOf(b.section.position || "");
-      return ai - bi;
+      // Sections without position go to the end
+      const aVal = ai === -1 ? 999 : ai;
+      const bVal = bi === -1 ? 999 : bi;
+      return aVal - bVal;
     });
     return indexed;
   }, [sections]);
 
+  const gridClass = GRID_COLS_MAP[gridColumns ?? 2] || GRID_COLS_MAP[2];
+
   return (
-    <div className="w-full max-w-4xl mx-auto">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div className="w-full max-w-5xl mx-auto">
+      <div className={gridClass}>
         {orderedSections.map(({ section, originalIndex }) => {
           const field = section.fields[0];
           const color = section.color || "#0080ff";
