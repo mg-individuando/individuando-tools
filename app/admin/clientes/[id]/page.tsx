@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { FileUpload } from "@/components/ui/file-upload";
+import { FontUpload } from "@/components/ui/font-upload";
 import { toast } from "sonner";
 import { ArrowLeft, Save, Eye, Trash2, Plus, X } from "lucide-react";
 import Link from "next/link";
@@ -45,21 +46,6 @@ const RADIUS_OPTIONS = [
   { value: "9999px", label: "Pill (9999px)" },
 ];
 
-
-/** Auto-detect font weight from filename */
-function detectWeightFromFilename(filename: string): string {
-  const lower = filename.toLowerCase();
-  if (lower.includes("thin")) return "100";
-  if (lower.includes("extralight") || lower.includes("extra-light") || lower.includes("extra_light")) return "200";
-  if (lower.includes("light")) return "300";
-  if (lower.includes("regular") || lower.includes("normal")) return "400";
-  if (lower.includes("medium")) return "500";
-  if (lower.includes("semibold") || lower.includes("semi-bold") || lower.includes("semi_bold") || lower.includes("demi")) return "600";
-  if (lower.includes("extrabold") || lower.includes("extra-bold") || lower.includes("extra_bold")) return "800";
-  if (lower.includes("black") || lower.includes("heavy")) return "900";
-  if (lower.includes("bold")) return "700";
-  return "400";
-}
 
 function getWeightLabel(weight: string): string {
   const map: Record<string, string> = {
@@ -449,25 +435,15 @@ export default function EditClientPage({
                       </div>
                     )}
 
-                    {/* Add new font file */}
-                    <FileUpload
+                    {/* Add new font files — multi-file upload */}
+                    <FontUpload
                       bucket="client-assets"
                       path={`fonts/${slug}`}
-                      accept=".ttf,.otf,.woff,.woff2"
-                      label="+ Adicionar peso"
-                      hint="TTF, OTF, WOFF ou WOFF2. Máximo 5MB."
-                      onUpload={(url) => {
-                        // Extract filename from URL
-                        const filename = url.split("/").pop() || "font";
-                        const weight = detectWeightFromFilename(filename);
-                        const newFont: CustomFont = { url, weight, name: decodeURIComponent(filename) };
-                        const updated = [...(brand.customFonts || []), newFont];
+                      onUpload={(newFonts) => {
+                        const updated = [...(brand.customFonts || []), ...newFonts];
                         updateBrand("customFonts", updated);
                       }}
                     />
-                    <p className="text-xs text-muted-foreground">
-                      O peso e detectado automaticamente pelo nome do arquivo (ex: &quot;Montserrat-Bold.woff2&quot; → 700 Bold).
-                    </p>
                   </div>
                 </>
               )}
