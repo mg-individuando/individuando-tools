@@ -231,82 +231,112 @@ export default function PublicFormPage({
               className="flex items-center relative z-10"
               style={{ height: headerHeight }}
             >
-            {bannerConfig ? (
-              /* Column-based banner layout */
-              <div className="flex items-center w-full h-full gap-4">
-                {/* Client logo column */}
-                {bannerConfig.showClientLogo !== false && (
-                  <div className="flex items-center shrink-0" style={{ order: bannerConfig.clientLogoPosition === "right" ? 3 : 1 }}>
-                    {client.logo_url ? (
-                      <img
-                        src={client.logo_url}
-                        alt={client.name}
-                        className="object-contain"
-                        style={{ height: `${bannerConfig.clientLogoSize || 40}px`, maxWidth: "160px" }}
-                      />
-                    ) : showNameInHeader ? (
-                      <span
-                        style={{ color: headerTextColor, fontWeight: Number(headingWeight), fontFamily: fontFamily || undefined }}
-                        className="text-lg"
-                      >
-                        {client.name}
-                      </span>
-                    ) : null}
-                  </div>
-                )}
-                {/* Text column */}
-                <div className="flex-1 min-w-0 flex flex-col justify-center" style={{ order: 2 }}>
-                  {bannerConfig.title && (
-                    <p
-                      className="font-semibold leading-tight"
-                      style={{
-                        color: bannerConfig.titleColor || "#FFFFFF",
-                        fontSize: `${bannerConfig.titleSize || 22}px`,
-                        display: "-webkit-box",
-                        WebkitLineClamp: 2,
-                        WebkitBoxOrient: "vertical" as const,
-                        overflow: "hidden",
-                        textAlign: bannerConfig.titlePosition || "center",
-                        fontFamily: fontFamily || undefined,
-                      }}
-                    >
-                      {bannerConfig.title}
-                    </p>
+            {bannerConfig ? (() => {
+              const layout = bannerConfig.bannerLayout || "logo-text-logo";
+              const logoSize = bannerConfig.clientLogoSize || 40;
+              const indSize = bannerConfig.individuandoSize || 36;
+              const showClient = bannerConfig.showClientLogo !== false;
+              const titleStyle: React.CSSProperties = {
+                color: bannerConfig.titleColor || "#FFFFFF",
+                fontSize: `${bannerConfig.titleSize || 22}px`,
+                display: "-webkit-box",
+                WebkitLineClamp: 2,
+                WebkitBoxOrient: "vertical" as const,
+                overflow: "hidden",
+                textAlign: bannerConfig.titlePosition || "center",
+                fontFamily: fontFamily || undefined,
+              };
+              const subtitleStyle: React.CSSProperties = {
+                color: bannerConfig.subtitleColor || "rgba(255,255,255,0.75)",
+                fontSize: `${bannerConfig.subtitleSize || 13}px`,
+                textAlign: bannerConfig.titlePosition || "center",
+                fontFamily: fontFamily || undefined,
+              };
+              const nameStyle: React.CSSProperties = {
+                color: bannerConfig.titleColor || headerTextColor,
+                fontWeight: Number(headingWeight),
+                fontFamily: fontFamily || undefined,
+              };
+
+              const clientLogoEl = showClient && (client.logo_url || showNameInHeader) ? (
+                <div className="flex items-center gap-2.5 shrink-0">
+                  {client.logo_url && (
+                    <img src={client.logo_url} alt={client.name} className="object-contain" style={{ height: `${logoSize}px`, maxWidth: "160px" }} />
                   )}
-                  {bannerConfig.subtitle && (
-                    <p
-                      className="leading-tight truncate mt-0.5"
-                      style={{
-                        color: bannerConfig.subtitleColor || "rgba(255,255,255,0.75)",
-                        fontSize: `${bannerConfig.subtitleSize || 13}px`,
-                        textAlign: bannerConfig.titlePosition || "center",
-                        fontFamily: fontFamily || undefined,
-                      }}
-                    >
-                      {bannerConfig.subtitle}
-                    </p>
+                  {showNameInHeader && (
+                    <span style={nameStyle} className="text-lg">{client.name}</span>
                   )}
                 </div>
-                {/* Individuando logo column */}
-                {bannerConfig.individuandoVariant && (
-                  <div className="flex items-center shrink-0" style={{ order: bannerConfig.clientLogoPosition === "right" ? 1 : 3 }}>
-                    <img
-                      src={`/logos/individuando/logo-${bannerConfig.individuandoVariant}.svg`}
-                      alt="Individuando"
-                      className="object-contain"
-                      style={{ height: `${bannerConfig.individuandoSize || 36}px`, maxWidth: "140px" }}
-                    />
+              ) : null;
+
+              const textEl = (bannerConfig.title || bannerConfig.subtitle) ? (
+                <div className="flex-1 min-w-0 flex flex-col justify-center">
+                  {bannerConfig.title && <p className="font-semibold leading-tight" style={titleStyle}>{bannerConfig.title}</p>}
+                  {bannerConfig.subtitle && <p className="leading-tight truncate mt-0.5" style={subtitleStyle}>{bannerConfig.subtitle}</p>}
+                </div>
+              ) : <div className="flex-1" />;
+
+              const indLogoEl = bannerConfig.individuandoVariant ? (
+                <div className="flex items-center shrink-0">
+                  <img src={`/logos/individuando/logo-${bannerConfig.individuandoVariant}.svg`} alt="Individuando" className="object-contain" style={{ height: `${indSize}px`, maxWidth: "140px" }} />
+                </div>
+              ) : null;
+
+              if (layout === "centered") {
+                return (
+                  <div className="flex flex-col items-center justify-center w-full h-full gap-2">
+                    <div className="flex items-center gap-4">
+                      {clientLogoEl}
+                      {indLogoEl}
+                    </div>
+                    {textEl}
                   </div>
-                )}
-              </div>
-            ) : (
+                );
+              }
+
+              if (layout === "logo-text") {
+                // Client logo left, text right (no Individuando logo)
+                return (
+                  <div className="flex items-center w-full h-full gap-4">
+                    {clientLogoEl}
+                    {textEl}
+                    {indLogoEl}
+                  </div>
+                );
+              }
+
+              if (layout === "text-logo") {
+                // Text left, logos right
+                return (
+                  <div className="flex items-center w-full h-full gap-4">
+                    {textEl}
+                    {clientLogoEl}
+                    {indLogoEl}
+                  </div>
+                );
+              }
+
+              // Default: logo-text-logo — client on one side, individuando on opposite
+              const clientOrder = bannerConfig.clientLogoPosition === "right" ? 3 : 1;
+              const indOrder = bannerConfig.clientLogoPosition === "right" ? 1 : 3;
+              return (
+                <div className="flex items-center w-full h-full gap-4">
+                  {clientLogoEl && <div style={{ order: clientOrder }}>{clientLogoEl}</div>}
+                  <div className="flex-1 min-w-0 flex flex-col justify-center" style={{ order: 2 }}>
+                    {bannerConfig.title && <p className="font-semibold leading-tight" style={titleStyle}>{bannerConfig.title}</p>}
+                    {bannerConfig.subtitle && <p className="leading-tight truncate mt-0.5" style={subtitleStyle}>{bannerConfig.subtitle}</p>}
+                  </div>
+                  {indLogoEl && <div style={{ order: indOrder }}>{indLogoEl}</div>}
+                </div>
+              );
+            })() : (
               /* Legacy header layout — still shows Individuando logo */
               <div className="flex items-center justify-between w-full">
                 <div className="flex items-center gap-3">
                   {client.logo_url && (
                     <img src={client.logo_url} alt={client.name} className="h-10 object-contain max-w-[160px]" />
                   )}
-                  {showNameInHeader && !client.logo_url && (
+                  {showNameInHeader && (
                     <span style={{ color: headerTextColor, fontWeight: Number(headingWeight), fontFamily: fontFamily || undefined }} className="text-lg">
                       {client.name}
                     </span>

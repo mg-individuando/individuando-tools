@@ -420,41 +420,30 @@ export function BannerEditor({
       >
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-2">
-            {LAYOUT_OPTIONS.map((opt) => {
-              const isFirst = opt.value === "logo-text-logo";
-              const isDisabled = !isFirst;
-              return (
-                <button
-                  key={opt.value}
-                  onClick={() => { if (!isDisabled) update("bannerLayout", opt.value); }}
-                  disabled={isDisabled}
-                  className={`p-3 rounded-lg border text-left transition-all ${
-                    isDisabled
-                      ? "border-gray-100 bg-gray-50 opacity-60 cursor-not-allowed"
-                      : config.bannerLayout === opt.value
-                        ? "border-[#1e2f4c] bg-[#1e2f4c]/5 ring-1 ring-[#1e2f4c]"
-                        : "border-gray-200 hover:border-gray-300"
-                  }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <span className={`text-sm font-medium ${isDisabled ? "text-gray-400" : "text-gray-800"}`}>
-                      {opt.label}
-                    </span>
-                    {isDisabled ? (
-                      <span className="text-[10px] text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded-full">
-                        Em breve
-                      </span>
-                    ) : config.bannerLayout === opt.value ? (
-                      <Check className="h-4 w-4 text-[#1e2f4c]" />
-                    ) : null}
-                  </div>
-                  <span className={`text-[11px] ${isDisabled ? "text-gray-400" : "text-gray-500"}`}>{opt.desc}</span>
-                </button>
-              );
-            })}
+            {LAYOUT_OPTIONS.map((opt) => (
+              <button
+                key={opt.value}
+                onClick={() => update("bannerLayout", opt.value)}
+                className={`p-3 rounded-lg border text-left transition-all ${
+                  config.bannerLayout === opt.value
+                    ? "border-[#1e2f4c] bg-[#1e2f4c]/5 ring-1 ring-[#1e2f4c]"
+                    : "border-gray-200 hover:border-gray-300"
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium text-gray-800">
+                    {opt.label}
+                  </span>
+                  {config.bannerLayout === opt.value && (
+                    <Check className="h-4 w-4 text-[#1e2f4c]" />
+                  )}
+                </div>
+                <span className="text-[11px] text-gray-500">{opt.desc}</span>
+              </button>
+            ))}
           </div>
 
-          {(config.bannerLayout === "logo-text-logo") && (
+          {(config.bannerLayout === "logo-text-logo" || config.bannerLayout === "logo-text" || config.bannerLayout === "text-logo") && (
             <div className="space-y-2">
               <Label className="text-xs text-gray-500">Posicao da logo do cliente</Label>
               <div className="flex gap-2">
