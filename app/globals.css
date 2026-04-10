@@ -361,3 +361,109 @@ html {
     font-weight: 600;
   }
 }
+
+/* ── Print / PDF ─────────────────────────────────────────── */
+@media print {
+  @page {
+    size: A4;
+    margin: 1.5cm;
+  }
+
+  /* Esconder elementos interativos e UI-only */
+  .no-print,
+  button,
+  input[type="range"],
+  .btn-primary,
+  .radar-slider,
+  .free-slider {
+    display: none !important;
+  }
+
+  /* Inputs/textareas: mostrar valor como texto limpo */
+  input[type="text"],
+  input[type="date"],
+  input[type="email"],
+  textarea,
+  select {
+    border: none !important;
+    background: none !important;
+    box-shadow: none !important;
+    padding: 4px 0 !important;
+    resize: none !important;
+    -webkit-appearance: none;
+    appearance: none;
+    overflow: visible !important;
+    height: auto !important;
+  }
+
+  /* Textarea: expandir para mostrar todo o conteúdo */
+  textarea {
+    white-space: pre-wrap !important;
+    overflow: visible !important;
+  }
+
+  /* Layout geral */
+  header {
+    position: relative !important;
+  }
+
+  body {
+    background: white !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Glassmorphism: simplificar para impressão */
+  .glass-input {
+    background: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    box-shadow: none !important;
+    border: none !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+    border-radius: 0 !important;
+    padding: 2px 0 !important;
+  }
+
+  /* Cards: manter borda sutil, remover efeitos de vidro pesados */
+  [style*="backdrop-filter"] {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  /* Evitar quebra dentro de cards/seções */
+  [style*="borderRadius: \"16px\""],
+  [style*="borderRadius"] {
+    break-inside: avoid;
+  }
+
+  /* Checkbox: preservar estado visual */
+  input[type="checkbox"] {
+    display: inline-block !important;
+    -webkit-appearance: checkbox !important;
+    appearance: checkbox !important;
+  }
+
+  /* Radar: mostrar valores numéricos (badges) */
+  .radar-slider + * {
+    display: block !important;
+  }
+
+  /* Fonte de corpo: reduzir para caber em A4 (~10pt) */
+  html {
+    font-size: 13px;
+  }
+
+  /* Remover max-width para ocupar largura total do papel */
+  .max-w-4xl,
+  .max-w-5xl,
+  .max-w-3xl,
+  .max-w-2xl {
+    max-width: 100% !important;
+  }
+
+  /* Links: não mostrar URL */
+  a[href]::after {
+    content: none !important;
+  }
+}

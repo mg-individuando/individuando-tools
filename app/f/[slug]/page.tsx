@@ -9,7 +9,7 @@ import type {
   ToolSettings,
   IdentificationField,
 } from "@/lib/schemas/tool-schema";
-import { CheckCircle2, Loader2, ArrowRight } from "lucide-react";
+import { CheckCircle2, Loader2, ArrowRight, Download } from "lucide-react";
 import { toast } from "sonner";
 
 export default function PublicFormPage({
@@ -681,6 +681,15 @@ export default function PublicFormPage({
 
       {/* Tool renderer */}
       <main className="flex-1 w-full max-w-4xl mx-auto px-4 py-8">
+        <div className="flex justify-end mb-4 no-print">
+          <button
+            onClick={() => window.print()}
+            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 hover:text-gray-700 transition-colors cursor-pointer"
+          >
+            <Download className="w-4 h-4" />
+            Salvar como PDF
+          </button>
+        </div>
         <ToolRenderer schema={schema} onSubmit={handleSubmit} />
 
         {submitting && (
