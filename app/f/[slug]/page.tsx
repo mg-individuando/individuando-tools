@@ -54,7 +54,7 @@ export default function PublicFormPage({
     loadTool();
   }, [slug]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Load client font dynamically
+  // Load client font dynamically (Google Fonts URL)
   useEffect(() => {
     if (!client) return;
     const brand = client.brand_config as BrandConfig | undefined;
@@ -72,6 +72,29 @@ export default function PublicFormPage({
 
     return () => {
       link.remove();
+    };
+  }, [client]);
+
+  // Load custom uploaded fonts as @font-face
+  useEffect(() => {
+    if (!client) return;
+    const brand = client.brand_config as BrandConfig | undefined;
+    const customFonts = (brand as any)?.customFonts as Array<{ url: string; weight: string; name: string }> | undefined;
+    if (!customFonts || customFonts.length === 0) return;
+
+    const fontFamily = brand?.fontFamily || "CustomFont";
+    const faces = customFonts.map((f) => {
+      const ext = f.name?.split(".").pop()?.toLowerCase() || "woff2";
+      const format = ext === "ttf" ? "truetype" : ext === "otf" ? "opentype" : ext === "woff" ? "woff" : "woff2";
+      return `@font-face { font-family: '${fontFamily}'; src: url('${f.url}') format('${format}'); font-weight: ${f.weight}; font-style: normal; font-display: swap; }`;
+    }).join("\n");
+
+    const style = document.createElement("style");
+    style.textContent = faces;
+    document.head.appendChild(style);
+
+    return () => {
+      style.remove();
     };
   }, [client]);
 

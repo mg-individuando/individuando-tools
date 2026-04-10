@@ -600,72 +600,14 @@ export default function EditClientPage({
                 </div>
               </CardHeader>
               <CardContent>
-                {/* Banner/Header Preview — uses actual banner config */}
+                {/* Banner/Header Preview — mirrors public page layouts */}
                 <div
                   className="rounded-xl overflow-hidden border shadow-sm"
                   style={{
                     fontFamily: brand.fontFamily === "Custom" ? "sans-serif" : brand.fontFamily,
                   }}
                 >
-                  {/* Header Preview — mirrors public page exactly */}
-                  <div
-                    className="px-4 flex items-center relative overflow-hidden"
-                    style={{
-                      height: "80px",
-                      ...(brand.bannerConfig?.backgroundType === "gradient"
-                        ? { background: `linear-gradient(${brand.bannerConfig.gradientDirection || "to right"}, ${brand.bannerConfig.gradientFrom}, ${brand.bannerConfig.gradientTo})` }
-                        : brand.bannerConfig?.backgroundType === "solid"
-                          ? { backgroundColor: brand.bannerConfig.backgroundColor }
-                          : brand.bannerConfig?.backgroundType === "image" && brand.bannerConfig.backgroundImage
-                            ? { backgroundImage: `url(${brand.bannerConfig.backgroundImage})`, backgroundSize: "cover", backgroundPosition: "center" }
-                            : { backgroundColor: brand.primaryColor || "#2D5A7B" }),
-                    }}
-                  >
-                    {/* Overlay */}
-                    {brand.bannerConfig?.overlayOpacity > 0 && (
-                      <div className="absolute inset-0 pointer-events-none" style={{ backgroundColor: `rgba(0,0,0,${brand.bannerConfig.overlayOpacity / 100})` }} />
-                    )}
-                    <div className="flex items-center w-full h-full gap-2 relative z-10">
-                      {/* Client logo */}
-                      {brand.bannerConfig?.showClientLogo !== false && (
-                        <div className="flex items-center shrink-0" style={{ order: brand.bannerConfig?.clientLogoPosition === "right" ? 3 : 1 }}>
-                          {previewLogo ? (
-                            <img src={previewLogo} alt="Logo" className="object-contain" style={{ height: `${Math.min(brand.bannerConfig?.clientLogoSize || 40, 36)}px`, maxWidth: "90px" }} />
-                          ) : (
-                            <div className="rounded-lg flex items-center justify-center text-white text-xs font-bold shrink-0" style={{ backgroundColor: "rgba(255,255,255,0.2)", width: "28px", height: "28px" }}>
-                              {name ? name.charAt(0).toUpperCase() : "C"}
-                            </div>
-                          )}
-                        </div>
-                      )}
-                      {/* Text */}
-                      <div className="flex-1 min-w-0 flex flex-col justify-center" style={{ order: 2 }}>
-                        {brand.bannerConfig?.title ? (
-                          <>
-                            <p className="text-[11px] font-semibold leading-tight truncate" style={{ color: brand.bannerConfig.titleColor || "#fff", textAlign: brand.bannerConfig.titlePosition || "center" }}>
-                              {brand.bannerConfig.title}
-                            </p>
-                            {brand.bannerConfig.subtitle && (
-                              <p className="text-[8px] leading-tight truncate mt-0.5" style={{ color: brand.bannerConfig.subtitleColor || "rgba(255,255,255,0.7)", textAlign: brand.bannerConfig.titlePosition || "center" }}>
-                                {brand.bannerConfig.subtitle}
-                              </p>
-                            )}
-                          </>
-                        ) : (
-                          <span className="text-xs text-white font-medium text-center">{name || "Nome do Cliente"}</span>
-                        )}
-                      </div>
-                      {/* Individuando logo */}
-                      <div className="flex items-center shrink-0" style={{ order: brand.bannerConfig?.clientLogoPosition === "right" ? 1 : 3 }}>
-                        <img
-                          src={`/logos/individuando/logo-${brand.bannerConfig?.individuandoVariant || 7}.svg`}
-                          alt="Individuando"
-                          className="object-contain"
-                          style={{ height: `${Math.min(brand.bannerConfig?.individuandoSize || 28, 28)}px`, maxWidth: "80px" }}
-                        />
-                      </div>
-                    </div>
-                  </div>
+                  <PreviewHeader brand={brand} previewLogo={previewLogo} clientName={name} size="small" />
 
                   {/* Preview Body */}
                   <div className="p-4 space-y-3" style={{ backgroundColor: brand.backgroundColor, color: brand.textColor }}>
@@ -699,56 +641,7 @@ export default function EditClientPage({
                     <button onClick={() => setPreviewFullscreen(false)} className="text-gray-400 hover:text-gray-600 transition-colors">✕</button>
                   </div>
                   <div style={{ fontFamily: brand.fontFamily === "Custom" ? "sans-serif" : brand.fontFamily }}>
-                    {/* Full-size header */}
-                    <div
-                      className="px-6 flex items-center relative overflow-hidden"
-                      style={{
-                        height: "100px",
-                        ...(brand.bannerConfig?.backgroundType === "gradient"
-                          ? { background: `linear-gradient(${brand.bannerConfig.gradientDirection || "to right"}, ${brand.bannerConfig.gradientFrom}, ${brand.bannerConfig.gradientTo})` }
-                          : brand.bannerConfig?.backgroundType === "solid"
-                            ? { backgroundColor: brand.bannerConfig.backgroundColor }
-                            : brand.bannerConfig?.backgroundType === "image" && brand.bannerConfig.backgroundImage
-                              ? { backgroundImage: `url(${brand.bannerConfig.backgroundImage})`, backgroundSize: "cover", backgroundPosition: "center" }
-                              : { backgroundColor: brand.primaryColor || "#2D5A7B" }),
-                      }}
-                    >
-                      {brand.bannerConfig?.overlayOpacity > 0 && (
-                        <div className="absolute inset-0 pointer-events-none" style={{ backgroundColor: `rgba(0,0,0,${brand.bannerConfig.overlayOpacity / 100})` }} />
-                      )}
-                      <div className="flex items-center w-full h-full gap-4 relative z-10">
-                        {brand.bannerConfig?.showClientLogo !== false && (
-                          <div className="flex items-center shrink-0" style={{ order: brand.bannerConfig?.clientLogoPosition === "right" ? 3 : 1 }}>
-                            {previewLogo ? (
-                              <img src={previewLogo} alt="Logo" className="object-contain" style={{ height: `${brand.bannerConfig?.clientLogoSize || 48}px`, maxWidth: "180px" }} />
-                            ) : (
-                              <div className="rounded-lg flex items-center justify-center text-white text-lg font-bold" style={{ backgroundColor: "rgba(255,255,255,0.2)", width: "48px", height: "48px" }}>
-                                {name ? name.charAt(0).toUpperCase() : "C"}
-                              </div>
-                            )}
-                          </div>
-                        )}
-                        <div className="flex-1 min-w-0 flex flex-col justify-center" style={{ order: 2 }}>
-                          {brand.bannerConfig?.title ? (
-                            <>
-                              <p className="font-semibold leading-tight" style={{ color: brand.bannerConfig.titleColor || "#fff", fontSize: `${brand.bannerConfig.titleSize || 22}px`, textAlign: brand.bannerConfig.titlePosition || "center" }}>
-                                {brand.bannerConfig.title}
-                              </p>
-                              {brand.bannerConfig.subtitle && (
-                                <p className="leading-tight mt-1" style={{ color: brand.bannerConfig.subtitleColor || "rgba(255,255,255,0.75)", fontSize: `${brand.bannerConfig.subtitleSize || 13}px`, textAlign: brand.bannerConfig.titlePosition || "center" }}>
-                                  {brand.bannerConfig.subtitle}
-                                </p>
-                              )}
-                            </>
-                          ) : (
-                            <span className="text-lg text-white font-semibold text-center">{name || "Nome do Cliente"}</span>
-                          )}
-                        </div>
-                        <div className="flex items-center shrink-0" style={{ order: brand.bannerConfig?.clientLogoPosition === "right" ? 1 : 3 }}>
-                          <img src={`/logos/individuando/logo-${brand.bannerConfig?.individuandoVariant || 7}.svg`} alt="Individuando" className="object-contain" style={{ height: `${brand.bannerConfig?.individuandoSize || 36}px`, maxWidth: "140px" }} />
-                        </div>
-                      </div>
-                    </div>
+                    <PreviewHeader brand={brand} previewLogo={previewLogo} clientName={name} size="large" />
                     {/* Full-size body */}
                     <div className="p-8 space-y-4" style={{ backgroundColor: brand.backgroundColor, color: brand.textColor }}>
                       <h3 className="text-xl" style={{ fontWeight: Number(brand.headingWeight) }}>Título de exemplo</h3>
@@ -774,6 +667,156 @@ export default function EditClientPage({
         </div>
       </div>
 
+    </div>
+  );
+}
+
+/* --- Preview Header Component — mirrors public page layouts --- */
+
+function PreviewHeader({
+  brand,
+  previewLogo,
+  clientName,
+  size = "small",
+}: {
+  brand: Record<string, any>;
+  previewLogo: string | null;
+  clientName: string;
+  size?: "small" | "large";
+}) {
+  const bc = brand.bannerConfig;
+  const layout = bc?.bannerLayout || "logo-text-logo";
+  const isSmall = size === "small";
+  const height = isSmall ? "80px" : "100px";
+  const showName = brand.showNameInHeader !== false;
+  const logoMaxH = isSmall ? Math.min(bc?.clientLogoSize || 40, 36) : (bc?.clientLogoSize || 48);
+  const logoMaxW = isSmall ? "90px" : "180px";
+  const indH = isSmall ? Math.min(bc?.individuandoSize || 28, 28) : (bc?.individuandoSize || 36);
+  const indMaxW = isSmall ? "80px" : "140px";
+  const titleSize = isSmall ? "11px" : `${bc?.titleSize || 22}px`;
+  const subtitleSize = isSmall ? "8px" : `${bc?.subtitleSize || 13}px`;
+  const nameSize = isSmall ? "text-xs" : "text-lg";
+  const gap = isSmall ? "gap-2" : "gap-4";
+  const px = isSmall ? "px-4" : "px-6";
+
+  const bgStyle: React.CSSProperties = bc?.backgroundType === "gradient"
+    ? { background: `linear-gradient(${bc.gradientDirection || "to right"}, ${bc.gradientFrom}, ${bc.gradientTo})` }
+    : bc?.backgroundType === "solid"
+      ? { backgroundColor: bc.backgroundColor }
+      : bc?.backgroundType === "image" && bc.backgroundImage
+        ? { backgroundImage: `url(${bc.backgroundImage})`, backgroundSize: "cover", backgroundPosition: "center" }
+        : { backgroundColor: brand.primaryColor || "#2D5A7B" };
+
+  const nameColor = bc?.titleColor || brand.headerTextColor || "#fff";
+
+  const clientLogoEl = bc?.showClientLogo !== false ? (
+    <div className={`flex items-center ${gap} shrink-0`}>
+      {previewLogo ? (
+        <img src={previewLogo} alt="Logo" className="object-contain" style={{ height: `${logoMaxH}px`, maxWidth: logoMaxW }} />
+      ) : (
+        <div className="rounded-lg flex items-center justify-center text-white font-bold shrink-0" style={{ backgroundColor: "rgba(255,255,255,0.2)", width: isSmall ? "28px" : "48px", height: isSmall ? "28px" : "48px", fontSize: isSmall ? "12px" : "18px" }}>
+          {clientName ? clientName.charAt(0).toUpperCase() : "C"}
+        </div>
+      )}
+      {showName && (
+        <span className={`${nameSize} font-medium`} style={{ color: nameColor }}>
+          {clientName || "Nome do Cliente"}
+        </span>
+      )}
+    </div>
+  ) : null;
+
+  const textEl = bc?.title ? (
+    <div className="flex-1 min-w-0 flex flex-col justify-center">
+      <p className="font-semibold leading-tight truncate" style={{ color: bc.titleColor || "#fff", fontSize: titleSize, textAlign: bc.titlePosition || "center" }}>
+        {bc.title}
+      </p>
+      {bc.subtitle && (
+        <p className="leading-tight truncate mt-0.5" style={{ color: bc.subtitleColor || "rgba(255,255,255,0.7)", fontSize: subtitleSize, textAlign: bc.titlePosition || "center" }}>
+          {bc.subtitle}
+        </p>
+      )}
+    </div>
+  ) : (
+    <div className="flex-1 min-w-0 flex flex-col justify-center">
+      {!clientLogoEl && (
+        <span className={`${nameSize} text-white font-medium text-center`}>{clientName || "Nome do Cliente"}</span>
+      )}
+    </div>
+  );
+
+  const indLogoEl = (
+    <div className="flex items-center shrink-0">
+      <img
+        src={`/logos/individuando/logo-${bc?.individuandoVariant || 7}.svg`}
+        alt="Individuando"
+        className="object-contain"
+        style={{ height: `${indH}px`, maxWidth: indMaxW }}
+      />
+    </div>
+  );
+
+  let headerContent: React.ReactNode;
+
+  if (layout === "centered") {
+    headerContent = (
+      <div className="flex flex-col items-center justify-center w-full h-full gap-1">
+        <div className={`flex items-center ${gap}`}>
+          {clientLogoEl}
+          {indLogoEl}
+        </div>
+        {textEl}
+      </div>
+    );
+  } else if (layout === "logo-text") {
+    headerContent = (
+      <div className={`flex items-center w-full h-full ${gap}`}>
+        {clientLogoEl}
+        {textEl}
+        {indLogoEl}
+      </div>
+    );
+  } else if (layout === "text-logo") {
+    headerContent = (
+      <div className={`flex items-center w-full h-full ${gap}`}>
+        {textEl}
+        {clientLogoEl}
+        {indLogoEl}
+      </div>
+    );
+  } else {
+    // logo-text-logo (default)
+    const clientOrder = bc?.clientLogoPosition === "right" ? 3 : 1;
+    const indOrder = bc?.clientLogoPosition === "right" ? 1 : 3;
+    headerContent = (
+      <div className={`flex items-center w-full h-full ${gap}`}>
+        {clientLogoEl && <div style={{ order: clientOrder }}>{clientLogoEl}</div>}
+        <div className="flex-1 min-w-0 flex flex-col justify-center" style={{ order: 2 }}>
+          {bc?.title ? (
+            <>
+              <p className="font-semibold leading-tight truncate" style={{ color: bc.titleColor || "#fff", fontSize: titleSize, textAlign: bc.titlePosition || "center" }}>{bc.title}</p>
+              {bc.subtitle && <p className="leading-tight truncate mt-0.5" style={{ color: bc.subtitleColor || "rgba(255,255,255,0.7)", fontSize: subtitleSize, textAlign: bc.titlePosition || "center" }}>{bc.subtitle}</p>}
+            </>
+          ) : !clientLogoEl ? (
+            <span className={`${nameSize} text-white font-medium text-center`}>{clientName || "Nome do Cliente"}</span>
+          ) : null}
+        </div>
+        <div style={{ order: indOrder }}>{indLogoEl}</div>
+      </div>
+    );
+  }
+
+  return (
+    <div
+      className={`${px} flex items-center relative overflow-hidden`}
+      style={{ height, ...bgStyle }}
+    >
+      {bc?.overlayOpacity > 0 && (
+        <div className="absolute inset-0 pointer-events-none" style={{ backgroundColor: `rgba(0,0,0,${bc.overlayOpacity / 100})` }} />
+      )}
+      <div className="relative z-10 w-full h-full flex items-center">
+        {headerContent}
+      </div>
     </div>
   );
 }
