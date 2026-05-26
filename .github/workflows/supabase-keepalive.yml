@@ -1,0 +1,47 @@
+name: Supabase Keep-Alive
+
+# Mantém o projeto Supabase ativo no plano free (pausa após 7 dias sem
+# atividade no banco). Roda 2x por semana — se uma falhar, a outra cobre.
+
+on:
+  schedule:
+    # Toda segunda e quinta às 06:00 UTC (03:00 Brasília)
+    - cron: "0 6 * * 1,4"
+  # Permite disparar manualmente em Actions → Run workflow
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Query Supabase REST API
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: |
+          set -e
+
+          if [ -z "$SUPABASE_URL" ] || [ -z "$SUPABASE_ANON_KEY" ]; then
+            echo "::error::SUPABASE_URL ou SUPABASE_ANON_KEY ausente nos secrets do repo."
+            exit 1
+          fi
+
+          # Hit /auth/v1/settings — endpoint público com apikey que retorna
+          # 200 e conta como atividade no Supabase, impedindo o auto-pause.
+          response=$(curl -sS -o /tmp/body -w "%{http_code}" \
+            -H "apikey: $SUPABASE_ANON_KEY" \
+            "$SUPABASE_URL/auth/v1/settings" \
+            -m 30)
+
+          echo "HTTP $response"
+          echo "Body: $(cat /tmp/body)"
+
+          # 200 = ok; 401/403 também provam que o servidor está respondendo
+          # (significa que o projeto está vivo, só pode ser RLS bloqueando)
+          if [ "$response" -ge 200 ] && [ "$response" -lt 500 ]; then
+            echo "Supabase respondeu — projeto ativo."
+            exit 0
+          else
+            echo "::error::Supabase retornou HTTP $response — projeto pode estar pausado/fora."
+            exit 1
+          fi
