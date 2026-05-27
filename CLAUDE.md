@@ -192,3 +192,22 @@ npm run start  # Servidor de produção
 - **Responsividade:** Mobile-first. Breakpoints: `sm` (640), `md` (768), `lg` (1024).
 - **Estado:** `useState` local. Sem Redux/Context global (exceto auth via Supabase).
 - **Validação:** Zod para schemas. Browser validation para forms.
+
+## DevOps / CI
+
+### Supabase Keep-Alive (GitHub Actions)
+
+Plano free do Supabase **pausa o projeto após 7 dias** sem atividade no banco. Se pausar e não for resumido em 90 dias, é deletado permanentemente.
+
+**Solução em produção:** workflow `.github/workflows/supabase-keepalive.yml`
+- Roda toda **segunda e quinta às 06:00 UTC** (03:00 Brasília)
+- Faz `GET /auth/v1/settings` no Supabase com `apikey` — atividade suficiente pra resetar o timer
+- Pode ser disparado manualmente em **Actions → Supabase Keep-Alive → Run workflow**
+
+**Secrets necessários** (`Settings → Secrets and variables → Actions`):
+- `SUPABASE_URL` — URL do projeto Supabase
+- `SUPABASE_ANON_KEY` — chave anon pública
+
+**Histórico:** o projeto Supabase `jbcopicfdgawlghzwykf` entrou em pause em 2026-05-27 (DNS NXDOMAIN, site servia 504 ao tentar autenticar). Foi resumido manualmente via dashboard e este workflow foi criado para evitar repetição.
+
+**Credenciais (cofre local):** ver `~/.claude/credentials/individuando-tools.md`.
