@@ -102,7 +102,7 @@ export default function AdminLayout({
           <div className="w-10 h-10 rounded-xl bg-[#2D5A7B] flex items-center justify-center animate-pulse">
             <span className="text-white font-bold text-lg font-sans">I</span>
           </div>
-          <p className="text-sm text-slate-400 font-sans">Carregando...</p>
+          <p className="text-sm text-slate-600 font-sans">Carregando...</p>
         </div>
       </div>
     );
@@ -164,7 +164,7 @@ export default function AdminLayout({
             <p className="font-semibold text-slate-800 text-sm tracking-tight leading-tight">
               Individuando
             </p>
-            <p className="text-[11px] text-slate-400 leading-tight">
+            <p className="text-[11px] text-slate-600 leading-tight">
               Ferramentas Online
             </p>
           </div>
@@ -200,7 +200,7 @@ export default function AdminLayout({
 
                   <item.icon
                     className={`w-[18px] h-[18px] shrink-0 transition-colors ${
-                      active ? "text-[#2D5A7B]" : "text-slate-400 group-hover:text-slate-500"
+                      active ? "text-[#2D5A7B]" : "text-slate-600 group-hover:text-slate-500"
                     }`}
                   />
                   <span>{item.label}</span>
@@ -246,7 +246,7 @@ export default function AdminLayout({
               <p className="text-sm font-medium text-slate-700 truncate leading-tight">
                 {profile?.name || "..."}
               </p>
-              <p className="text-[11px] text-slate-400 capitalize leading-tight mt-0.5">
+              <p className="text-[11px] text-slate-600 capitalize leading-tight mt-0.5">
                 {profile?.role === "admin" ? "Administrador" : "Facilitador"}
               </p>
             </div>

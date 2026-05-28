@@ -92,7 +92,7 @@ export default function IconPicker({ value, onSelect, onClose }: IconPickerProps
 
           {/* Search */}
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600" />
             <input
               ref={inputRef}
               type="text"
@@ -108,7 +108,7 @@ export default function IconPicker({ value, onSelect, onClose }: IconPickerProps
             <span className="text-xs px-2.5 py-1.5 rounded-lg bg-purple-100 text-purple-700 font-medium">
               Special Lineal
             </span>
-            <span className="text-xs text-gray-400">Freepik Icons</span>
+            <span className="text-xs text-gray-600">Freepik Icons</span>
           </div>
         </div>
 
@@ -120,7 +120,7 @@ export default function IconPicker({ value, onSelect, onClose }: IconPickerProps
             </div>
           ) : icons.length === 0 ? (
             <div className="text-center py-16">
-              <p className="text-sm text-gray-400">
+              <p className="text-sm text-gray-600">
                 Nenhum ícone encontrado. Tente outro termo.
               </p>
             </div>
@@ -163,7 +163,7 @@ export default function IconPicker({ value, onSelect, onClose }: IconPickerProps
             >
               Anterior
             </button>
-            <span className="text-xs text-gray-400">
+            <span className="text-xs text-gray-600">
               Página {page} de {Math.min(lastPage, 100)}
             </span>
             <button

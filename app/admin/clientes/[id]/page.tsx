@@ -593,7 +593,7 @@ export default function EditClientPage({
                   </CardTitle>
                   <button
                     onClick={() => setPreviewFullscreen(!previewFullscreen)}
-                    className="text-xs text-gray-400 hover:text-[#2D5A7B] transition-colors flex items-center gap-1"
+                    className="text-xs text-gray-600 hover:text-[#2D5A7B] transition-colors flex items-center gap-1"
                   >
                     {previewFullscreen ? "Reduzir" : "Ampliar"}
                   </button>
@@ -638,7 +638,7 @@ export default function EditClientPage({
                 <div className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-auto" onClick={(e) => e.stopPropagation()}>
                   <div className="flex items-center justify-between px-6 py-4 border-b">
                     <span className="text-sm font-semibold text-gray-800">Preview — Ferramenta Publicada</span>
-                    <button onClick={() => setPreviewFullscreen(false)} className="text-gray-400 hover:text-gray-600 transition-colors">✕</button>
+                    <button onClick={() => setPreviewFullscreen(false)} className="text-gray-600 hover:text-gray-600 transition-colors">✕</button>
                   </div>
                   <div style={{ fontFamily: brand.fontFamily === "Custom" ? "sans-serif" : brand.fontFamily }}>
                     <PreviewHeader brand={brand} previewLogo={previewLogo} clientName={name} size="large" />

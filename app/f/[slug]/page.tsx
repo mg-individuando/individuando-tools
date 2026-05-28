@@ -533,6 +533,9 @@ export default function PublicFormPage({
                     value={participantName}
                     onChange={(e) => setParticipantName(e.target.value)}
                     placeholder="Como você quer ser identificado"
+                    required
+                    aria-required="true"
+                    autoComplete="name"
                     className="w-full glass-input"
                   />
                 </div>
@@ -557,6 +560,9 @@ export default function PublicFormPage({
                     value={participantEmail}
                     onChange={(e) => setParticipantEmail(e.target.value)}
                     placeholder="seu@email.com"
+                    required
+                    aria-required="true"
+                    autoComplete="email"
                     className="w-full glass-input"
                   />
                 </div>
@@ -614,6 +620,8 @@ export default function PublicFormPage({
                         }))
                       }
                       placeholder={field.placeholder || ""}
+                      required={field.required || undefined}
+                      aria-required={field.required || undefined}
                       className="w-full glass-input"
                       style={
                         {
@@ -716,11 +724,16 @@ export default function PublicFormPage({
         <ToolRenderer schema={schema} onSubmit={handleSubmit} />
 
         {submitting && (
-          <div className="fixed inset-0 bg-white/60 backdrop-blur-sm flex items-center justify-center z-50">
+          <div
+            role="status"
+            aria-live="polite"
+            aria-busy="true"
+            className="fixed inset-0 bg-white/60 backdrop-blur-sm flex items-center justify-center z-50"
+          >
             <div className="glass-card p-6 flex items-center gap-3">
-              <Loader2 className="w-5 h-5 animate-spin text-[#0080ff]" />
+              <Loader2 className="w-5 h-5 animate-spin text-[#0080ff]" aria-hidden="true" />
               <span className="text-sm text-[#475569] font-medium">
-                Enviando...
+                Enviando sua resposta...
               </span>
             </div>
           </div>

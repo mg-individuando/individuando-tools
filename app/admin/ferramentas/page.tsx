@@ -226,17 +226,19 @@ export default function FerramentasPage() {
                 <button
                   className="text-[#475569] hover:text-[#0080ff] w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[rgba(0,128,255,0.05)] transition-all duration-200"
                   onClick={(e) => handleDuplicate(tool.id, e)}
+                  aria-label={`Duplicar ferramenta ${tool.title}`}
                   title="Duplicar ferramenta"
                 >
-                  <Copy className="w-4 h-4" />
+                  <Copy className="w-4 h-4" aria-hidden="true" />
                 </button>
 
                 <Link href={`/admin/ferramentas/${tool.id}`}>
                   <button
                     className="text-[#475569] hover:text-[#0080ff] w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[rgba(0,128,255,0.05)] transition-all duration-200"
+                    aria-label={`Editar ferramenta ${tool.title}`}
                     title="Editar ferramenta"
                   >
-                    <Pencil className="w-4 h-4" />
+                    <Pencil className="w-4 h-4" aria-hidden="true" />
                   </button>
                 </Link>
 
@@ -247,27 +249,30 @@ export default function FerramentasPage() {
                 >
                   <button
                     className="text-[#475569] hover:text-[#0080ff] w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[rgba(0,128,255,0.05)] transition-all duration-200"
+                    aria-label={`Abrir ferramenta ${tool.title} em nova aba`}
                     title="Abrir ferramenta"
                   >
-                    <ExternalLink className="w-4 h-4" />
+                    <ExternalLink className="w-4 h-4" aria-hidden="true" />
                   </button>
                 </a>
 
                 <Link href={`/admin/ferramentas/${tool.id}/respostas`}>
                   <button
                     className="text-[#475569] hover:text-[#0080ff] w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[rgba(0,128,255,0.05)] transition-all duration-200"
+                    aria-label={`Ver respostas de ${tool.title}`}
                     title="Ver respostas"
                   >
-                    <Eye className="w-4 h-4" />
+                    <Eye className="w-4 h-4" aria-hidden="true" />
                   </button>
                 </Link>
 
                 <button
                   className="text-[#475569] hover:text-red-500 w-8 h-8 flex items-center justify-center rounded-lg hover:bg-red-50 transition-all duration-200"
                   onClick={(e) => handleDelete(tool.id, e)}
+                  aria-label={`Excluir ferramenta ${tool.title}`}
                   title="Excluir ferramenta"
                 >
-                  <Trash2 className="w-4 h-4" />
+                  <Trash2 className="w-4 h-4" aria-hidden="true" />
                 </button>
 
                 <div className="ml-auto flex items-center gap-1.5">
@@ -324,17 +329,19 @@ export default function FerramentasPage() {
               <div className="flex items-center gap-1.5">
                 <button
                   className="text-[#475569] hover:text-[#0080ff] w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[rgba(0,128,255,0.05)] transition-all duration-200"
+                  aria-label={`Duplicar ferramenta ${tool.title}`}
                   title="Duplicar"
                   onClick={(e) => handleDuplicate(tool.id, e)}
                 >
-                  <Copy className="w-4 h-4" />
+                  <Copy className="w-4 h-4" aria-hidden="true" />
                 </button>
                 <Link href={`/admin/ferramentas/${tool.id}`} onClick={(e) => e.stopPropagation()}>
                   <button
                     className="text-[#475569] hover:text-[#0080ff] w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[rgba(0,128,255,0.05)] transition-all duration-200"
+                    aria-label={`Editar ferramenta ${tool.title}`}
                     title="Editar"
                   >
-                    <Pencil className="w-4 h-4" />
+                    <Pencil className="w-4 h-4" aria-hidden="true" />
                   </button>
                 </Link>
                 <a
@@ -345,17 +352,19 @@ export default function FerramentasPage() {
                 >
                   <button
                     className="text-[#475569] hover:text-[#0080ff] w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[rgba(0,128,255,0.05)] transition-all duration-200"
+                    aria-label={`Abrir ferramenta ${tool.title} em nova aba`}
                     title="Abrir ferramenta"
                   >
-                    <ExternalLink className="w-4 h-4" />
+                    <ExternalLink className="w-4 h-4" aria-hidden="true" />
                   </button>
                 </a>
                 <button
                   className="text-[#475569] hover:text-red-500 w-8 h-8 flex items-center justify-center rounded-lg hover:bg-red-50 transition-all duration-200"
+                  aria-label={`Excluir ferramenta ${tool.title}`}
                   title="Excluir"
                   onClick={(e) => handleDelete(tool.id, e)}
                 >
-                  <Trash2 className="w-4 h-4" />
+                  <Trash2 className="w-4 h-4" aria-hidden="true" />
                 </button>
               </div>
             </div>

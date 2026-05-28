@@ -20,6 +20,8 @@ import {
   Copy,
   ChevronUp,
   ChevronDown,
+  X as XIcon,
+  Settings as SettingsIcon,
 } from "lucide-react";
 
 interface BuilderPanelProps {
@@ -40,6 +42,22 @@ export default function BuilderPanel({ schema, onChange, onSave, saving }: Build
   const [showIconPicker, setShowIconPicker] = useState(false);
   const [iconPickerTarget, setIconPickerTarget] = useState<number | null>(null);
   const [originalSchema] = useState<ToolSchema>(JSON.parse(JSON.stringify(schema)));
+  // Mobile-only: tracks if the properties drawer is open. On desktop, properties
+  // are always visible (CSS handles it). On mobile, this opens after any selection.
+  const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
+  const hasMountedRef = useRef(false);
+
+  // When the user picks a section/field (or tool), open the drawer on mobile.
+  // We skip the initial mount where selected defaults to { type: "tool" }.
+  useEffect(() => {
+    if (!hasMountedRef.current) {
+      hasMountedRef.current = true;
+      return;
+    }
+    if (selected !== null) {
+      setIsMobileDrawerOpen(true);
+    }
+  }, [selected]);
 
   const defaultTheme = { primaryColor: "#2D5A7B", backgroundColor: "#FFFFFF", fontFamily: "Inter" };
 
@@ -176,20 +194,25 @@ export default function BuilderPanel({ schema, onChange, onSave, saving }: Build
     setSelected({ type: "tool" });
   };
 
+  // Properties panel is shown side-by-side on md+, as a bottom-sheet drawer on mobile.
+  // `isMobileDrawerOpen` is mobile-only — desktop ignores it via CSS.
+  const propsDrawerOpen = isMobileDrawerOpen;
+
   return (
-    <div className="flex h-[calc(100vh-200px)] min-h-[600px] gap-0 rounded-xl border bg-white overflow-hidden">
+    <div className="flex flex-col md:flex-row md:h-[calc(100vh-200px)] md:min-h-[600px] gap-0 rounded-xl border bg-white overflow-hidden relative">
       {/* Center Panel — Live Preview */}
       <div className="flex-1 overflow-y-auto bg-gray-50">
-        <div className="p-3 border-b bg-white flex items-center justify-between">
-          <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+        <div className="p-3 border-b bg-white flex items-center justify-between gap-2">
+          <h3 className="text-xs font-semibold text-gray-600 uppercase tracking-wide truncate">
             Preview ao Vivo
           </h3>
-          <div className="flex gap-2">
-            <Button variant="ghost" size="sm" onClick={handleReset}>
-              <Undo2 className="w-3 h-3 mr-1" /> Resetar
+          <div className="flex gap-2 shrink-0">
+            <Button variant="ghost" size="sm" onClick={handleReset} aria-label="Desfazer todas as alterações">
+              <Undo2 className="w-3 h-3 mr-1" aria-hidden="true" />
+              <span className="hidden sm:inline">Resetar</span>
             </Button>
-            <Button size="sm" onClick={onSave} disabled={saving} className="bg-[#2D5A7B] hover:bg-[#1e4260]">
-              <Save className="w-3 h-3 mr-1" /> {saving ? "Salvando..." : "Salvar"}
+            <Button size="sm" onClick={onSave} disabled={saving} aria-label="Salvar ferramenta" className="bg-[#2D5A7B] hover:bg-[#1e4260]">
+              <Save className="w-3 h-3 mr-1" aria-hidden="true" /> {saving ? "Salvando..." : "Salvar"}
             </Button>
           </div>
         </div>
@@ -220,7 +243,7 @@ export default function BuilderPanel({ schema, onChange, onSave, saving }: Build
                 value={schema.instructions || ""}
                 onChange={(v) => onChange({ ...schema, instructions: v })}
                 onFocus={() => setSelected({ type: "tool" })}
-                className="text-xs text-gray-400 mt-2 italic inline-block"
+                className="text-xs text-gray-600 mt-2 italic inline-block"
                 placeholder="Instruções (clique para editar)"
                 multiline
               />
@@ -250,12 +273,59 @@ export default function BuilderPanel({ schema, onChange, onSave, saving }: Build
         </div>
       </div>
 
-      {/* Right Panel — Properties */}
-      <div className="w-72 flex-shrink-0 border-l overflow-y-auto">
-        <div className="p-3 border-b bg-white">
-          <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+      {/* Mobile backdrop — fades the preview when properties drawer is open */}
+      {propsDrawerOpen && (
+        <button
+          type="button"
+          aria-label="Fechar painel de propriedades"
+          onClick={() => setIsMobileDrawerOpen(false)}
+          className="md:hidden fixed inset-0 z-30 bg-black/40 backdrop-blur-sm animate-in fade-in duration-200"
+        />
+      )}
+
+      {/* Mobile FAB — re-opens the drawer to edit the currently selected item */}
+      {!propsDrawerOpen && selected !== null && (
+        <button
+          type="button"
+          onClick={() => setIsMobileDrawerOpen(true)}
+          aria-label="Abrir painel de propriedades"
+          className="md:hidden fixed bottom-4 right-4 z-30 flex items-center gap-2 px-4 py-2.5 rounded-full bg-[#2D5A7B] text-white text-sm font-medium shadow-lg hover:bg-[#1e4260] focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#2D5A7B] focus-visible:outline-none transition-all active:scale-95"
+        >
+          <SettingsIcon className="w-4 h-4" aria-hidden="true" />
+          Propriedades
+        </button>
+      )}
+
+      {/* Right Panel — Properties (side panel on desktop, bottom-sheet on mobile) */}
+      <div
+        role="region"
+        aria-label="Propriedades do item selecionado"
+        className={`
+          bg-white overflow-y-auto
+          md:w-72 md:flex-shrink-0 md:border-l md:static md:max-h-none md:translate-y-0 md:rounded-none md:shadow-none md:z-auto
+          fixed inset-x-0 bottom-0 z-40 max-h-[75vh] rounded-t-2xl shadow-2xl
+          transition-transform duration-300 ease-out
+          ${propsDrawerOpen ? "translate-y-0" : "translate-y-full md:translate-y-0"}
+        `}
+      >
+        {/* Mobile drag handle */}
+        <div className="md:hidden flex justify-center pt-2 pb-1" aria-hidden="true">
+          <div className="w-10 h-1 rounded-full bg-gray-300" />
+        </div>
+        <div className="p-3 border-b bg-white flex items-center justify-between">
+          <h3 className="text-xs font-semibold text-gray-600 uppercase tracking-wide flex items-center gap-1.5">
+            <SettingsIcon className="w-3 h-3 md:hidden" aria-hidden="true" />
             Propriedades
           </h3>
+          {/* Close button — mobile only */}
+          <button
+            type="button"
+            onClick={() => setIsMobileDrawerOpen(false)}
+            aria-label="Fechar painel de propriedades"
+            className="md:hidden -m-1 p-1.5 rounded-lg hover:bg-gray-100 focus-visible:ring-2 focus-visible:ring-[#0080ff] focus-visible:outline-none transition-colors"
+          >
+            <XIcon className="w-4 h-4 text-gray-600" aria-hidden="true" />
+          </button>
         </div>
 
         <div className="p-4 space-y-4">
@@ -362,17 +432,17 @@ export default function BuilderPanel({ schema, onChange, onSave, saving }: Build
                 {/* Section action buttons */}
                 {sectionMgmtEnabled && (
                   <div className="flex gap-1 mb-3">
-                    <Button variant="ghost" size="sm" className="flex-1 h-7 text-[10px] px-1" onClick={() => reorderSection(si, "up")} disabled={si === 0} title="Mover para cima">
-                      <ChevronUp className="w-3.5 h-3.5" />
+                    <Button variant="ghost" size="sm" className="flex-1 h-7 text-[10px] px-1" onClick={() => reorderSection(si, "up")} disabled={si === 0} aria-label="Mover seção para cima" title="Mover para cima">
+                      <ChevronUp className="w-3.5 h-3.5" aria-hidden="true" />
                     </Button>
-                    <Button variant="ghost" size="sm" className="flex-1 h-7 text-[10px] px-1" onClick={() => reorderSection(si, "down")} disabled={si === schema.sections.length - 1} title="Mover para baixo">
-                      <ChevronDown className="w-3.5 h-3.5" />
+                    <Button variant="ghost" size="sm" className="flex-1 h-7 text-[10px] px-1" onClick={() => reorderSection(si, "down")} disabled={si === schema.sections.length - 1} aria-label="Mover seção para baixo" title="Mover para baixo">
+                      <ChevronDown className="w-3.5 h-3.5" aria-hidden="true" />
                     </Button>
-                    <Button variant="ghost" size="sm" className="flex-1 h-7 text-[10px] px-1" onClick={() => duplicateSection(si)} title="Duplicar seção">
-                      <Copy className="w-3.5 h-3.5" />
+                    <Button variant="ghost" size="sm" className="flex-1 h-7 text-[10px] px-1" onClick={() => duplicateSection(si)} aria-label="Duplicar seção" title="Duplicar seção">
+                      <Copy className="w-3.5 h-3.5" aria-hidden="true" />
                     </Button>
-                    <Button variant="ghost" size="sm" className="flex-1 h-7 text-[10px] px-1 text-red-500 hover:text-red-600 hover:bg-red-50" onClick={() => removeSection(si)} disabled={schema.sections.length <= minSections} title="Remover seção">
-                      <Trash2 className="w-3.5 h-3.5" />
+                    <Button variant="ghost" size="sm" className="flex-1 h-7 text-[10px] px-1 text-red-500 hover:text-red-600 hover:bg-red-50" onClick={() => removeSection(si)} disabled={schema.sections.length <= minSections} aria-label="Remover seção" title="Remover seção">
+                      <Trash2 className="w-3.5 h-3.5" aria-hidden="true" />
                     </Button>
                   </div>
                 )}
@@ -419,7 +489,7 @@ export default function BuilderPanel({ schema, onChange, onSave, saving }: Build
                         className="w-8 h-8 rounded-lg border bg-white p-0.5 object-contain"
                       />
                     ) : (
-                      <div className="w-8 h-8 rounded-lg border bg-gray-50 flex items-center justify-center text-[10px] text-gray-400">
+                      <div className="w-8 h-8 rounded-lg border bg-gray-50 flex items-center justify-center text-[10px] text-gray-600">
                         {section.icon || "—"}
                       </div>
                     )}
@@ -467,7 +537,7 @@ export default function BuilderPanel({ schema, onChange, onSave, saving }: Build
                   <Type className="w-4 h-4 text-gray-500" />
                   <span className="text-sm font-semibold">{field.label || field.id}</span>
                 </div>
-                <div className="text-xs text-gray-400 mb-3">
+                <div className="text-xs text-gray-600 mb-3">
                   Tipo: <code className="bg-gray-100 px-1 py-0.5 rounded">{field.type}</code> &middot; ID: <code className="bg-gray-100 px-1 py-0.5 rounded">{field.id}</code>
                 </div>
                 {field.label !== undefined && (
@@ -551,7 +621,7 @@ export default function BuilderPanel({ schema, onChange, onSave, saving }: Build
           })()}
 
           {!selected && (
-            <p className="text-sm text-gray-400 text-center py-8">
+            <p className="text-sm text-gray-600 text-center py-8">
               Selecione um elemento na estrutura para editar suas propriedades.
             </p>
           )}

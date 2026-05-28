@@ -129,7 +129,7 @@ export default function ConvidarUsuarioPage() {
                 <option value="facilitator">Facilitador</option>
                 <option value="admin">Administrador</option>
               </select>
-              <p className="text-xs text-gray-400">
+              <p className="text-xs text-gray-600">
                 Facilitadores podem criar e gerenciar suas próprias ferramentas.
                 Administradores têm acesso completo à plataforma.
               </p>

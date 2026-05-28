@@ -393,28 +393,56 @@ export default function EditToolPage({
             size="sm"
             className="text-red-500 hover:text-red-700 hover:bg-red-50 border-red-200"
             onClick={handleDelete}
+            aria-label="Excluir ferramenta"
             title="Excluir ferramenta"
           >
-            <Trash2 className="w-4 h-4" />
+            <Trash2 className="w-4 h-4" aria-hidden="true" />
           </Button>
         </div>
       </div>
 
-      {/* Tabs */}
-      <div className="flex gap-4 mb-6 border-b border-gray-200">
+      {/* Tabs — desktop */}
+      <div
+        role="tablist"
+        aria-label="Seções de edição da ferramenta"
+        className="hidden md:flex gap-4 mb-6 border-b border-gray-200"
+      >
         {tabs.map((tab) => (
           <button
             key={tab.key}
+            role="tab"
+            aria-selected={activeTab === tab.key}
+            aria-controls={`tabpanel-${tab.key}`}
+            id={`tab-${tab.key}`}
             onClick={() => setActiveTab(tab.key)}
             className={`pb-2 px-1 text-sm font-medium transition-colors ${
               activeTab === tab.key
                 ? "border-b-2 border-primary text-primary"
-                : "text-gray-500 hover:text-gray-700"
+                : "text-gray-600 hover:text-gray-700"
             }`}
           >
-            <tab.icon className="w-4 h-4 inline mr-1" /> {tab.label}
+            <tab.icon className="w-4 h-4 inline mr-1" aria-hidden="true" /> {tab.label}
           </button>
         ))}
+      </div>
+
+      {/* Tabs — mobile (dropdown) */}
+      <div className="md:hidden mb-4">
+        <label htmlFor="tab-select" className="sr-only">
+          Seção de edição
+        </label>
+        <select
+          id="tab-select"
+          value={activeTab}
+          onChange={(e) => setActiveTab(e.target.value as typeof activeTab)}
+          className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm font-medium text-gray-900 focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none transition-all"
+        >
+          {tabs.map((tab) => (
+            <option key={tab.key} value={tab.key}>
+              {tab.label}
+            </option>
+          ))}
+        </select>
       </div>
 
       {/* Tab Content */}
@@ -441,11 +469,17 @@ export default function EditToolPage({
             <Card className="border-purple-200 bg-gradient-to-b from-purple-50/30 to-white">
               <CardContent className="pt-4 pb-4">
                 {/* Chat messages */}
-                <div className="max-h-[250px] overflow-y-auto space-y-3 mb-3">
+                <div
+                  role="log"
+                  aria-live="polite"
+                  aria-atomic="false"
+                  aria-label="Conversa com a IA"
+                  className="max-h-[250px] overflow-y-auto space-y-3 mb-3"
+                >
                   {aiMessages.length === 0 && (
                     <div className="text-center py-4">
-                      <Bot className="w-8 h-8 text-purple-300 mx-auto mb-2" />
-                      <p className="text-sm text-gray-400">
+                      <Bot className="w-8 h-8 text-purple-300 mx-auto mb-2" aria-hidden="true" />
+                      <p className="text-sm text-gray-600">
                         Peça ajustes à IA: &quot;adicione mais 3 dimensões&quot;, &quot;troque as cores&quot;, &quot;mude para radar&quot;...
                       </p>
                     </div>
@@ -456,7 +490,7 @@ export default function EditToolPage({
                       className={`flex gap-2 ${msg.role === "user" ? "justify-end" : "justify-start"}`}
                     >
                       {msg.role === "assistant" && (
-                        <div className="w-6 h-6 rounded-md bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center shrink-0 mt-0.5">
+                        <div className="w-6 h-6 rounded-md bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center shrink-0 mt-0.5" aria-hidden="true">
                           <Bot className="w-3 h-3 text-white" />
                         </div>
                       )}
@@ -467,18 +501,21 @@ export default function EditToolPage({
                             : "bg-white border text-gray-700"
                         }`}
                       >
+                        <span className="sr-only">
+                          {msg.role === "user" ? "Você: " : "IA: "}
+                        </span>
                         {msg.content}
                       </div>
                     </div>
                   ))}
                   {aiLoading && (
-                    <div className="flex gap-2 justify-start">
-                      <div className="w-6 h-6 rounded-md bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center shrink-0">
+                    <div className="flex gap-2 justify-start" aria-busy="true">
+                      <div className="w-6 h-6 rounded-md bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center shrink-0" aria-hidden="true">
                         <Bot className="w-3 h-3 text-white" />
                       </div>
-                      <div className="bg-white border rounded-xl px-3 py-2 text-sm text-gray-500 flex items-center gap-2">
-                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                        Atualizando...
+                      <div className="bg-white border rounded-xl px-3 py-2 text-sm text-gray-600 flex items-center gap-2">
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" aria-hidden="true" />
+                        Atualizando ferramenta...
                       </div>
                     </div>
                   )}
@@ -486,7 +523,11 @@ export default function EditToolPage({
                 </div>
                 {/* Input */}
                 <div className="flex gap-2">
+                  <label htmlFor="ai-chat-input" className="sr-only">
+                    Mensagem para a IA
+                  </label>
                   <textarea
+                    id="ai-chat-input"
                     ref={aiTextareaRef}
                     value={aiInput}
                     onChange={(e) => {
@@ -503,16 +544,17 @@ export default function EditToolPage({
                     placeholder="Ex: Adicione uma dimensão de &quot;Comunicação&quot;..."
                     disabled={aiLoading}
                     rows={1}
-                    className="flex-1 resize-none rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm placeholder:text-gray-300 focus:ring-2 focus:ring-purple-200 focus:border-purple-300 outline-none transition-all"
+                    className="flex-1 resize-none rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm placeholder:text-gray-500 focus:ring-2 focus:ring-purple-200 focus:border-purple-300 outline-none transition-all"
                     style={{ minHeight: "40px", maxHeight: "100px" }}
                   />
                   <Button
                     onClick={sendAiEdit}
                     disabled={!aiInput.trim() || aiLoading}
                     size="sm"
+                    aria-label="Enviar mensagem para a IA"
                     className="bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 shrink-0 self-end"
                   >
-                    <Send className="w-4 h-4" />
+                    <Send className="w-4 h-4" aria-hidden="true" />
                   </Button>
                 </div>
               </CardContent>
@@ -540,7 +582,7 @@ export default function EditToolPage({
                 <p className="text-gray-500 mt-2">{description}</p>
               )}
               {schema.instructions && (
-                <p className="text-sm text-gray-400 mt-2 italic">
+                <p className="text-sm text-gray-600 mt-2 italic">
                   {schema.instructions}
                 </p>
               )}
@@ -654,7 +696,7 @@ export default function EditToolPage({
                 <Send className="w-4 h-4 mr-2" />
                 Enviar Convites
               </Button>
-              <p className="text-xs text-gray-400">
+              <p className="text-xs text-gray-600">
                 A mensagem com o link será copiada para a área de transferência.
                 Cole-a no seu cliente de email.
               </p>
@@ -974,7 +1016,9 @@ export default function EditToolPage({
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="shrink-0 text-red-400 hover:text-red-600 hover:bg-red-50 mt-5"
+                          aria-label="Remover campo de identificação"
+                          title="Remover campo"
+                          className="shrink-0 text-red-500 hover:text-red-600 hover:bg-red-50 mt-5"
                           onClick={() => {
                             const fields = [
                               ...((settings as any).identificationFields || []),
@@ -986,7 +1030,7 @@ export default function EditToolPage({
                             } as ToolSettings);
                           }}
                         >
-                          <Trash2 className="w-4 h-4" />
+                          <Trash2 className="w-4 h-4" aria-hidden="true" />
                         </Button>
                       </div>
                     </div>

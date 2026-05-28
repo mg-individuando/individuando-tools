@@ -454,14 +454,14 @@ export default function NovaFerramentaPage() {
                     <h3 className="text-base font-semibold text-gray-700 mb-1">
                       Olá! Como posso ajudar?
                     </h3>
-                    <p className="text-sm text-gray-400 mb-6 max-w-md">
+                    <p className="text-sm text-gray-600 mb-6 max-w-md">
                       Me descreva a ferramenta que você precisa para seu
                       workshop ou mentoria. Pode ser bem direto!
                     </p>
 
                     {/* Suggestion chips */}
                     <div className="space-y-2 w-full max-w-lg">
-                      <p className="text-xs text-gray-400 font-medium uppercase tracking-wider">
+                      <p className="text-xs text-gray-600 font-medium uppercase tracking-wider">
                         Sugestões
                       </p>
                       <div className="flex flex-wrap gap-2 justify-center">
@@ -565,9 +565,11 @@ export default function NovaFerramentaPage() {
                               prev.filter((_, idx) => idx !== i)
                             )
                           }
-                          className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-red-500 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                          aria-label={`Remover imagem de referência ${i + 1}`}
+                          title="Remover imagem"
+                          className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-red-500 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 focus-visible:opacity-100 transition-opacity"
                         >
-                          <XIcon className="w-3 h-3" />
+                          <XIcon className="w-3 h-3" aria-hidden="true" />
                         </button>
                       </div>
                     ))}
@@ -594,7 +596,7 @@ export default function NovaFerramentaPage() {
                     type="button"
                     onClick={() => imageInputRef.current?.click()}
                     disabled={aiLoading}
-                    className="shrink-0 p-2.5 rounded-xl border border-gray-200 text-gray-400 hover:text-purple-500 hover:border-purple-200 hover:bg-purple-50 transition-colors disabled:opacity-50"
+                    className="shrink-0 p-2.5 rounded-xl border border-gray-200 text-gray-600 hover:text-purple-500 hover:border-purple-200 hover:bg-purple-50 transition-colors disabled:opacity-50"
                     title="Enviar imagem de referência"
                   >
                     <ImagePlus className="w-4 h-4" />
@@ -632,7 +634,7 @@ export default function NovaFerramentaPage() {
                     <Send className="w-4 h-4" />
                   </Button>
                 </form>
-                <p className="text-xs text-gray-400">
+                <p className="text-xs text-gray-600">
                   {generatedSchema
                     ? '💡 Peça ajustes: "mude as cores", "adicione dimensões", "troque para radar"...'
                     : "📎 Envie imagens de referência para a IA se inspirar"}
@@ -657,7 +659,7 @@ export default function NovaFerramentaPage() {
                     <div className="w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center mx-auto mb-3">
                       <Sparkles className="w-6 h-6 text-gray-300" />
                     </div>
-                    <p className="text-sm text-gray-400">
+                    <p className="text-sm text-gray-600">
                       A ferramenta aparecerá aqui depois que a IA criar.
                     </p>
                   </div>
@@ -703,7 +705,7 @@ export default function NovaFerramentaPage() {
                           </div>
                         ))}
                       {(generatedSchema.sections?.length || 0) > 8 && (
-                        <p className="text-xs text-gray-400 pl-4">
+                        <p className="text-xs text-gray-600 pl-4">
                           +{generatedSchema.sections.length - 8} mais...
                         </p>
                       )}
@@ -796,9 +798,11 @@ export default function NovaFerramentaPage() {
                 </h3>
                 <button
                   onClick={() => setShowPreview(false)}
-                  className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                  aria-label="Fechar preview"
+                  title="Fechar"
+                  className="p-2 rounded-lg hover:bg-gray-100 focus-visible:ring-2 focus-visible:ring-[#0080ff] focus-visible:outline-none transition-colors"
                 >
-                  <XIcon className="w-5 h-5 text-gray-500" />
+                  <XIcon className="w-5 h-5 text-gray-500" aria-hidden="true" />
                 </button>
               </div>
               <div className="p-6">
@@ -924,11 +928,11 @@ export default function NovaFerramentaPage() {
                     onClick={() => pdfInputRef.current?.click()}
                     className="w-full border-2 border-dashed border-gray-300 rounded-xl p-10 text-center hover:border-emerald-400 hover:bg-emerald-50/30 transition-colors"
                   >
-                    <FileUp className="w-10 h-10 text-gray-400 mx-auto mb-3" />
+                    <FileUp className="w-10 h-10 text-gray-600 mx-auto mb-3" />
                     <p className="text-sm font-medium text-gray-600">
                       Clique para selecionar um PDF
                     </p>
-                    <p className="text-xs text-gray-400 mt-1">
+                    <p className="text-xs text-gray-600 mt-1">
                       Até 20MB. A primeira página será analisada.
                     </p>
                   </button>
@@ -979,7 +983,7 @@ export default function NovaFerramentaPage() {
                     rows={3}
                     className="text-sm"
                   />
-                  <p className="text-xs text-gray-400 mt-2">
+                  <p className="text-xs text-gray-600 mt-2">
                     Instruções adicionais para a IA ao converter o PDF
                   </p>
                 </CardContent>
@@ -1104,7 +1108,7 @@ export default function NovaFerramentaPage() {
               <Card className="border-dashed">
                 <CardContent className="py-16 text-center">
                   <FileUp className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                  <p className="text-sm text-gray-400">
+                  <p className="text-sm text-gray-600">
                     {pdfImage
                       ? "Clique em \"Converter para Ferramenta Digital\" para gerar o preview"
                       : "Faça upload de um PDF para começar"}

@@ -216,7 +216,7 @@ export default function UsuarioDetalhePage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-24 text-gray-400">
+      <div className="flex items-center justify-center py-24 text-gray-600">
         Carregando...
       </div>
     );
@@ -472,7 +472,7 @@ export default function UsuarioDetalhePage() {
                           {tool.title}
                         </p>
                         <div className="flex items-center gap-2 mt-0.5">
-                          <span className="text-xs text-gray-400">
+                          <span className="text-xs text-gray-600">
                             {new Date(tool.created_at).toLocaleDateString(
                               "pt-BR"
                             )}

@@ -115,7 +115,7 @@ export default function RespostasPage({
               Nenhuma resposta recebida ainda.
             </p>
             {tool.status !== "published" && (
-              <p className="text-sm text-gray-400 mt-2">
+              <p className="text-sm text-gray-600 mt-2">
                 Publique a ferramenta para começar a receber respostas.
               </p>
             )}
@@ -189,7 +189,7 @@ export default function RespostasPage({
               </Card>
             ) : (
               <Card>
-                <CardContent className="text-center py-12 text-gray-400">
+                <CardContent className="text-center py-12 text-gray-600">
                   <Eye className="w-8 h-8 mx-auto mb-2" />
                   <p>Selecione uma resposta para visualizar</p>
                 </CardContent>

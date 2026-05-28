@@ -318,9 +318,9 @@ function SectionAccordion({
           )}
         </div>
         {isOpen ? (
-          <ChevronUp className="h-4 w-4 text-gray-400" />
+          <ChevronUp className="h-4 w-4 text-gray-600" />
         ) : (
-          <ChevronDown className="h-4 w-4 text-gray-400" />
+          <ChevronDown className="h-4 w-4 text-gray-600" />
         )}
       </button>
       {isOpen && <div className="px-4 pb-4">{children}</div>}
@@ -461,7 +461,7 @@ export function BannerEditor({
                   </button>
                 ))}
               </div>
-              <p className="text-[11px] text-gray-400">
+              <p className="text-[11px] text-gray-600">
                 A logo Individuando ficara no lado oposto automaticamente.
               </p>
             </div>
@@ -605,14 +605,14 @@ export function BannerEditor({
               {config.backgroundImage && (
                 <p className="text-xs text-green-600">Imagem carregada</p>
               )}
-              <p className="text-xs text-gray-400">
+              <p className="text-xs text-gray-600">
                 Recomendado: 1200x200px. PNG, JPG ou WebP.
               </p>
               {/* Overlay for image backgrounds */}
               <div className="space-y-1.5 pt-2">
                 <div className="flex items-center justify-between">
                   <Label className="text-xs text-gray-500">Escurecimento</Label>
-                  <span className="text-xs text-gray-400">{config.overlayOpacity}%</span>
+                  <span className="text-xs text-gray-600">{config.overlayOpacity}%</span>
                 </div>
                 <input
                   type="range"
@@ -654,7 +654,7 @@ export function BannerEditor({
           <div className="space-y-3">
             {/* Dark background variants */}
             <div>
-              <p className="text-[10px] text-gray-400 uppercase tracking-wider mb-2">Para fundos escuros</p>
+              <p className="text-[10px] text-gray-600 uppercase tracking-wider mb-2">Para fundos escuros</p>
               <div className="grid grid-cols-4 gap-2">
                 {INDIVIDUANDO_LOGOS.filter(l => l.bgSuit === "dark").map((logo) => (
                   <button
@@ -685,7 +685,7 @@ export function BannerEditor({
 
             {/* Light background variants */}
             <div>
-              <p className="text-[10px] text-gray-400 uppercase tracking-wider mb-2">Para fundos claros</p>
+              <p className="text-[10px] text-gray-600 uppercase tracking-wider mb-2">Para fundos claros</p>
               <div className="grid grid-cols-4 gap-2">
                 {INDIVIDUANDO_LOGOS.filter(l => l.bgSuit === "light").map((logo) => (
                   <button
@@ -719,10 +719,10 @@ export function BannerEditor({
           <div className="space-y-1.5">
             <div className="flex items-center justify-between">
               <Label className="text-xs text-gray-500">Tamanho</Label>
-              <span className="text-xs text-gray-400">{config.individuandoSize}px</span>
+              <span className="text-xs text-gray-600">{config.individuandoSize}px</span>
             </div>
             <div className="flex items-center gap-3">
-              <Minimize2 className="h-3 w-3 text-gray-400" />
+              <Minimize2 className="h-3 w-3 text-gray-600" />
               <input
                 type="range"
                 min={16}
@@ -731,7 +731,7 @@ export function BannerEditor({
                 onChange={(e) => update("individuandoSize", Number(e.target.value))}
                 className="flex-1"
               />
-              <Maximize2 className="h-3 w-3 text-gray-400" />
+              <Maximize2 className="h-3 w-3 text-gray-600" />
             </div>
           </div>
         </div>
@@ -767,10 +767,10 @@ export function BannerEditor({
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
                   <Label className="text-xs text-gray-500">Tamanho</Label>
-                  <span className="text-xs text-gray-400">{config.clientLogoSize}px</span>
+                  <span className="text-xs text-gray-600">{config.clientLogoSize}px</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <Minimize2 className="h-3 w-3 text-gray-400" />
+                  <Minimize2 className="h-3 w-3 text-gray-600" />
                   <input
                     type="range"
                     min={20}
@@ -779,7 +779,7 @@ export function BannerEditor({
                     onChange={(e) => update("clientLogoSize", Number(e.target.value))}
                     className="flex-1"
                   />
-                  <Maximize2 className="h-3 w-3 text-gray-400" />
+                  <Maximize2 className="h-3 w-3 text-gray-600" />
                 </div>
               </div>
 
@@ -891,7 +891,7 @@ export function BannerEditor({
                     onChange={(e) => update("titleSize", Number(e.target.value))}
                     className="w-24"
                   />
-                  <span className="text-xs text-gray-400 w-8">{config.titleSize}px</span>
+                  <span className="text-xs text-gray-600 w-8">{config.titleSize}px</span>
                 </div>
               </div>
               <div className="flex items-center gap-2">
