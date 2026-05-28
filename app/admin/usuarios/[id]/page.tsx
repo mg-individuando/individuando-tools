@@ -216,8 +216,20 @@ export default function UsuarioDetalhePage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-24 text-gray-600">
-        Carregando...
+      <div role="status" aria-live="polite" aria-busy="true" className="max-w-2xl space-y-6">
+        <span className="sr-only">Carregando perfil do usuário…</span>
+        <div className="space-y-2">
+          <div className="h-7 w-1/2 rounded-md bg-[rgba(0,128,255,0.08)] animate-pulse" />
+          <div className="h-4 w-2/3 rounded-md bg-[rgba(0,128,255,0.08)] animate-pulse" />
+        </div>
+        <div className="glass-card rounded-2xl p-6 space-y-4">
+          <div className="h-4 w-24 rounded bg-[rgba(0,128,255,0.08)] animate-pulse" />
+          <div className="h-10 rounded-xl bg-[rgba(0,128,255,0.08)] animate-pulse" />
+          <div className="h-4 w-24 rounded bg-[rgba(0,128,255,0.08)] animate-pulse" />
+          <div className="h-10 rounded-xl bg-[rgba(0,128,255,0.08)] animate-pulse" />
+          <div className="h-4 w-24 rounded bg-[rgba(0,128,255,0.08)] animate-pulse" />
+          <div className="h-24 rounded-xl bg-[rgba(0,128,255,0.08)] animate-pulse" />
+        </div>
       </div>
     );
   }

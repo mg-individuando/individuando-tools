@@ -39,6 +39,8 @@ import {
   X as XIcon,
 } from "lucide-react";
 import Link from "next/link";
+import { Skeleton, EditorSkeleton } from "@/components/ui/skeleton";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
 export default function EditToolPage({
   params,
@@ -323,8 +325,9 @@ export default function EditToolPage({
 
   if (!tool) {
     return (
-      <div className="text-center py-12 text-gray-500">
-        Carregando...
+      <div role="status" aria-live="polite" aria-busy="true">
+        <span className="sr-only">Carregando editor da ferramenta…</span>
+        <EditorSkeleton />
       </div>
     );
   }
@@ -385,9 +388,20 @@ export default function EditToolPage({
               <Eye className="w-4 h-4 mr-1" /> Respostas
             </Button>
           </Link>
-          <Button variant="outline" size="sm" onClick={handlePublish}>
-            {tool.status === "published" ? "Despublicar" : "Publicar"}
-          </Button>
+          {tool.status === "published" ? (
+            <Button variant="outline" size="sm" onClick={handlePublish}>
+              Despublicar
+            </Button>
+          ) : (
+            <Button
+              size="sm"
+              onClick={handlePublish}
+              className="bg-[#22c55e] hover:bg-[#16a34a] text-white font-semibold shadow-md shadow-emerald-500/20 hover:shadow-lg hover:shadow-emerald-500/30 focus-visible:ring-emerald-500"
+            >
+              <Sparkles className="w-4 h-4 mr-1.5" aria-hidden="true" />
+              Publicar
+            </Button>
+          )}
           <Button
             variant="outline"
             size="sm"

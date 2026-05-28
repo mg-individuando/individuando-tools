@@ -144,8 +144,7 @@ export default function ToolRenderer({
         <div className="mt-8 flex justify-center">
           <button
             onClick={() => onSubmit(values)}
-            className="btn-primary text-base px-10 py-3.5"
-            style={{ background: "var(--gradient-primary)" }}
+            className="btn-cta text-base px-10 py-3.5"
           >
             Enviar Respostas
           </button>

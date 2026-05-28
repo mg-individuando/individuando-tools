@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import type { Profile } from "@/lib/schemas/types";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
 const navItems = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
@@ -75,15 +76,22 @@ export default function AdminLayout({
     setSidebarOpen(false);
   }, [pathname]);
 
-  const handleLogout = useCallback(async () => {
+  const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
+
+  const performLogout = useCallback(async () => {
+    setLogoutDialogOpen(false);
     try {
       await supabase.auth.signOut();
-      toast.success("Sessao encerrada.");
+      toast.success("Sessão encerrada.");
       router.push("/auth/login");
     } catch {
       toast.error("Erro ao sair.");
     }
   }, [supabase, router]);
+
+  const handleLogout = useCallback(() => {
+    setLogoutDialogOpen(true);
+  }, []);
 
   const filteredNavItems = navItems.filter(
     (item) => !item.adminOnly || profile?.role === "admin"
@@ -97,12 +105,20 @@ export default function AdminLayout({
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+      <div
+        role="status"
+        aria-live="polite"
+        aria-busy="true"
+        className="min-h-screen bg-slate-50 flex items-center justify-center"
+      >
         <div className="flex flex-col items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-[#2D5A7B] flex items-center justify-center animate-pulse">
+          <div
+            className="w-10 h-10 rounded-xl bg-[#2D5A7B] flex items-center justify-center animate-pulse"
+            aria-hidden="true"
+          >
             <span className="text-white font-bold text-lg font-sans">I</span>
           </div>
-          <p className="text-sm text-slate-600 font-sans">Carregando...</p>
+          <p className="text-sm text-slate-600 font-sans">Carregando seu painel…</p>
         </div>
       </div>
     );
@@ -270,6 +286,18 @@ export default function AdminLayout({
       <main className="lg:ml-64 pt-14 lg:pt-0">
         <div className="p-5 sm:p-6 lg:p-8 max-w-7xl mx-auto">{children}</div>
       </main>
+
+      {/* ── Logout confirmation ────────────────────────────────── */}
+      <ConfirmDialog
+        open={logoutDialogOpen}
+        onCancel={() => setLogoutDialogOpen(false)}
+        onConfirm={performLogout}
+        title="Encerrar sessão?"
+        description={`Você será desconectado e precisará fazer login novamente para acessar o painel${profile?.name ? `, ${profile.name.split(" ")[0]}` : ""}.`}
+        confirmLabel="Sair"
+        cancelLabel="Cancelar"
+        variant="destructive"
+      />
     </div>
   );
 }

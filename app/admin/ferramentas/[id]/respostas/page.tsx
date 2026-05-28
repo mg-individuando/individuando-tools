@@ -6,10 +6,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { ArrowLeft, Download, Eye, FileText, Users } from "lucide-react";
+import { ArrowLeft, Download, Eye, FileText, Users, ExternalLink } from "lucide-react";
 import Link from "next/link";
 import type { Tool, Response } from "@/lib/schemas/types";
 import type { ToolSchema } from "@/lib/schemas/tool-schema";
+import { ListSkeleton, Skeleton } from "@/components/ui/skeleton";
 
 export default function RespostasPage({
   params,
@@ -76,11 +77,36 @@ export default function RespostasPage({
   }
 
   if (loading) {
-    return <div className="text-center py-12 text-gray-500">Carregando...</div>;
+    return (
+      <div role="status" aria-live="polite" aria-busy="true" className="space-y-6">
+        <span className="sr-only">Carregando respostas…</span>
+        <div className="space-y-2">
+          <Skeleton className="h-7 w-1/3" />
+          <Skeleton className="h-4 w-1/2" />
+        </div>
+        <ListSkeleton rows={5} />
+      </div>
+    );
   }
 
   if (!tool) {
-    return <div className="text-center py-12 text-gray-500">Ferramenta não encontrada</div>;
+    return (
+      <div className="text-center py-12 max-w-md mx-auto">
+        <div className="w-12 h-12 rounded-full bg-red-50 text-red-500 flex items-center justify-center mx-auto mb-3" aria-hidden="true">
+          <FileText className="w-5 h-5" />
+        </div>
+        <h2 className="text-base font-semibold text-[#0f172a]">Ferramenta não encontrada</h2>
+        <p className="text-sm text-[#475569] mt-1">
+          Esta ferramenta pode ter sido removida ou o link está incorreto.
+        </p>
+        <Link href="/admin/ferramentas">
+          <Button variant="outline" size="sm" className="mt-4">
+            <ArrowLeft className="w-4 h-4 mr-1.5" aria-hidden="true" />
+            Voltar para Ferramentas
+          </Button>
+        </Link>
+      </div>
+    );
   }
 
   const schema = tool.schema as ToolSchema;
@@ -109,16 +135,34 @@ export default function RespostasPage({
 
       {responses.length === 0 ? (
         <Card>
-          <CardContent className="text-center py-12">
-            <Users className="w-12 h-12 mx-auto mb-4 text-gray-300" />
-            <p className="text-gray-500">
-              Nenhuma resposta recebida ainda.
+          <CardContent className="text-center py-14 px-6 max-w-md mx-auto">
+            <div className="w-14 h-14 rounded-full bg-[rgba(0,128,255,0.08)] flex items-center justify-center mx-auto mb-4" aria-hidden="true">
+              <Users className="w-7 h-7 text-[#0080ff]" />
+            </div>
+            <h2 className="text-base font-semibold text-[#0f172a] mb-1.5">
+              {tool.status === "published"
+                ? "Aguardando primeiras respostas"
+                : "Ferramenta ainda não publicada"}
+            </h2>
+            <p className="text-sm text-[#475569] leading-relaxed mb-5">
+              {tool.status === "published" ? (
+                <>
+                  Compartilhe o link com seus participantes. Quando alguém responder,
+                  os dados aparecem aqui.
+                </>
+              ) : (
+                <>
+                  Publique a ferramenta primeiro, depois compartilhe o link público
+                  para começar a receber respostas.
+                </>
+              )}
             </p>
-            {tool.status !== "published" && (
-              <p className="text-sm text-gray-600 mt-2">
-                Publique a ferramenta para começar a receber respostas.
-              </p>
-            )}
+            <Link href={`/admin/ferramentas/${tool.id}?tab=share`}>
+              <Button size="sm" className="bg-[#0080ff] hover:bg-[#0066cc]">
+                <ExternalLink className="w-4 h-4 mr-1.5" aria-hidden="true" />
+                {tool.status === "published" ? "Compartilhar ferramenta" : "Ir para publicação"}
+              </Button>
+            </Link>
           </CardContent>
         </Card>
       ) : (

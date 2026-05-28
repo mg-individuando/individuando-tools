@@ -15,6 +15,7 @@ import {
   UserX,
 } from "lucide-react";
 import type { Profile } from "@/lib/schemas/types";
+import { ListSkeleton, Skeleton } from "@/components/ui/skeleton";
 
 export default function UsuariosPage() {
   const [profiles, setProfiles] = useState<Profile[]>([]);
@@ -45,8 +46,14 @@ export default function UsuariosPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-24 text-[#475569]">
-        Carregando...
+      <div role="status" aria-live="polite" aria-busy="true" className="space-y-6">
+        <span className="sr-only">Carregando usuários…</span>
+        <div className="space-y-2">
+          <Skeleton className="h-7 w-32" />
+          <Skeleton className="h-4 w-64" />
+        </div>
+        <Skeleton className="h-10 w-full max-w-sm" />
+        <ListSkeleton rows={6} />
       </div>
     );
   }

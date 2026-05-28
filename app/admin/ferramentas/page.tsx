@@ -4,9 +4,10 @@ import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Plus, Copy, ExternalLink, Eye, FileText, LayoutGrid, List, Trash2, Pencil } from "lucide-react";
+import { Plus, Copy, ExternalLink, Eye, FileText, LayoutGrid, List, Trash2, Pencil, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import type { Tool } from "@/lib/schemas/types";
+import { CardSkeleton } from "@/components/ui/skeleton";
 
 const templateLabels: Record<string, string> = {
   swot: "SWOT Pessoal",
@@ -115,8 +116,21 @@ export default function FerramentasPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-24 text-[#475569]">
-        Carregando...
+      <div>
+        {/* Header skeleton */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+          <div className="space-y-2">
+            <div className="h-7 w-40 rounded-md bg-[rgba(0,128,255,0.08)] animate-pulse" />
+            <div className="h-4 w-72 rounded-md bg-[rgba(0,128,255,0.08)] animate-pulse" />
+          </div>
+          <div className="h-10 w-36 rounded-xl bg-[rgba(0,128,255,0.08)] animate-pulse" />
+        </div>
+        {/* Cards grid skeleton */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" aria-label="Carregando ferramentas">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <CardSkeleton key={i} />
+          ))}
+        </div>
       </div>
     );
   }
@@ -162,19 +176,19 @@ export default function FerramentasPage() {
       {/* Empty state */}
       {tools.length === 0 ? (
         <div className="glass-card border-dashed">
-          <div className="flex flex-col items-center justify-center py-16">
-            <div className="feature-icon mb-4">
+          <div className="flex flex-col items-center justify-center py-16 px-6 text-center max-w-md mx-auto">
+            <div className="feature-icon mb-4" aria-hidden="true">
               <FileText className="w-8 h-8" />
             </div>
-            <p className="text-[#0f172a] font-medium mb-1">
-              Nenhuma ferramenta criada
-            </p>
-            <p className="text-sm text-[#475569] mb-6">
-              Crie sua primeira ferramenta interativa para compartilhar com seus clientes.
+            <h2 className="text-[#0f172a] font-semibold text-lg mb-1.5">
+              Comece sua primeira ferramenta
+            </h2>
+            <p className="text-sm text-[#475569] mb-6 leading-relaxed">
+              Escolha um template (SWOT, Roda da Vida, Ikigai…) ou descreva o que você precisa — a IA monta o esqueleto pra você ajustar.
             </p>
             <Link href="/admin/ferramentas/nova">
               <button className="btn-primary inline-flex items-center gap-2 text-sm">
-                <Plus className="w-4 h-4" />
+                <Sparkles className="w-4 h-4" aria-hidden="true" />
                 Criar Primeira Ferramenta
               </button>
             </Link>
