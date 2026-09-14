@@ -65,7 +65,7 @@ export interface BannerConfig {
 export const DEFAULT_CONFIG: BannerConfig = {
   backgroundType: "gradient",
   backgroundColor: "#2D5A7B",
-  gradientFrom: "#1e2f4c",
+  gradientFrom: "#1d2e4c",
   gradientTo: "#2D5A7B",
   gradientDirection: "to right",
   backgroundImage: "",
@@ -89,7 +89,7 @@ export const DEFAULT_CONFIG: BannerConfig = {
 /**
  * Individuando logo variants catalog.
  * Based on analysis of the 16 SVG files:
- * - 1-3: Navy (#1e2f4c) + Sage (#c0d57e) — for LIGHT backgrounds
+ * - 1-3: Navy (#1d2e4c) + Sage (#c0d57e) — for LIGHT backgrounds
  * - 4-6: Sage (#c0d57e) + White (#fff) — for DARK backgrounds
  * - 7-9: White only — for DARK backgrounds
  * - 10-12: Navy only — for LIGHT backgrounds
@@ -99,26 +99,26 @@ export const DEFAULT_CONFIG: BannerConfig = {
  *                3,6,9,12 = moderate (789x342), 13-16 = square (288x288)
  */
 const INDIVIDUANDO_LOGOS = [
-  { id: 1, label: "Completa Horizontal", colors: ["#1e2f4c", "#c0d57e"], bgSuit: "light", aspect: "wide" },
-  { id: 2, label: "Completa Vertical", colors: ["#1e2f4c", "#c0d57e"], bgSuit: "light", aspect: "portrait" },
-  { id: 3, label: "Completa Moderada", colors: ["#1e2f4c", "#c0d57e"], bgSuit: "light", aspect: "moderate" },
+  { id: 1, label: "Completa Horizontal", colors: ["#1d2e4c", "#c0d57e"], bgSuit: "light", aspect: "wide" },
+  { id: 2, label: "Completa Vertical", colors: ["#1d2e4c", "#c0d57e"], bgSuit: "light", aspect: "portrait" },
+  { id: 3, label: "Completa Moderada", colors: ["#1d2e4c", "#c0d57e"], bgSuit: "light", aspect: "moderate" },
   { id: 4, label: "Verde+Branca Horizontal", colors: ["#c0d57e", "#ffffff"], bgSuit: "dark", aspect: "wide" },
   { id: 5, label: "Verde+Branca Vertical", colors: ["#c0d57e", "#ffffff"], bgSuit: "dark", aspect: "portrait" },
   { id: 6, label: "Verde+Branca Moderada", colors: ["#c0d57e", "#ffffff"], bgSuit: "dark", aspect: "moderate" },
   { id: 7, label: "Branca Horizontal", colors: ["#ffffff"], bgSuit: "dark", aspect: "wide" },
   { id: 8, label: "Branca Vertical", colors: ["#ffffff"], bgSuit: "dark", aspect: "portrait" },
   { id: 9, label: "Branca Moderada", colors: ["#ffffff"], bgSuit: "dark", aspect: "moderate" },
-  { id: 10, label: "Azul Horizontal", colors: ["#1e2f4c"], bgSuit: "light", aspect: "wide" },
-  { id: 11, label: "Azul Vertical", colors: ["#1e2f4c"], bgSuit: "light", aspect: "portrait" },
-  { id: 12, label: "Azul Moderada", colors: ["#1e2f4c"], bgSuit: "light", aspect: "moderate" },
-  { id: 13, label: "Icone Cor", colors: ["#1e2f4c", "#c0d57e"], bgSuit: "light", aspect: "square" },
+  { id: 10, label: "Azul Horizontal", colors: ["#1d2e4c"], bgSuit: "light", aspect: "wide" },
+  { id: 11, label: "Azul Vertical", colors: ["#1d2e4c"], bgSuit: "light", aspect: "portrait" },
+  { id: 12, label: "Azul Moderada", colors: ["#1d2e4c"], bgSuit: "light", aspect: "moderate" },
+  { id: 13, label: "Icone Cor", colors: ["#1d2e4c", "#c0d57e"], bgSuit: "light", aspect: "square" },
   { id: 14, label: "Icone Verde+Branca", colors: ["#c0d57e", "#ffffff"], bgSuit: "dark", aspect: "square" },
-  { id: 15, label: "Icone Cor Alt.", colors: ["#1e2f4c", "#c0d57e"], bgSuit: "light", aspect: "square" },
+  { id: 15, label: "Icone Cor Alt.", colors: ["#1d2e4c", "#c0d57e"], bgSuit: "light", aspect: "square" },
   { id: 16, label: "Icone Verde+Branca Alt.", colors: ["#c0d57e", "#ffffff"], bgSuit: "dark", aspect: "square" },
 ];
 
 const GRADIENT_PRESETS = [
-  { from: "#1e2f4c", to: "#2D5A7B", label: "Individuando" },
+  { from: "#1d2e4c", to: "#2D5A7B", label: "Individuando" },
   { from: "#065F46", to: "#059669", label: "Verde Esmeralda" },
   { from: "#4C1D95", to: "#7C3AED", label: "Violeta" },
   { from: "#9F1239", to: "#DB2777", label: "Rosa Intenso" },
@@ -292,7 +292,7 @@ function SectionAccordion({
       className={`rounded-lg border transition-colors ${
         isOpen
           ? highlight
-            ? "border-[#1e2f4c]/30 bg-[#1e2f4c]/[0.03]"
+            ? "border-[#1d2e4c]/30 bg-[#1d2e4c]/[0.03]"
             : "border-gray-200 bg-white"
           : "border-gray-100 bg-gray-50/50"
       }`}
@@ -300,19 +300,19 @@ function SectionAccordion({
       <button
         onClick={onToggle}
         className={`w-full flex items-center justify-between px-4 py-3 text-sm font-medium transition-colors ${
-          highlight && !isOpen ? "text-[#1e2f4c]" : "text-gray-700"
+          highlight && !isOpen ? "text-[#1d2e4c]" : "text-gray-700"
         }`}
       >
         <div className="flex items-center gap-2">
           {icon}
           {title}
           {highlight && (
-            <span className="text-[10px] bg-[#1e2f4c] text-white px-1.5 py-0.5 rounded-full font-medium">
+            <span className="text-[10px] bg-[#1d2e4c] text-white px-1.5 py-0.5 rounded-full font-medium">
               Recomendado
             </span>
           )}
           {badge && (
-            <span className="text-[10px] bg-[#c0d57e] text-[#1e2f4c] px-1.5 py-0.5 rounded-full font-semibold">
+            <span className="text-[10px] bg-[#c0d57e] text-[#1d2e4c] px-1.5 py-0.5 rounded-full font-semibold">
               {badge}
             </span>
           )}
@@ -426,7 +426,7 @@ export function BannerEditor({
                 onClick={() => update("bannerLayout", opt.value)}
                 className={`p-3 rounded-lg border text-left transition-all ${
                   config.bannerLayout === opt.value
-                    ? "border-[#1e2f4c] bg-[#1e2f4c]/5 ring-1 ring-[#1e2f4c]"
+                    ? "border-[#1d2e4c] bg-[#1d2e4c]/5 ring-1 ring-[#1d2e4c]"
                     : "border-gray-200 hover:border-gray-300"
                 }`}
               >
@@ -435,7 +435,7 @@ export function BannerEditor({
                     {opt.label}
                   </span>
                   {config.bannerLayout === opt.value && (
-                    <Check className="h-4 w-4 text-[#1e2f4c]" />
+                    <Check className="h-4 w-4 text-[#1d2e4c]" />
                   )}
                 </div>
                 <span className="text-[11px] text-gray-500">{opt.desc}</span>
@@ -453,7 +453,7 @@ export function BannerEditor({
                     onClick={() => update("clientLogoPosition", pos)}
                     className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                       config.clientLogoPosition === pos
-                        ? "bg-[#1e2f4c] text-white"
+                        ? "bg-[#1d2e4c] text-white"
                         : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                     }`}
                   >
@@ -484,7 +484,7 @@ export function BannerEditor({
                 onClick={() => update("backgroundType", type)}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                   config.backgroundType === type
-                    ? "bg-[#1e2f4c] text-white"
+                    ? "bg-[#1d2e4c] text-white"
                     : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                 }`}
               >
@@ -524,7 +524,7 @@ export function BannerEditor({
                     <div
                       className={`h-8 w-16 rounded-md border-2 transition-all ${
                         config.gradientFrom === preset.from && config.gradientTo === preset.to
-                          ? "border-[#1e2f4c] scale-110"
+                          ? "border-[#1d2e4c] scale-110"
                           : "border-transparent hover:border-gray-300"
                       }`}
                       style={{
@@ -643,7 +643,7 @@ export function BannerEditor({
             </p>
             <button
               onClick={autoDetect}
-              className="text-[11px] px-2.5 py-1 rounded-full border border-[#1e2f4c]/20 text-[#1e2f4c] hover:bg-[#1e2f4c]/5 transition-colors flex items-center gap-1"
+              className="text-[11px] px-2.5 py-1 rounded-full border border-[#1d2e4c]/20 text-[#1d2e4c] hover:bg-[#1d2e4c]/5 transition-colors flex items-center gap-1"
             >
               <Sparkles className="h-3 w-3" />
               Auto-detectar
@@ -662,10 +662,10 @@ export function BannerEditor({
                     onClick={() => update("individuandoVariant", logo.id)}
                     className={`relative rounded-lg border-2 p-2 transition-all ${
                       config.individuandoVariant === logo.id
-                        ? "border-[#1e2f4c] ring-2 ring-[#1e2f4c]/20"
+                        ? "border-[#1d2e4c] ring-2 ring-[#1d2e4c]/20"
                         : "border-gray-200 hover:border-gray-300"
                     }`}
-                    style={{ backgroundColor: "#1e2f4c" }}
+                    style={{ backgroundColor: "#1d2e4c" }}
                     title={logo.label}
                   >
                     <img
@@ -674,7 +674,7 @@ export function BannerEditor({
                       className="h-8 w-full object-contain"
                     />
                     {config.individuandoVariant === logo.id && (
-                      <div className="absolute -top-1 -right-1 bg-[#1e2f4c] rounded-full p-0.5">
+                      <div className="absolute -top-1 -right-1 bg-[#1d2e4c] rounded-full p-0.5">
                         <Check className="h-3 w-3 text-white" />
                       </div>
                     )}
@@ -693,7 +693,7 @@ export function BannerEditor({
                     onClick={() => update("individuandoVariant", logo.id)}
                     className={`relative rounded-lg border-2 p-2 transition-all ${
                       config.individuandoVariant === logo.id
-                        ? "border-[#1e2f4c] ring-2 ring-[#1e2f4c]/20"
+                        ? "border-[#1d2e4c] ring-2 ring-[#1d2e4c]/20"
                         : "border-gray-200 hover:border-gray-300"
                     }`}
                     style={{ backgroundColor: "#f8f9fa" }}
@@ -705,7 +705,7 @@ export function BannerEditor({
                       className="h-8 w-full object-contain"
                     />
                     {config.individuandoVariant === logo.id && (
-                      <div className="absolute -top-1 -right-1 bg-[#1e2f4c] rounded-full p-0.5">
+                      <div className="absolute -top-1 -right-1 bg-[#1d2e4c] rounded-full p-0.5">
                         <Check className="h-3 w-3 text-white" />
                       </div>
                     )}
@@ -810,12 +810,12 @@ export function BannerEditor({
                         maxLength={7}
                       />
                       <div className="flex gap-1.5 ml-2">
-                        {["#FFFFFF", "#000000", "#1e2f4c", "#c0d57e"].map((c) => (
+                        {["#FFFFFF", "#000000", "#1d2e4c", "#c0d57e"].map((c) => (
                           <button
                             key={c}
                             onClick={() => update("logoColor", c)}
                             className={`h-6 w-6 rounded-full border-2 transition-all ${
-                              config.logoColor === c ? "border-[#1e2f4c] scale-110" : "border-gray-200"
+                              config.logoColor === c ? "border-[#1d2e4c] scale-110" : "border-gray-200"
                             }`}
                             style={{ backgroundColor: c }}
                           />
@@ -903,7 +903,7 @@ export function BannerEditor({
                       onClick={() => update("titlePosition", pos)}
                       className={`p-2 rounded-md transition-colors ${
                         config.titlePosition === pos
-                          ? "bg-[#1e2f4c] text-white"
+                          ? "bg-[#1d2e4c] text-white"
                           : "bg-gray-100 hover:bg-gray-200 text-gray-600"
                       }`}
                     >

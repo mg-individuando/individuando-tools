@@ -2,7 +2,7 @@
 
 import { useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 import { POST, QUADRO, ANIVERSARIO as A } from "@/lib/posts/tokens";
-import { CANTO_ANEIS, CANTO_PONTOS, CANTO_VIEWBOX } from "@/lib/posts/canto";
+import { QuadroBase, QuadroDefs, QuadroFundo, QuadroAssinatura } from "./quadro-post";
 import { garantirFontePost } from "@/lib/posts/fontes";
 
 /** Baselines calibradas contra o export do Canva (pg11 = marcos). Ver lib/posts/CALIBRACAO.md. */
@@ -24,7 +24,7 @@ export interface PostAniversarioConfig {
   fotoZoom?: number;
   /** Corpo do nome em px. Omitido = auto-ajuste: reduz até a pílula não invadir a assinatura. */
   nomeCorpo?: number;
-  /** Posição da data no arco, 0..1. Padrão calibrado em tokens. */
+  /** Onde o CENTRO da data cai no arco, 0..1. Padrão em tokens (18° à direita das 12h). */
   arcoOffset?: number;
 }
 
@@ -51,11 +51,24 @@ export function PostAniversario({
   config,
   blobUrl = "/marca/blob.png",
   assinaturaUrl = "/marca/assinatura-branca.svg",
+  responsivo = false,
+  svgRef,
+  onEnquadramento,
+  ...svgProps
 }: {
   config: PostAniversarioConfig;
   blobUrl?: string;
   assinaturaUrl?: string;
-}) {
+  /** true = ocupa a largura do contêiner mantendo o quadrado (para o editor). */
+  responsivo?: boolean;
+  svgRef?: React.Ref<SVGSVGElement>;
+  /**
+   * Reporta quanto a foto pode correr em cada eixo, em unidades do canvas 1080.
+   * O editor usa isso para converter arrasto em foco sem duplicar a matemática daqui.
+   * folga 0 = a foto preenche o círculo exatamente; não há o que reposicionar.
+   */
+  onEnquadramento?: (g: { folgaX: number; folgaY: number; aspecto: number | null }) => void;
+} & Omit<React.SVGProps<SVGSVGElement>, "ref" | "width" | "height" | "viewBox">) {
   const data = (config.data ?? "").toString();
   const rotulo = (config.rotulo ?? "dia do").toString();
   const nome = (config.nome ?? "").toString();
@@ -63,7 +76,7 @@ export function PostAniversario({
   const fotoX = num(config.fotoX, 0, -1, 1);
   const fotoY = num(config.fotoY, 0, -1, 1);
   const zoom = num(config.fotoZoom, 1, 1, 8);
-  const offset = num(config.arcoOffset, A.arco.offsetPadrao, 0, 1);
+  const offset = num(config.arcoOffset, A.arco.offsetCentro, 0, 1);
 
   // ids únicos por instância: duas prévias na mesma página não podem compartilhar clipPath/gradiente
   const uid = useId().replace(/[^a-zA-Z0-9_-]/g, "");
@@ -128,25 +141,31 @@ export function PostAniversario({
   const a = aspecto ?? 1;
   const imgW = (a >= 1 ? d * a : d) * zoom;
   const imgH = (a >= 1 ? d : d / a) * zoom;
-  const fx = cx - imgW / 2 - fotoX * ((imgW - d) / 2);
-  const fy = cy - imgH / 2 - fotoY * ((imgH - d) / 2);
+  const folgaX = (imgW - d) / 2;
+  const folgaY = (imgH - d) / 2;
+  const fx = cx - imgW / 2 - fotoX * folgaX;
+  const fy = cy - imgH / 2 - fotoY * folgaY;
 
-  const sxCanto = QUADRO.canto.w / CANTO_VIEWBOX.w;
-  const syCanto = QUADRO.canto.h / CANTO_VIEWBOX.h;
+  useEffect(() => {
+    onEnquadramento?.({ folgaX, folgaY, aspecto });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [folgaX, folgaY, aspecto]);
 
   return (
     <svg
+      ref={svgRef}
       viewBox={`0 0 ${POST.canvas} ${POST.canvas}`}
-      width={POST.canvas}
-      height={POST.canvas}
+      {...(responsivo ? { width: "100%" } : { width: POST.canvas, height: POST.canvas })}
       xmlns="http://www.w3.org/2000/svg"
       data-pronto={!fotoUrl || fotoPronta ? "1" : "0"}
-      style={{ display: "block", fontFamily: POST.fonte.familia }}
+      {...svgProps}
+      style={{
+        display: "block", fontFamily: POST.fonte.familia, aspectRatio: "1 / 1",
+        touchAction: "none", ...(svgProps.style ?? {}),
+      }}
     >
       <defs>
-        <clipPath id={id("clipBlob")}>
-          <rect x={QUADRO.blob.x} y={QUADRO.blob.y} width={QUADRO.blob.w} height={QUADRO.blob.h} />
-        </clipPath>
+        <QuadroDefs uid={uid} />
         <clipPath id={id("clipFoto")}>
           <circle cx={cx} cy={cy} r={d / 2} />
         </clipPath>
@@ -155,16 +174,6 @@ export function PostAniversario({
           <stop offset="0" stopColor={POST.cor.azulClaro} />
           <stop offset="1" stopColor={POST.cor.azulEscuro} />
         </linearGradient>
-        <linearGradient id={id("gradCirc")} x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0" stopColor="#faf6ee" stopOpacity="0" />
-          <stop offset="0.5" stopColor="#f9f5ed" stopOpacity="0.465" />
-          <stop offset="1" stopColor="#f9f5ed" stopOpacity="0" />
-        </linearGradient>
-        <linearGradient id={id("gradCircAlt")} x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0" stopColor="#f9f5ed" stopOpacity="0.4" />
-          <stop offset="0.5" stopColor="#f9f5ed" stopOpacity="0" />
-          <stop offset="1" stopColor="#f9f5ed" stopOpacity="0.4" />
-        </linearGradient>
         <path
           id={id("trilhoData")}
           fill="none"
@@ -172,8 +181,8 @@ export function PostAniversario({
         />
       </defs>
 
-      {/* ---------- ordem de empilhamento igual à do Canva: data no fundo, assinatura sob o anel ---------- */}
-      <rect width={POST.canvas} height={POST.canvas} fill={POST.cor.creme} />
+      {/* ordem de empilhamento igual à do Canva: creme, data (atrás da onda), quadro, assinatura, miolo */}
+      <QuadroBase />
 
       <text
         fontSize={A.arco.corpo}
@@ -186,42 +195,8 @@ export function PostAniversario({
         </textPath>
       </text>
 
-      <g clipPath={`url(#${id("clipBlob")})`}>
-        <image
-          href={blobUrl}
-          x={QUADRO.blob.x + QUADRO.blob.imgX}
-          y={QUADRO.blob.y + QUADRO.blob.imgY}
-          width={QUADRO.blob.imgW}
-          height={QUADRO.blob.imgH}
-          preserveAspectRatio="none"
-        />
-      </g>
-      {QUADRO.circulos.map((c, i) => (
-        <circle
-          key={i}
-          cx={c.x + c.d / 2}
-          cy={c.y + c.d / 2}
-          r={c.d / 2}
-          fill={`url(#${id(c.alt ? "gradCircAlt" : "gradCirc")})`}
-          transform={`rotate(${c.grau} ${c.x + c.d / 2} ${c.y + c.d / 2})`}
-        />
-      ))}
-      {/* canto: escala não-uniforme para ocupar exatamente a caixa do Canva; traço em px finais, independente da escala */}
-      <g transform={`translate(${QUADRO.canto.x} ${QUADRO.canto.y}) scale(${sxCanto} ${syCanto})`}>
-        {/* traço dividido pela escala do grupo: fica em px do canvas 1080 em QUALQUER tamanho de
-            exibição. `non-scaling-stroke` seria relativo ao viewport e divergiria num preview reduzido. */}
-        <g fill="none" stroke={POST.cor.cantoAnel} strokeWidth={QUADRO.canto.tracoPx / ((sxCanto + syCanto) / 2)}>
-          {CANTO_ANEIS.map(([x, y, r], i) => <circle key={i} cx={x} cy={y} r={r} />)}
-        </g>
-        <g fill={POST.cor.cantoPonto}>
-          {CANTO_PONTOS.map(([x, y, r], i) => <circle key={i} cx={x} cy={y} r={r} />)}
-        </g>
-      </g>
-      <image
-        href={assinaturaUrl}
-        x={QUADRO.assinatura.x} y={QUADRO.assinatura.y}
-        width={QUADRO.assinatura.w} height={QUADRO.assinatura.h}
-      />
+      <QuadroFundo uid={uid} blobUrl={blobUrl} />
+      <QuadroAssinatura url={assinaturaUrl} />
 
       {/* ---------- miolo ---------- */}
       <ellipse

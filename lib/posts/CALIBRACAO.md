@@ -88,3 +88,39 @@ máx 5. No navegador, sem regressão — global 2,11 → 2,12, onda inferior 3,1
 **Erro de método que cometi aqui:** a primeira tentativa comparou uma região que, nesta página, é coberta
 pela pílula. O erro deu 31,21 idêntico em todos os tamanhos, inclusive no original — resultado constante é
 sinal de que o teste não está medindo o que diz medir. Refeito contra o composto em resolução cheia.
+
+## A data em arco: o original não é consistente consigo mesmo
+
+Testando uma data longa contra a página 24 ("15 de dezembro", márcia) apareceu uma diferença que
+"04 de julho" escondia. A causa está no arquivo do Canva, não no template:
+
+```
+p11  "04 de julho"      11 chars + 117 espaços = 128
+p24  "15 de dezembro"   14 chars + 110 espaços = 124
+```
+
+As datas foram centralizadas **à mão, digitando espaços**. Com o preenchimento, o texto passa da
+circunferência do trilho (≈2954 px contra 2802 disponíveis), então cada página comprime um pouco
+diferente. Medindo o ângulo do centro da data em cada uma: **16,3° na p11 e 23,3° na p24** — 7° de
+variação entre duas páginas do mesmo arquivo. Não existe um valor único a copiar.
+
+Decisão de projeto, não de fidelidade: o texto é ancorado no **meio**, a 18° (a média das duas
+páginas). Toda data cai no mesmo lugar independente do comprimento — mais consistente que o original.
+`arcoOffset` permite sobrescrever por post.
+
+**A data nunca cruza o anel**, para qualquer comprimento: a base do texto fica a 446 do centro do
+canvas, o anel termina em 423,6 do centro da foto (os dois centros distam 8 px), e em `textPath` os
+glifos crescem para fora. Folga mínima ≥ 14 px, por construção.
+
+Erro de medição meu no caminho: tentei provar isso contando pixels navy por distância do centro, mas
+o filtro pegava o blazer escuro da foto. Geometria resolveu sem medir.
+
+## Estado final
+
+| região | erro médio | p99 |
+|---|---|---|
+| global | **2,12** | 43 |
+| foto | 1,55 | 35 |
+| arco | 2,62 | 104 |
+| canto | 2,85 | 50 |
+| pílula | 4,39 | 60 |

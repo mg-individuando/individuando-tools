@@ -35,7 +35,7 @@ Você deve retornar APENAS um bloco JSON válido (sem markdown, sem explicaçõe
 }
 
 LOGOS INDIVIDUANDO DISPONÍVEIS:
-- Variantes 1-3: Azul marinho (#1e2f4c) + Verde sage (#c0d57e) — para fundos CLAROS
+- Variantes 1-3: Azul marinho (#1d2e4c) + Verde sage (#c0d57e) — para fundos CLAROS
   - 1: horizontal, 2: vertical, 3: moderada
 - Variantes 4-6: Verde sage + Branco — para fundos ESCUROS
   - 4: horizontal, 5: vertical, 6: moderada

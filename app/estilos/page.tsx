@@ -136,7 +136,7 @@ function AirtableStyle() {
         {/* Toolbar-like header */}
         <div className="px-4 py-3 bg-gray-50 border-b border-gray-200 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-5 h-5 rounded bg-[#1e2f4c] flex items-center justify-center">
+            <div className="w-5 h-5 rounded bg-[#1d2e4c] flex items-center justify-center">
               <span className="text-[9px] text-white font-bold">S</span>
             </div>
             <span className="text-sm font-semibold text-gray-800">Análise SWOT — Liderança</span>

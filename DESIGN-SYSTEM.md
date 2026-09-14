@@ -26,7 +26,7 @@ Plataforma SaaS de ferramentas de autoconhecimento e desenvolvimento humano. O v
 ### Individuando Identity
 | Token | Valor | Uso |
 |-------|-------|-----|
-| `--ind-navy` | `#1e2f4c` | Logo primaria |
+| `--ind-navy` | `#1d2e4c` | Logo primaria |
 | `--ind-sage` | `#c0d57e` | Logo acento |
 
 ### Semanticas

@@ -7,6 +7,7 @@ import Link from "next/link";
 import {
   LayoutDashboard,
   Wrench,
+  Image as ImageIcon,
   Users,
   Building2,
   LogOut,
@@ -22,6 +23,7 @@ import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 const navItems = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/ferramentas", label: "Ferramentas", icon: Wrench },
+  { href: "/admin/posts", label: "Posts", icon: ImageIcon },
   { href: "/admin/clientes", label: "Clientes", icon: Building2, adminOnly: true },
   { href: "/admin/usuarios", label: "Usuarios", icon: Users, adminOnly: true },
 ];

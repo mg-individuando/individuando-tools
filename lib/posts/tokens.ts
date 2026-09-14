@@ -3,7 +3,7 @@
  * Extraídos do Canva: design DAHU3eX9sD4 (aniversários) e DAHUnVeduKA (SEBRAE AM/BA).
  * Tipografia confirmada nas fontes embutidas do PDF exportado: Montserrat 500 / 800.
  *
- * NOTA: o app usa --ind-navy #1e2f4c; a identidade nova e os posts usam #1d2e4c.
+ * NOTA: o app usa --ind-navy #1d2e4c; a identidade nova e os posts usam #1d2e4c.
  * Mantido aqui o valor dos posts. Unificar quando o Marcos decidir.
  */
 export const POST = {
@@ -52,5 +52,11 @@ export const ANIVERSARIO = {
   pilula: { x: 70, y: 853.833, h: 164.167, padEsq: 38, padDir: 41.6, fimMax: 719 },
   rotulo: { x: 108, y: 873.236, corpo: 40, entrelinha: 1.4 },
   nome:   { x: 108, y: 902.6,   corpo: 80, corpoMin: 44, entrelinha: 1 }, // corpoMin: piso do auto-ajuste (= corpo da data)
-  arco:   { raio: 446, corpo: 44, espacamentoEm: 0.212, offsetPadrao: 0.601 }, // letterSpacing do Canva é fração do corpo (em), não px; offsetPadrao 0.601 ≈ 18° à direita das 12h
+  // No Canva a data é uma caixa curva com textAlign:start, centralizada À MÃO com
+  // espaços no fim — p11 tem 117, p24 tem 110 — e o texto preenchido excede a
+  // circunferência, então cada página comprime diferente. O centro da data cai a
+  // 16,3° na p11 e 23,3° na p24: o original é inconsistente consigo mesmo.
+  // Aqui o texto é ancorado no MEIO a 18° (a média das duas), então toda data cai
+  // no mesmo lugar, independente do comprimento. `arcoOffset` sobrescreve por post.
+  arco:   { raio: 446, corpo: 44, espacamentoEm: 0.212, offsetCentro: 0.601 }, // letterSpacing do Canva é fração do corpo (em), não px; offsetPadrao 0.601 ≈ 18° à direita das 12h
 } as const;

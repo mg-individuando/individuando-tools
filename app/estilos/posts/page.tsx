@@ -7,6 +7,7 @@
  */
 import { useEffect, useState } from "react";
 import { PostAniversario } from "@/components/posts/post-aniversario";
+import { EditorPost } from "@/components/posts/editor-post";
 import { svgParaCanvas, svgParaPng } from "@/lib/posts/exportar";
 import { garantirFontePost } from "@/lib/posts/fontes";
 
@@ -96,28 +97,45 @@ function lerVariante(): Variante {
 
 export default function PostsPreviewPage() {
   const [pronto, setPronto] = useState(false);
+  const [calibrar, setCalibrar] = useState(false);
   const [variante, setVariante] = useState<Variante>(PADRAO);
   useEffect(() => {
     let vivo = true;
     setVariante(lerVariante());
+    const modoCalibracao = new URLSearchParams(window.location.search).has("calibrar");
+    setCalibrar(modoCalibracao);
     garantirFontePost().then(() => { if (vivo) setPronto(true); });
-    window.__diffPost = diffContraReferencia;
-    window.__setVariante = (patch) => setVariante((v) => ({ ...v, ...patch }));
-    window.__exportarPost = async () => {
-      const svg = document.querySelector("#palco svg") as SVGSVGElement;
-      return URL.createObjectURL(await svgParaPng(svg));
-    };
+    // ganchos de medição existem SÓ no modo calibração — eles apontam para #palco
+    if (modoCalibracao) {
+      window.__diffPost = diffContraReferencia;
+      window.__setVariante = (patch) => setVariante((v) => ({ ...v, ...patch }));
+      window.__exportarPost = async () => {
+        const svg = document.querySelector("#palco svg") as SVGSVGElement | null;
+        if (!svg) throw new Error("palco de calibração ausente");
+        return URL.createObjectURL(await svgParaPng(svg));
+      };
+    }
     return () => {
       vivo = false;
       delete window.__diffPost; delete window.__exportarPost; delete window.__setVariante;
     };
   }, []);
 
+  if (!calibrar) {
+    return (
+      <div className="mx-auto max-w-5xl p-6">
+        <h1 className="mb-1 text-2xl font-semibold tracking-tight">Posts — aniversário</h1>
+        <p className="mb-6 text-sm text-muted-foreground">
+          Prévia do editor. A versão de produção fica em /admin/posts.
+        </p>
+        <EditorPost />
+      </div>
+    );
+  }
+  // modo calibração: palco cru em 1080 real, com os ganchos de diff
   return (
     <div id="palco" data-pronto={pronto ? "1" : "0"} style={{ width: 1080, height: 1080 }}>
-      {pronto && (
-        <PostAniversario config={variante} />
-      )}
+      {pronto && <PostAniversario config={variante} />}
     </div>
   );
 }
