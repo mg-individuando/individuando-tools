@@ -162,7 +162,8 @@ Varredura medida no PNG final (desvio padrão, em níveis de 255):
 
 | ajuste | creme | área escura |
 |---|---|---|
-| slope 3 · 0,5 · soft-light ← escolhido | 1,10 | 5,8 |
+| slope 3 · 0,28 · soft-light ← escolhido | 0,68 | 5,4 |
+| slope 3 · 0,5 · soft-light | 1,10 | 5,8 |
 | slope 4 · 0,7 · soft-light | 2,38 | 11,8 |
 | slope 6 · 1,0 · soft-light | 5,29 | 24,5 |
 

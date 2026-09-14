@@ -43,11 +43,11 @@ export const POST = {
    * soft-light sobre creme claro isso some (medido: desvio 0,58 mesmo a opacidade 1).
    * Por isso o `contraste` expande em torno de 0,5 ANTES do blend.
    *
-   * Valores medidos no PNG final: desvio ~1,1 no creme e ~5,8 nas áreas escuras.
+   * Valores medidos no PNG final: desvio ~0,6 no creme e ~3,3 nas áreas escuras.
    * Soft-light é assim por natureza — quase nada nos claros, grão de filme nos
    * meios-tons. Subir `opacidade` mexe nos dois ao mesmo tempo.
    */
-  ruido: { frequencia: 0.9, oitavas: 4, contraste: 3, opacidade: 0.5, mistura: "soft-light" },
+  ruido: { frequencia: 0.9, oitavas: 4, contraste: 3, opacidade: 0.28, mistura: "soft-light" },
 } as const;
 
 /** Geometria do quadro — idêntica em todos os templates. Medida, não estimada. */
