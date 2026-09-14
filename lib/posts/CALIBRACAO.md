@@ -189,3 +189,14 @@ a largura do token (299,57) como piso, o original reproduz exato e um texto maio
 
 O logo usado no teste foi extraído do próprio render, modelando o gradiente do cartão para recuperar
 o alfa — é fixture, não o arquivo real. Em produção o parceiro entra por upload.
+
+## Templates "marco" e "grade"
+
+**Não foram medidos.** Os arquivos originais não estão na conta do Canva — só existem como
+referência de 640 px do Instagram. São desenho novo sobre os mesmos tokens, sombra e grão.
+Se os arquivos aparecerem, vale recalibrar como foi feito com aniversário e presença.
+
+- **marco** é o único template com fundo próprio (azul, não creme), então não usa `QuadroFundo`;
+  mantém canto, assinatura e grão.
+- **grade** tem cinco arranjos (2 a 6 fotos) que alternam tamanhos de propósito, para não virar
+  tabela. Cada foto cobre o seu quadro pelo lado que falta, sem distorcer.

@@ -78,6 +78,26 @@ export const PRESENCA = {
   chip:   { x: 639.548, y: 725.391, w: 299.574, h: 98.609, corpo: 50.6663, entrelinha: 1.4 },
 } as const;
 
+/**
+ * Miolo "marco" (11 anos) e "grade" (fotos do carrossel).
+ *
+ * ATENÇÃO: diferente de `ANIVERSARIO` e `PRESENCA`, estes NÃO foram medidos
+ * contra um arquivo do Canva — os originais não estão na conta. São desenho
+ * novo sobre os mesmos tokens. Se aparecer o arquivo, vale recalibrar.
+ */
+export const MARCO = {
+  numero: { y: 540, corpo: 460, peso: 200 },   // numeral fino, centralizado
+  rotulo: { corpo: 62, espacamentoEm: 0.28 },  // "ANOS" na vertical, à direita
+  fundo:  { de: "#cfe4fb", para: "#8fc0f2" },  // azul claro, mais leve que o anel
+} as const;
+
+export const GRADE = {
+  margem: 70,
+  vao: 18,
+  raio: 16,
+  area: { x: 70, y: 150, w: 940, h: 760 },
+} as const;
+
 /** Miolo do aniversário. */
 export const ANIVERSARIO = {
   anel:   { x: 109.722, y: 127.054, w: 847.227, h: 838.686 },
