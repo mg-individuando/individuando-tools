@@ -49,3 +49,9 @@ next-env.d.ts
 
 # Claude
 .claude/
+
+# resource forks do macOS ao gravar em volume externo
+._*
+
+# fixtures locais de calibração dos posts
+public/marca/_teste-*
