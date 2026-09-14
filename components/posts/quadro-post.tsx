@@ -89,3 +89,46 @@ export function QuadroDefs({ uid }: { uid: string }) {
     </>
   );
 }
+
+/**
+ * Grão por cima de tudo. Vai por ÚLTIMO, depois do miolo.
+ *
+ * O feTurbulence gera ruído RGBA; o feColorMatrix converte para cinza (média dos
+ * canais) e força alfa opaco — sem isso o ruído do canal alfa fura a camada.
+ * Em soft-light, cinza 50% é neutro: o grão só abre os claros e fecha os escuros.
+ */
+export function QuadroRuido({ uid }: { uid: string }) {
+  const r = POST.ruido;
+  return (
+    <>
+      <filter id={`ruido-${uid}`} x="0" y="0" width="100%" height="100%">
+        <feTurbulence
+          type="fractalNoise"
+          baseFrequency={r.frequencia}
+          numOctaves={r.oitavas}
+          stitchTiles="stitch"
+        />
+        <feColorMatrix
+          type="matrix"
+          values="0.333 0.333 0.333 0 0
+                  0.333 0.333 0.333 0 0
+                  0.333 0.333 0.333 0 0
+                  0     0     0     0 1"
+        />
+        {/* expande o contraste em torno de 0,5 — sem isto o soft-light some no creme */}
+        <feComponentTransfer>
+          <feFuncR type="linear" slope={r.contraste} intercept={(1 - r.contraste) / 2} />
+          <feFuncG type="linear" slope={r.contraste} intercept={(1 - r.contraste) / 2} />
+          <feFuncB type="linear" slope={r.contraste} intercept={(1 - r.contraste) / 2} />
+        </feComponentTransfer>
+      </filter>
+      <rect
+        width={POST.canvas}
+        height={POST.canvas}
+        filter={`url(#ruido-${uid})`}
+        opacity={r.opacidade}
+        style={{ mixBlendMode: r.mistura as React.CSSProperties["mixBlendMode"] }}
+      />
+    </>
+  );
+}

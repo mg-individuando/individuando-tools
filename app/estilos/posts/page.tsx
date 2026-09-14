@@ -135,7 +135,7 @@ export default function PostsPreviewPage() {
   // modo calibração: palco cru em 1080 real, com os ganchos de diff
   return (
     <div id="palco" data-pronto={pronto ? "1" : "0"} style={{ width: 1080, height: 1080 }}>
-      {pronto && <PostAniversario config={variante} />}
+      {pronto && <PostAniversario config={variante} ruido={false} />}
     </div>
   );
 }

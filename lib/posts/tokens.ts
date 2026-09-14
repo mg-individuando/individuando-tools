@@ -3,8 +3,8 @@
  * Extraídos do Canva: design DAHU3eX9sD4 (aniversários) e DAHUnVeduKA (SEBRAE AM/BA).
  * Tipografia confirmada nas fontes embutidas do PDF exportado: Montserrat 500 / 800.
  *
- * NOTA: o app usa --ind-navy #1d2e4c; a identidade nova e os posts usam #1d2e4c.
- * Mantido aqui o valor dos posts. Unificar quando o Marcos decidir.
+ * Navy #1d2e4c e sage #c0d57e conferidos contra os SVG oficiais da pasta New_ID
+ * (Corner_3, Asset 87). Montserrat é a fonte oficial da identidade (pasta Fontes).
  */
 export const POST = {
   canvas: 1080,
@@ -24,6 +24,30 @@ export const POST = {
     forte: 800,
   },
   raioPilula: 20,
+
+  /**
+   * Sombras. O JSON do Canva NÃO expõe efeitos — não há nenhuma chave de shadow,
+   * blur ou filter na árvore de elementos — então estes valores vieram de medir o
+   * escurecimento do render de referência contra um render sem sombra.
+   * Deslocamento a 45° (na borda direita ≈ na borda de baixo, no topo ≈ 0).
+   */
+  sombra: {
+    anel:   { dx: 17, dy: 17, desfoque: 6.5, opacidade: 0.19 },
+    pilula: { dx: 15, dy: 15, desfoque: 9.0, opacidade: 0.227 },
+  },
+
+  /**
+   * Grão. NÃO existe no original do Canva — é adição nossa, por cima de tudo.
+   *
+   * O ruído do feTurbulence sai de baixo contraste, agrupado perto de 0,5; em
+   * soft-light sobre creme claro isso some (medido: desvio 0,58 mesmo a opacidade 1).
+   * Por isso o `contraste` expande em torno de 0,5 ANTES do blend.
+   *
+   * Valores medidos no PNG final: desvio ~1,1 no creme e ~5,8 nas áreas escuras.
+   * Soft-light é assim por natureza — quase nada nos claros, grão de filme nos
+   * meios-tons. Subir `opacidade` mexe nos dois ao mesmo tempo.
+   */
+  ruido: { frequencia: 0.9, oitavas: 4, contraste: 3, opacidade: 0.5, mistura: "soft-light" },
 } as const;
 
 /** Geometria do quadro — idêntica em todos os templates. Medida, não estimada. */

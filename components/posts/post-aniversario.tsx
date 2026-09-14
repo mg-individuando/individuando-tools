@@ -2,7 +2,7 @@
 
 import { useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 import { POST, QUADRO, ANIVERSARIO as A } from "@/lib/posts/tokens";
-import { QuadroBase, QuadroDefs, QuadroFundo, QuadroAssinatura } from "./quadro-post";
+import { QuadroBase, QuadroDefs, QuadroFundo, QuadroAssinatura, QuadroRuido } from "./quadro-post";
 import { garantirFontePost } from "@/lib/posts/fontes";
 
 /** Baselines calibradas contra o export do Canva (pg11 = marcos). Ver lib/posts/CALIBRACAO.md. */
@@ -54,6 +54,7 @@ export function PostAniversario({
   responsivo = false,
   svgRef,
   onEnquadramento,
+  ruido = true,
   ...svgProps
 }: {
   config: PostAniversarioConfig;
@@ -68,6 +69,8 @@ export function PostAniversario({
    * folga 0 = a foto preenche o círculo exatamente; não há o que reposicionar.
    */
   onEnquadramento?: (g: { folgaX: number; folgaY: number; aspecto: number | null }) => void;
+  /** Grão por cima. Desligue para comparar com o Canva, que não tem. */
+  ruido?: boolean;
 } & Omit<React.SVGProps<SVGSVGElement>, "ref" | "width" | "height" | "viewBox">) {
   const data = (config.data ?? "").toString();
   const rotulo = (config.rotulo ?? "dia do").toString();
@@ -174,6 +177,20 @@ export function PostAniversario({
           <stop offset="0" stopColor={POST.cor.azulClaro} />
           <stop offset="1" stopColor={POST.cor.azulEscuro} />
         </linearGradient>
+        <filter id={id("sombraAnel")} x="-15%" y="-15%" width="140%" height="140%">
+          <feDropShadow
+            dx={POST.sombra.anel.dx} dy={POST.sombra.anel.dy}
+            stdDeviation={POST.sombra.anel.desfoque}
+            floodColor="#000000" floodOpacity={POST.sombra.anel.opacidade}
+          />
+        </filter>
+        <filter id={id("sombraPilula")} x="-25%" y="-25%" width="160%" height="170%">
+          <feDropShadow
+            dx={POST.sombra.pilula.dx} dy={POST.sombra.pilula.dy}
+            stdDeviation={POST.sombra.pilula.desfoque}
+            floodColor="#000000" floodOpacity={POST.sombra.pilula.opacidade}
+          />
+        </filter>
         <path
           id={id("trilhoData")}
           fill="none"
@@ -205,6 +222,7 @@ export function PostAniversario({
         rx={A.anel.w / 2}
         ry={A.anel.h / 2}
         fill={`url(#${id("gradAnel")})`}
+        filter={`url(#${id("sombraAnel")})`}
       />
       {fotoUrl && fotoPronta && (
         <g clipPath={`url(#${id("clipFoto")})`}>
@@ -219,6 +237,7 @@ export function PostAniversario({
         height={A.pilula.h}
         rx={POST.raioPilula}
         fill={POST.cor.pilula}
+        filter={`url(#${id("sombraPilula")})`}
       />
       <text ref={rotuloRef} x={A.rotulo.x} y={A.rotulo.y + BASE_ROTULO}
             fontSize={A.rotulo.corpo} fontWeight={POST.fonte.medio} fill={POST.cor.azulSuave}>
@@ -229,6 +248,8 @@ export function PostAniversario({
         {nome}
       </text>
       {/* medida: mesmo texto no corpo nominal, invisível mas com geometria (visibility, não display) */}
+      {ruido && <QuadroRuido uid={uid} />}
+
       <text ref={medidaRef} data-medida="1" x={A.nome.x} y={A.nome.y + BASE_NOME} visibility="hidden" aria-hidden="true"
             fontSize={A.nome.corpo} fontWeight={POST.fonte.forte}>
         {nome}

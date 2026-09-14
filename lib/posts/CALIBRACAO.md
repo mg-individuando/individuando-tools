@@ -124,3 +124,49 @@ o filtro pegava o blazer escuro da foto. Geometria resolveu sem medir.
 | arco | 2,62 | 104 |
 | canto | 2,85 | 50 |
 | pílula | 4,39 | 60 |
+
+## Sombras
+
+O JSON do Canva **não expõe efeitos** — a árvore de elementos não tem nenhuma chave de shadow,
+blur ou filter. Por isso as sombras passaram despercebidas até o Marcos apontar.
+
+Extraídas medindo o escurecimento do render de referência contra um render sem sombra:
+
+| borda | escurecimento na borda | alcance |
+|---|---|---|
+| anel — direita | 46,7 | ~30 px |
+| anel — baixo | 43,3 | ~30 px |
+| anel — cima / esquerda | ~3 | nada |
+| pílula — baixo | 52,0 | ~26 px |
+
+Direita ≈ baixo e topo ≈ zero ⇒ deslocamento a 45°. Ajuste do perfil de queda a uma gaussiana deu
+`anel {dx:17, dy:17, desfoque:6.5, opacidade:0.19}` e `pílula {dx:15, dy:15, desfoque:9, opacidade:0.227}`.
+
+| região | sem sombra | com sombra |
+|---|---|---|
+| **global** | 2,12 · p99 43 | **1,29 · p99 11** |
+| foto | 1,55 | 1,11 |
+| canto | 2,85 | 1,44 |
+| abaixo da pílula | 52 na borda | ±2 |
+
+## Grão
+
+Adição nossa — não existe no Canva. Por isso o modo calibração renderiza com `ruido={false}`,
+para os números acima continuarem comparáveis.
+
+O ruído do `feTurbulence` sai de baixo contraste, agrupado perto de 0,5. Em `soft-light` sobre o
+creme isso simplesmente some: medido **desvio 0,58 mesmo com opacidade 1**. A correção é expandir o
+contraste em torno de 0,5 (`feComponentTransfer`, slope 3) ANTES do blend.
+
+Varredura medida no PNG final (desvio padrão, em níveis de 255):
+
+| ajuste | creme | área escura |
+|---|---|---|
+| slope 3 · 0,5 · soft-light ← escolhido | 1,10 | 5,8 |
+| slope 4 · 0,7 · soft-light | 2,38 | 11,8 |
+| slope 6 · 1,0 · soft-light | 5,29 | 24,5 |
+
+Soft-light é assimétrico por natureza: quase nada nos claros, grão de filme nos meios-tons.
+
+**Custo:** o PNG passou de 1033 KB para 2420 KB — grão é entropia e o PNG comprime pior. Para o
+Instagram tanto faz (ele recomprime), mas se pesar, o caminho é exportar JPEG de alta qualidade.
