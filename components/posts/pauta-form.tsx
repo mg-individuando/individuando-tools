@@ -10,7 +10,7 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import type { Pessoa } from "@/lib/schemas/types";
-import { enviarArquivo, salvarPessoa, removerPessoa } from "@/lib/posts/dados";
+import { enviarArquivo, salvarPessoa, arquivarPessoa, apagarPessoa, apagarArquivo } from "@/lib/posts/dados";
 
 const MESES = ["janeiro","fevereiro","março","abril","maio","junho",
   "julho","agosto","setembro","outubro","novembro","dezembro"];
@@ -30,6 +30,7 @@ export function PautaForm({
   const [fotoPath, setFotoPath] = useState<string | null>(null);
   const [previa, setPrevia] = useState<string>("");
   const [salvando, setSalvando] = useState(false);
+  const [confirmando, setConfirmando] = useState(false);
   const objUrl = useRef<string | null>(null);
 
   useEffect(() => {
@@ -51,8 +52,11 @@ export function PautaForm({
     objUrl.current = URL.createObjectURL(f);
     setPrevia(objUrl.current);
     try {
+      const anterior = fotoPath;
       const caminho = await enviarArquivo(f, "fotos", nome || "pessoa");
       setFotoPath(caminho);
+      // a anterior perde a referência aqui; apagar evita foto órfã no bucket
+      if (anterior && anterior !== caminho) await apagarArquivo(anterior).catch(() => {});
       toast.success("Foto enviada.");
     } catch (err) {
       toast.error((err as Error).message);
@@ -80,15 +84,40 @@ export function PautaForm({
     }
   }
 
-  async function remover() {
+  async function arquivar() {
     if (!pessoa?.id) return;
     try {
-      await removerPessoa(pessoa.id);
-      toast.success("Removida da pauta.");
+      await arquivarPessoa(pessoa.id);
+      toast.success("Tirada da pauta. A foto continua guardada.");
       aoSalvar();
-    } catch (err) {
-      toast.error((err as Error).message);
-    }
+    } catch (err) { toast.error((err as Error).message); }
+  }
+
+  async function apagar() {
+    if (!pessoa?.id) return;
+    try {
+      await apagarPessoa(pessoa.id, pessoa.foto_url ?? null);
+      toast.success("Cadastro e foto apagados.");
+      setConfirmando(false);
+      aoSalvar();
+    } catch (err) { toast.error((err as Error).message); }
+  }
+
+  if (confirmando) {
+    return (
+      <div className="space-y-3 rounded-xl border border-destructive/40 bg-destructive/5 p-4">
+        <p className="font-medium">Apagar {nome} de vez?</p>
+        <p className="text-sm text-muted-foreground">
+          Remove o cadastro <strong>e a foto do armazenamento</strong>, sem volta. É o que atende um
+          pedido de exclusão. Posts já gerados continuam existindo, mas perdem a imagem de origem.
+          Para só tirar da lista do ano, use “Tirar da pauta”.
+        </p>
+        <div className="flex justify-end gap-2">
+          <Button variant="ghost" onClick={() => setConfirmando(false)}>Cancelar</Button>
+          <Button variant="destructive" onClick={apagar}>Apagar de vez</Button>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -141,9 +170,13 @@ export function PautaForm({
 
       <div className="flex items-center justify-end gap-2">
         {pessoa?.id && (
-          <Button variant="ghost" size="sm" onClick={remover} className="mr-auto text-destructive">
-            <Trash2 className="mr-1.5 size-3.5" /> Remover
-          </Button>
+          <div className="mr-auto flex items-center gap-1">
+            <Button variant="ghost" size="sm" onClick={arquivar}>Tirar da pauta</Button>
+            <Button variant="ghost" size="sm" onClick={() => setConfirmando(true)}
+                    className="text-destructive">
+              <Trash2 className="mr-1.5 size-3.5" /> Apagar
+            </Button>
+          </div>
         )}
         <Button variant="ghost" onClick={aoFechar}>Cancelar</Button>
         <Button onClick={salvar} disabled={salvando}>

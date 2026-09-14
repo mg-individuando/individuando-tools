@@ -4,9 +4,10 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "node scripts/checar-publicos.mjs && next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "checar:publicos": "node scripts/checar-publicos.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.86.1",

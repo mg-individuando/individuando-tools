@@ -72,10 +72,34 @@ export async function salvarPessoa(p: Partial<Pessoa> & { nome: string }): Promi
   return data as Pessoa;
 }
 
-export async function removerPessoa(id: string): Promise<void> {
+/** Tira da pauta mas mantém o cadastro e a foto — para quem só saiu da lista do ano. */
+export async function arquivarPessoa(id: string): Promise<void> {
   const supabase = createClient();
   const { error } = await supabase.from("pessoas").update({ ativo: false }).eq("id", id);
   if (error) throw new Error(error.message);
+}
+
+/**
+ * Apaga de verdade: remove a foto do Storage e o cadastro.
+ * É o que atende um pedido de exclusão — arquivar deixaria a imagem no bucket.
+ * Os posts já gerados continuam existindo; perdem só a imagem de origem.
+ */
+export async function apagarPessoa(id: string, fotoPath?: string | null): Promise<void> {
+  const supabase = createClient();
+  if (fotoPath) {
+    const { error } = await supabase.storage.from(BUCKET).remove([fotoPath]);
+    // seguir mesmo se o arquivo já não existir: o cadastro tem de sair de qualquer forma
+    if (error && !/not found/i.test(error.message)) throw new Error(`foto: ${error.message}`);
+  }
+  const { error } = await supabase.from("pessoas").delete().eq("id", id);
+  if (error) throw new Error(error.message);
+}
+
+/** Remove um arquivo do bucket. Usado ao trocar uma foto, para não deixar órfão. */
+export async function apagarArquivo(caminho: string): Promise<void> {
+  const supabase = createClient();
+  const { error } = await supabase.storage.from(BUCKET).remove([caminho]);
+  if (error && !/not found/i.test(error.message)) throw new Error(error.message);
 }
 
 /**

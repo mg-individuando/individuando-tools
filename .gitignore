@@ -53,5 +53,9 @@ next-env.d.ts
 # resource forks do macOS ao gravar em volume externo
 ._*
 
-# fixtures locais de calibração dos posts
-public/marca/_teste-*
+# CONVENÇÃO: em public/, tudo que começa com "_" é local e nunca vai ao repositório.
+# public/ é servido como arquivo estático, SEM passar pelo login — então material
+# com pessoa identificável não pode morar ali. O lugar dele é o bucket privado do
+# Supabase, que sai por URL assinada e com expiração. Ver DADOS-PESSOAIS.md.
+public/**/_*
+public/_*
