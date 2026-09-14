@@ -94,3 +94,40 @@ export interface Response {
   ip_hash: string | null;
   created_at: string;
 }
+
+// ---------------------------------------------------------------- posts
+
+export interface Pessoa {
+  id: string;
+  nome: string;
+  tratamento: "dia do" | "dia da";
+  nascimento_dia: number;
+  nascimento_mes: number;
+  foto_url: string | null;
+  /** Enquadramento salvo: ajusta uma vez, vale para os próximos anos. */
+  foto_x: number;
+  foto_y: number;
+  foto_zoom: number;
+  ativo: boolean;
+  criado_por: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export type TemplatePost = "aniversario" | "presenca" | "marco" | "grade";
+export type StatusPost = "rascunho" | "aprovado" | "publicado";
+
+export interface Post {
+  id: string;
+  template: TemplatePost;
+  titulo: string;
+  /** O que o template recebe. Reabrir o post reproduz a arte. */
+  config: Record<string, unknown>;
+  pessoa_id: string | null;
+  ano: number | null;
+  png_url: string | null;
+  status: StatusPost;
+  criado_por: string | null;
+  created_at: string;
+  updated_at: string;
+}

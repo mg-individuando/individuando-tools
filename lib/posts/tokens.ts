@@ -67,6 +67,17 @@ export const QUADRO = {
   ],
 } as const;
 
+/**
+ * Miolo "presença": cartão com logo do parceiro e chip de região.
+ * Medido em DAHUnVeduKA (SEBRAE - AM-BA - Mentorias), página 1.
+ */
+export const PRESENCA = {
+  titulo: { x: 158.289, y: 167.822, largura: 349.781, corpo: 52, entrelinha: 1 },
+  cartao: { x: 103.778, y: 293.478, w: 872.444, h: 493.043 },
+  logo:   { x: 261.556, y: 389.640, w: 556.888, h: 300.719 },
+  chip:   { x: 639.548, y: 725.391, w: 299.574, h: 98.609, corpo: 50.6663, entrelinha: 1.4 },
+} as const;
+
 /** Miolo do aniversário. */
 export const ANIVERSARIO = {
   anel:   { x: 109.722, y: 127.054, w: 847.227, h: 838.686 },

@@ -171,3 +171,21 @@ Soft-light é assimétrico por natureza: quase nada nos claros, grão de filme n
 
 **Custo:** o PNG passou de 1033 KB para 2420 KB — grão é entropia e o PNG comprime pior. Para o
 Instagram tanto faz (ele recomprime), mas se pesar, o caminho é exportar JPEG de alta qualidade.
+
+## Template "presença"
+
+Medido em `DAHUnVeduKA` (SEBRAE - AM-BA - Mentorias), página 1. Reaproveita o quadro inteiro.
+
+| região | erro médio | p99 |
+|---|---|---|
+| **global** | **2,14** | 12 |
+| quadro (topo) | 0,83 | 7 |
+| corpo do cartão | 4,31 | 9 |
+| chip | 4,91 | 65 |
+
+Ajustes que a medição corrigiu: baseline do título 9 px acima (+49 em vez de +40) e o padding do
+chip — eu tinha suposto texto de 148 px, mas "AM / BA" em 50,67 bold mede **214,2**. Com padding 40 e
+a largura do token (299,57) como piso, o original reproduz exato e um texto maior faz o chip crescer.
+
+O logo usado no teste foi extraído do próprio render, modelando o gradiente do cartão para recuperar
+o alfa — é fixture, não o arquivo real. Em produção o parceiro entra por upload.
