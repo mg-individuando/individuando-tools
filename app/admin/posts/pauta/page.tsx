@@ -6,6 +6,7 @@ import { ArrowLeft, Plus, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
 import { PautaForm } from "@/components/posts/pauta-form";
+import { ImportarPauta } from "@/components/posts/importar-pauta";
 import { listarPessoas, urlsAssinadas, dataPorExtenso } from "@/lib/posts/dados";
 import type { Pessoa } from "@/lib/schemas/types";
 
@@ -71,6 +72,10 @@ export default function PautaPage() {
             </p>
           </div>
         </div>
+      )}
+
+      {!editando && pessoas.length === 0 && !carregando && (
+        <ImportarPauta aoTerminar={() => void carregar()} />
       )}
 
       {carregando ? (

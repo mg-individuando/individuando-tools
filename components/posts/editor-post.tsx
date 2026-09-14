@@ -10,13 +10,16 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { PostAniversario, type PostAniversarioConfig } from "./post-aniversario";
+import { PostPresenca, PRESENCA_PADRAO, type PostPresencaConfig } from "./post-presenca";
+import { PostMarco, MARCO_PADRAO, type PostMarcoConfig } from "./post-marco";
+import { PostGrade, GRADE_PADRAO, type PostGradeConfig } from "./post-grade";
 import { svgParaPng } from "@/lib/posts/exportar";
 import { garantirFontePost } from "@/lib/posts/fontes";
 import { ANIVERSARIO } from "@/lib/posts/tokens";
 import {
   dataPorExtenso, enviarArquivo, listarPessoas, listarPosts, salvarPessoa, salvarPost, urlAssinada,
 } from "@/lib/posts/dados";
-import type { Pessoa, Post } from "@/lib/schemas/types";
+import type { Pessoa, Post, TemplatePost } from "@/lib/schemas/types";
 
 const MESES = ["janeiro","fevereiro","março","abril","maio","junho",
   "julho","agosto","setembro","outubro","novembro","dezembro"];
@@ -30,6 +33,14 @@ function porExtenso(iso: string): string {
 function semAcento(s: string) {
   return s.normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-zA-Z0-9]+/g, "-").toLowerCase();
 }
+
+/** Este Select mostra o valor cru no gatilho, então o rótulo vai explícito. */
+const ROTULO_TEMPLATE: Record<TemplatePost, string> = {
+  aniversario: "Aniversário",
+  presenca: "Presença",
+  marco: "Marco",
+  grade: "Grade de fotos",
+};
 
 const PADRAO: PostAniversarioConfig = {
   data: "04 de julho",
@@ -52,7 +63,11 @@ export function EditorPost({
   postId?: string;
   aoSalvar?: (p: Post) => void;
 } = {}) {
+  const [template, setTemplate] = useState<TemplatePost>("aniversario");
   const [cfg, setCfg] = useState<PostAniversarioConfig>(PADRAO);
+  const [cfgPresenca, setCfgPresenca] = useState<PostPresencaConfig>(PRESENCA_PADRAO);
+  const [cfgMarco, setCfgMarco] = useState<PostMarcoConfig>(MARCO_PADRAO);
+  const [cfgGrade, setCfgGrade] = useState<PostGradeConfig>(GRADE_PADRAO);
   const [iso, setIso] = useState("2026-07-04");
   const [corpoManual, setCorpoManual] = useState<number | "">("");
   const [baixando, setBaixando] = useState(false);
@@ -79,6 +94,14 @@ export function EditorPost({
           if (!achado) throw new Error("post não encontrado");
           if (!vivo) return;
           setPost(achado);
+          setTemplate(achado.template);
+          if (achado.template !== "aniversario") {
+            if (achado.template === "presenca") setCfgPresenca(achado.config as unknown as PostPresencaConfig);
+            if (achado.template === "marco") setCfgMarco(achado.config as unknown as PostMarcoConfig);
+            if (achado.template === "grade") setCfgGrade(achado.config as unknown as PostGradeConfig);
+            setCarregando(false);
+            return;
+          }
           const c = achado.config as Partial<PostAniversarioConfig> & { fotoPath?: string };
           const caminho = c.fotoPath ?? null;
           setFotoPath(caminho);
@@ -137,17 +160,26 @@ export function EditorPost({
   async function guardar() {
     setSalvando(true);
     try {
-      const titulo = `${cfg.rotulo} ${cfg.nome}`.trim();
+      const titulo =
+        template === "aniversario" ? `${cfg.rotulo} ${cfg.nome}`.trim()
+        : template === "presenca" ? (cfgPresenca.titulo || "presença")
+        : template === "marco" ? `${cfgMarco.numero} ${cfgMarco.rotulo ?? ""}`.trim()
+        : cfgGrade.titulo || `grade com ${cfgGrade.fotos.length} fotos`;
+      const config =
+        template === "aniversario" ? { ...cfg, fotoUrl: undefined, fotoPath, iso }
+        : template === "presenca" ? { ...cfgPresenca }
+        : template === "marco" ? { ...cfgMarco }
+        : { ...cfgGrade };
       const salvo = await salvarPost({
         ...(post?.id ? { id: post.id } : {}),
-        template: "aniversario",
+        template,
         titulo,
-        pessoa_id: pessoa?.id ?? post?.pessoa_id ?? null,
-        ano: Number(iso.slice(0, 4)) || new Date().getFullYear(),
-        config: { ...cfg, fotoUrl: undefined, fotoPath, iso },
+        pessoa_id: template === "aniversario" ? (pessoa?.id ?? post?.pessoa_id ?? null) : null,
+        ano: template === "aniversario" ? (Number(iso.slice(0, 4)) || new Date().getFullYear()) : null,
+        config,
       });
       setPost(salvo);
-      if (pessoa) {
+      if (pessoa && template === "aniversario") {
         await salvarPessoa({
           id: pessoa.id, nome: pessoa.nome,
           foto_url: fotoPath, foto_x: cfg.fotoX ?? 0,
@@ -196,7 +228,12 @@ export function EditorPost({
       const blob = await svgParaPng(svgRef.current, 1080);
       const a = document.createElement("a");
       a.href = URL.createObjectURL(blob);
-      a.download = `aniversario-${semAcento(cfg.nome || "post")}.png`;
+      const base =
+        template === "aniversario" ? `aniversario-${semAcento(cfg.nome || "post")}`
+        : template === "presenca" ? `presenca-${semAcento(cfgPresenca.titulo || "parceiro")}`
+        : template === "marco" ? `marco-${semAcento(cfgMarco.numero || "n")}`
+        : `grade-${cfgGrade.fotos.length}-fotos`;
+      a.download = `${base}.png`;
       a.click();
       setTimeout(() => URL.revokeObjectURL(a.href), 10_000);
       toast.success("PNG 1080×1080 baixado.");
@@ -206,6 +243,13 @@ export function EditorPost({
       setBaixando(false);
     }
   }
+
+  // cada template tem o seu mínimo para valer a pena exportar
+  const completo =
+    template === "aniversario" ? !!cfg.nome.trim()
+    : template === "presenca" ? !!cfgPresenca.titulo.trim() || !!cfgPresenca.logoUrl
+    : template === "marco" ? !!cfgMarco.numero.trim()
+    : cfgGrade.fotos.length > 0;
 
   const zoom = cfg.fotoZoom ?? 1;
   const podeArrastar = !!cfg.fotoUrl && (folgas.folgaX > 0.5 || folgas.folgaY > 0.5);
@@ -224,19 +268,27 @@ export function EditorPost({
           className="overflow-hidden rounded-xl border bg-white shadow-sm"
           style={{ cursor: podeArrastar ? (arrasto.current ? "grabbing" : "grab") : "default" }}
         >
-          <PostAniversario
-            config={cfg}
-            responsivo
-            svgRef={svgRef}
-            onEnquadramento={(g) => setFolgas({ folgaX: g.folgaX, folgaY: g.folgaY })}
-            onPointerDown={aoPressionar}
-            onPointerMove={aoMover}
-            onPointerUp={aoSoltar}
-            onPointerCancel={aoSoltar}
-          />
+          {template === "aniversario" && (
+            <PostAniversario
+              config={cfg}
+              responsivo
+              svgRef={svgRef}
+              onEnquadramento={(g) => setFolgas({ folgaX: g.folgaX, folgaY: g.folgaY })}
+              onPointerDown={aoPressionar}
+              onPointerMove={aoMover}
+              onPointerUp={aoSoltar}
+              onPointerCancel={aoSoltar}
+            />
+          )}
+          {template === "presenca" && <PostPresenca config={cfgPresenca} responsivo svgRef={svgRef} />}
+          {template === "marco" && <PostMarco config={cfgMarco} responsivo svgRef={svgRef} />}
+          {template === "grade" && <PostGrade config={cfgGrade} responsivo svgRef={svgRef} />}
         </div>
         <p className="mt-2 text-xs text-muted-foreground">
-          {podeArrastar
+          {template === "grade" ? "A ordem das fotos é a da lista ao lado."
+            : template === "presenca" ? "O logo do parceiro entra pelo campo ao lado."
+            : template === "marco" ? "Só número e legenda — a arte é o resto."
+            : podeArrastar
             ? "Arraste a imagem para enquadrar."
             : cfg.fotoUrl
               ? "Esta foto preenche o círculo exatamente — dê zoom para reposicionar."
@@ -246,6 +298,33 @@ export function EditorPost({
 
       {/* ---------------- controles ---------------- */}
       <div className="space-y-5">
+        <div className="space-y-2">
+          <Label>Template</Label>
+          <Select value={template} onValueChange={(v) => setTemplate(v as TemplatePost)} disabled={!!post}>
+            <SelectTrigger>{ROTULO_TEMPLATE[template]}</SelectTrigger>
+            <SelectContent>
+              <SelectItem value="aniversario">Aniversário</SelectItem>
+              <SelectItem value="presenca">Presença</SelectItem>
+              <SelectItem value="marco">Marco</SelectItem>
+              <SelectItem value="grade">Grade de fotos</SelectItem>
+            </SelectContent>
+          </Select>
+          {post && <p className="text-xs text-muted-foreground">
+            Um post salvo não troca de template — crie outro.
+          </p>}
+        </div>
+
+        {template === "presenca" && (
+          <ControlesPresenca cfg={cfgPresenca} set={setCfgPresenca} persistivel={persistivel} />
+        )}
+        {template === "marco" && (
+          <ControlesMarco cfg={cfgMarco} set={setCfgMarco} />
+        )}
+        {template === "grade" && (
+          <ControlesGrade cfg={cfgGrade} set={setCfgGrade} persistivel={persistivel} />
+        )}
+
+        {template === "aniversario" && <>
         <div className="space-y-2">
           <Label htmlFor="foto">Foto</Label>
           <label
@@ -325,14 +404,16 @@ export function EditorPost({
           </div>
         </div>
 
+        </>}
+
         <div className="space-y-2">
           {persistivel && (
-            <Button onClick={guardar} disabled={!cfg.nome || salvando} className="w-full">
+            <Button onClick={guardar} disabled={!completo || salvando} className="w-full">
               {salvando ? <Loader2 className="mr-2 size-4 animate-spin" /> : <Save className="mr-2 size-4" />}
               {post ? "Salvar alterações" : "Salvar post"}
             </Button>
           )}
-          <Button onClick={baixar} disabled={!cfg.nome || baixando}
+          <Button onClick={baixar} disabled={!completo || baixando}
                   variant={persistivel ? "outline" : "default"} className="w-full">
             {baixando ? <Loader2 className="mr-2 size-4 animate-spin" /> : <Download className="mr-2 size-4" />}
             Baixar PNG 1080×1080
@@ -344,3 +425,132 @@ export function EditorPost({
 }
 
 export default EditorPost;
+
+// ---------------------------------------------------------------- controles
+
+/** Envia um arquivo e devolve a URL de exibição; guarda no bucket se houver onde. */
+function useEnvioDeImagem(persistivel: boolean) {
+  const urls = useRef<string[]>([]);
+  useEffect(() => () => { urls.current.forEach((u) => URL.revokeObjectURL(u)); }, []);
+  return async (f: File, pasta: "fotos" | "png" = "fotos", nome = "imagem") => {
+    const local = URL.createObjectURL(f);
+    urls.current.push(local);
+    if (persistivel) {
+      try { await enviarArquivo(f, pasta, nome); }
+      catch (e) { toast.error(`imagem não foi guardada: ${(e as Error).message}`); }
+    }
+    return local;
+  };
+}
+
+function ControlesPresenca({
+  cfg, set, persistivel,
+}: { cfg: PostPresencaConfig; set: (c: PostPresencaConfig) => void; persistivel: boolean }) {
+  const enviar = useEnvioDeImagem(persistivel);
+  return (
+    <>
+      <div className="space-y-2">
+        <Label htmlFor="pres-titulo">Chamada</Label>
+        <Input id="pres-titulo" value={cfg.titulo} placeholder="mentorias online"
+               onChange={(e) => set({ ...cfg, titulo: e.target.value })} />
+        <p className="text-xs text-muted-foreground">Quebra em linhas sozinha.</p>
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="pres-logo">Logo do parceiro</Label>
+        <label htmlFor="pres-logo"
+               className="flex cursor-pointer items-center justify-center gap-2 rounded-lg border border-dashed px-4 py-5 text-sm text-muted-foreground transition hover:border-foreground/30 hover:bg-muted/40">
+          <ImagePlus className="size-4" /> {cfg.logoUrl ? "Trocar logo" : "Escolher logo"}
+        </label>
+        <input id="pres-logo" type="file" accept="image/*" className="sr-only"
+               onChange={async (e) => {
+                 const f = e.target.files?.[0]; if (!f) return;
+                 set({ ...cfg, logoUrl: await enviar(f, "fotos", "logo-parceiro") });
+               }} />
+        <label className="flex items-center gap-2 text-sm">
+          <input type="checkbox" checked={cfg.logoBranco !== false}
+                 onChange={(e) => set({ ...cfg, logoBranco: e.target.checked })} />
+          pintar de branco
+        </label>
+        <p className="text-xs text-muted-foreground">
+          Precisa ter fundo transparente para o branco funcionar.
+        </p>
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="pres-regiao">Região</Label>
+        <Input id="pres-regiao" value={cfg.regiao ?? ""} placeholder="AM / BA"
+               onChange={(e) => set({ ...cfg, regiao: e.target.value })} />
+        <p className="text-xs text-muted-foreground">Vazio esconde o selo.</p>
+      </div>
+    </>
+  );
+}
+
+function ControlesMarco({ cfg, set }: { cfg: PostMarcoConfig; set: (c: PostMarcoConfig) => void }) {
+  return (
+    <>
+      <div className="space-y-2">
+        <Label htmlFor="marco-num">Número</Label>
+        <Input id="marco-num" value={cfg.numero} placeholder="11" inputMode="numeric"
+               onChange={(e) => set({ ...cfg, numero: e.target.value })} />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="marco-rot">Legenda</Label>
+        <Input id="marco-rot" value={cfg.rotulo ?? ""} placeholder="ANOS"
+               onChange={(e) => set({ ...cfg, rotulo: e.target.value.toUpperCase() })} />
+        <p className="text-xs text-muted-foreground">Sai na vertical, à direita.</p>
+      </div>
+    </>
+  );
+}
+
+function ControlesGrade({
+  cfg, set, persistivel,
+}: { cfg: PostGradeConfig; set: (c: PostGradeConfig) => void; persistivel: boolean }) {
+  const enviar = useEnvioDeImagem(persistivel);
+  const mover = (i: number, d: -1 | 1) => {
+    const f = [...cfg.fotos]; const j = i + d;
+    if (j < 0 || j >= f.length) return;
+    [f[i], f[j]] = [f[j], f[i]];
+    set({ ...cfg, fotos: f });
+  };
+  return (
+    <>
+      <div className="space-y-2">
+        <Label htmlFor="grade-titulo">Chamada</Label>
+        <Input id="grade-titulo" value={cfg.titulo ?? ""} placeholder="como foi"
+               onChange={(e) => set({ ...cfg, titulo: e.target.value })} />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="grade-fotos">Fotos ({cfg.fotos.length}/6)</Label>
+        <label htmlFor="grade-fotos"
+               className="flex cursor-pointer items-center justify-center gap-2 rounded-lg border border-dashed px-4 py-5 text-sm text-muted-foreground transition hover:border-foreground/30 hover:bg-muted/40">
+          <ImagePlus className="size-4" /> Adicionar fotos
+        </label>
+        <input id="grade-fotos" type="file" accept="image/*" multiple className="sr-only"
+               onChange={async (e) => {
+                 const fs = [...(e.target.files ?? [])].slice(0, 6 - cfg.fotos.length);
+                 const novas: string[] = [];
+                 for (const f of fs) novas.push(await enviar(f, "fotos", "grade"));
+                 set({ ...cfg, fotos: [...cfg.fotos, ...novas] });
+               }} />
+        <ul className="space-y-1">
+          {cfg.fotos.map((src, i) => (
+            <li key={`${src}-${i}`} className="flex items-center gap-2 rounded-lg border p-1.5">
+              <img src={src} alt="" className="size-9 shrink-0 rounded object-cover" />
+              <span className="flex-1 text-xs text-muted-foreground">foto {i + 1}</span>
+              <button onClick={() => mover(i, -1)} disabled={i === 0}
+                      className="px-1 text-xs disabled:opacity-30" aria-label="subir">▲</button>
+              <button onClick={() => mover(i, 1)} disabled={i === cfg.fotos.length - 1}
+                      className="px-1 text-xs disabled:opacity-30" aria-label="descer">▼</button>
+              <button onClick={() => set({ ...cfg, fotos: cfg.fotos.filter((_, k) => k !== i) })}
+                      className="px-1 text-xs text-destructive" aria-label="remover">×</button>
+            </li>
+          ))}
+        </ul>
+        <p className="text-xs text-muted-foreground">
+          O arranjo muda com a quantidade. A ordem é a da lista.
+        </p>
+      </div>
+    </>
+  );
+}

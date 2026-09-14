@@ -129,7 +129,7 @@ export function PautaForm({
             <div className="space-y-1.5">
               <Label>Mês</Label>
               <Select value={String(mes)} onValueChange={(v) => setMes(Number(v))}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectTrigger>{MESES[mes - 1]}</SelectTrigger>
                 <SelectContent>
                   {MESES.map((m, i) => <SelectItem key={m} value={String(i + 1)}>{m}</SelectItem>)}
                 </SelectContent>

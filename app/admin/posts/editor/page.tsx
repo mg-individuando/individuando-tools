@@ -19,7 +19,7 @@ export default function EditorPage() {
         <Link href="/admin/posts" className="mb-1 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
           <ArrowLeft className="size-3.5" /> Posts
         </Link>
-        <h1 className="text-2xl font-semibold tracking-tight">Aniversário</h1>
+        <h1 className="text-2xl font-semibold tracking-tight">Novo post</h1>
       </header>
       {params && <EditorPost pessoaId={params.pessoa} postId={params.post} />}
     </div>

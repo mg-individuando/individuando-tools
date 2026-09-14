@@ -124,7 +124,7 @@ export default function PostsPreviewPage() {
   if (!calibrar) {
     return (
       <div className="mx-auto max-w-5xl p-6">
-        <h1 className="mb-1 text-2xl font-semibold tracking-tight">Posts — aniversário</h1>
+        <h1 className="mb-1 text-2xl font-semibold tracking-tight">Posts</h1>
         <p className="mb-6 text-sm text-muted-foreground">
           Prévia do editor. A versão de produção fica em /admin/posts.
         </p>
