@@ -116,6 +116,9 @@ export async function svgParaCanvas(origem: SVGSVGElement, tamanho = 1080): Prom
     canvas.height = tamanho;
     const ctx = canvas.getContext("2d");
     if (!ctx) throw new Error("canvas 2d indisponível");
+    // fundo opaco: em JPEG o alfa vira preto, e o post é opaco de qualquer forma
+    ctx.fillStyle = "#f8f4ed";
+    ctx.fillRect(0, 0, tamanho, tamanho);
     ctx.drawImage(img, 0, 0, tamanho, tamanho);
     return canvas;
   } finally {
@@ -124,8 +127,23 @@ export async function svgParaCanvas(origem: SVGSVGElement, tamanho = 1080): Prom
 }
 
 export async function svgParaPng(origem: SVGSVGElement, tamanho = 1080): Promise<Blob> {
+  return rasterizar(origem, tamanho, "image/png");
+}
+
+/**
+ * JPEG para lote. O grão é entropia: em PNG cada post passa de 2 MB e o ano
+ * inteiro bate em 50 MB. Em JPEG 92 fica perto de 300 KB sem diferença visível,
+ * e o post é opaco — não há alfa a perder.
+ */
+export async function svgParaJpeg(origem: SVGSVGElement, tamanho = 1080, qualidade = 0.92): Promise<Blob> {
+  return rasterizar(origem, tamanho, "image/jpeg", qualidade);
+}
+
+async function rasterizar(
+  origem: SVGSVGElement, tamanho: number, tipo: string, qualidade?: number,
+): Promise<Blob> {
   const canvas = await svgParaCanvas(origem, tamanho);
   return new Promise((res, rej) =>
-    canvas.toBlob((b) => (b ? res(b) : rej(new Error("toBlob falhou"))), "image/png"),
+    canvas.toBlob((b) => (b ? res(b) : rej(new Error(`toBlob falhou para ${tipo}`))), tipo, qualidade),
   );
 }

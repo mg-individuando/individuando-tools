@@ -5,6 +5,7 @@ import Link from "next/link";
 import { AlertTriangle, CalendarDays, Images, Plus, Users } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { LoteAniversarios } from "@/components/posts/lote-aniversarios";
 import {
   listarPessoas, listarPosts, proximosAniversarios, urlsAssinadas, dataPorExtenso,
 } from "@/lib/posts/dados";
@@ -106,6 +107,8 @@ export default function PostsPage() {
           </ul>
         )}
       </section>
+
+      <LoteAniversarios />
 
       <section>
         <h2 className="mb-3 flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
