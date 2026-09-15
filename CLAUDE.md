@@ -22,6 +22,7 @@ app/
     clientes/     — Gestão de clientes com branding
     usuarios/     — Gestão de usuários e convites
   f/[slug]/       — Página pública do formulário (participante)
+  admin/posts/    — Fábrica de posts: painel, pauta (equipe) e editor
   api/
     ai/           — generate-tool, generate-banner, import-pdf
     icons/search  — Busca de ícones Freepik
@@ -34,12 +35,16 @@ components/
   builder/        — BuilderPanel (editor visual com inline editing)
   ui/             — shadcn base + FileUpload, FontUpload, IconPicker,
                     BannerEditor
+  posts/          — Templates SVG (aniversário, presença, marco, grade),
+                    quadro compartilhado, editor, lote e importação da pauta
 
 lib/
   schemas/        — tool-schema.ts (ToolSchema, Section, Field),
                     types.ts (Profile, Client, BrandConfig, Tool, Response)
   templates/      — 18 templates pré-definidos (swot, radar, ikigai, etc.)
   supabase/       — Client (browser), Server, Middleware
+  posts/          — tokens, geometria medida do Canva, exportação SVG→PNG/JPEG,
+                    ZIP, banco de arranjos de foto e acesso a dados
   utils.ts        — cn() helper
 
 supabase/
@@ -55,6 +60,8 @@ supabase/
 | `tool_sessions` | Sessões/turmas com código de acesso |
 | `responses` | Respostas dos participantes (JSONB) |
 | `clients` | Clientes com brand_config (cores, fontes, logo, banner) |
+| `pessoas` | Pauta de aniversários: nome, data, foto e enquadramento salvo |
+| `posts` | Posts gerados; `config` JSONB reproduz a arte ao reabrir |
 
 **RLS:** Facilitadores veem só suas ferramentas. Admins veem tudo. Público acessa ferramentas publicadas.
 
@@ -163,6 +170,15 @@ const GRID_COLS_MAP = {
   4: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4",
 };
 ```
+
+## Fábrica de posts
+
+Ver `lib/posts/CALIBRACAO.md` (como cada template foi medido contra o Canva e por quê),
+`DADOS-PESSOAIS.md` (onde foto de pessoa pode morar) e `COMO-APLICAR.md` (migration).
+
+**Regra que quebra o build:** `public/` é servido sem login, então só aceita a lista
+fechada de ativos de marca em `scripts/checar-publicos.mjs`. Foto de pessoa vai para o
+bucket privado do Supabase. Em `public/`, prefixo `_` é local e não versionado.
 
 ## Variáveis de ambiente
 
